@@ -134,7 +134,7 @@ target_compile_definitions(imgui-toolkit PUBLIC
 	IMGUI_DEFINE_MATH_OPERATORS
 )
 
-target_link_libraries(imgui-toolkit PRIVATE
+target_link_libraries(imgui-toolkit PUBLIC
     imgui
     imgui_backend
 	libglew_static
