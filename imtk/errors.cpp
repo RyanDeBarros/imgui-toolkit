@@ -12,6 +12,10 @@ namespace imtk
 			return "init_glfw";
 		case error_code::init_glew:
 			return "init_glew";
+		case error_code::existing_active_instance:
+			return "existing_active_instance";
+		case error_code::no_active_instance:
+			return "no_active_instance";
 		default:
 			return "";
 		}

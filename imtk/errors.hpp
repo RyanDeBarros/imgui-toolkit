@@ -9,6 +9,8 @@ namespace imtk
 		none,
 		init_glfw,
 		init_glew,
+		existing_active_instance,
+		no_active_instance,
 	};
 
 	struct error : public std::runtime_error
