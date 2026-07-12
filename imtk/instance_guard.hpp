@@ -8,7 +8,7 @@ namespace imtk
 	struct instance_guard
 	{
 	private:
-		static derived* _instance = nullptr;
+		static inline derived* _instance = nullptr;
 
 	public:
 		instance_guard()
