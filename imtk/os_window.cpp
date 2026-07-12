@@ -79,6 +79,29 @@ namespace imtk
 		return _w;
 	}
 
+	bool os_window::should_close() const
+	{
+		return glfwWindowShouldClose(_w);
+	}
+
+	void os_window::begin_frame() const
+	{
+		glfwPollEvents();
+
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+	}
+
+	void os_window::end_frame() const
+	{
+		ImGui::Render();
+		glClear(GL_COLOR_BUFFER_BIT);
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		glfwSwapBuffers(_w);
+	}
+
 	void os_window::set_size(int width, int height) const
 	{
 		int x, y;

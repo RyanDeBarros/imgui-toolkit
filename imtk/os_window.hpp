@@ -28,6 +28,10 @@ namespace imtk
 		const GLFWwindow* get() const;
 		GLFWwindow* get();
 
+		bool should_close() const;
+		void begin_frame() const;
+		void end_frame() const;
+
 		void set_size(int width, int height) const;
 		void set_maximized(bool maximized) const;
 		void set_fullscreen(bool fullscreen) const;
