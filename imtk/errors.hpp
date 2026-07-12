@@ -15,9 +15,6 @@ namespace imtk
 	{
 		error_code ec;
 
-		error(error_code ec)
-			: ec(ec)
-		{
-		}
+		error(error_code ec);
 	};
 }

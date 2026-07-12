@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 project(imgui-toolkit VERSION 1.0.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 include(FetchContent)
 
 # Enable Hot Reload for MSVC compilers if supported.
@@ -120,7 +117,7 @@ FetchContent_MakeAvailable(nanosvg)
 
 
 # ====================
-#     Build Toolkit
+#    Build Toolkit
 # ====================
 
 # TODO licensing may require library to be dynamically linked?
@@ -140,7 +137,6 @@ target_compile_definitions(imgui-toolkit PUBLIC
 target_link_libraries(imgui-toolkit PRIVATE
     imgui
     imgui_backend
-    imgui_file_dialog
 	libglew_static
 )
 
@@ -152,3 +148,7 @@ target_include_directories(imgui-toolkit PUBLIC
 
 # Add subdirectories
 add_subdirectory(imtk)
+
+add_executable(imtk_build build.cpp)
+target_include_directories(imtk_build PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(imtk_build PUBLIC imgui-toolkit)
