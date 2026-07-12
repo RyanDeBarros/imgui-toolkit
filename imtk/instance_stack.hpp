@@ -29,7 +29,7 @@ namespace imtk
 		static derived& instance()
 		{
 			if (!_instances.empty())
-				return *_instance.top();
+				return *_instances.top();
 			else
 				throw error(error_code::no_active_instance);
 		}
