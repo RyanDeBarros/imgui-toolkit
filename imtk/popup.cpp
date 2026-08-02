@@ -1,9 +1,11 @@
 #include "popup.hpp"
 
+#include "imtk/errors.hpp"
+
 namespace imtk
 {
 	popup::draw_impl::draw_impl(const char* name, bool modal, ImGuiWindowFlags window_flags)
-		: _alive(true)
+		: _alive(true), _open(true)
 	{
 		if (modal)
 			ImGui::BeginPopupModal(name, 0, window_flags);
@@ -24,7 +26,18 @@ namespace imtk
 
 	void popup::draw_impl::close()
 	{
-		ImGui::CloseCurrentPopup();
+		if (_alive)
+		{
+			ImGui::CloseCurrentPopup();
+			_open = false;
+		}
+		else
+			throw error(error_code::dead_object);
+	}
+
+	popup::draw_impl::operator bool() const
+	{
+		return _alive && _open;
 	}
 
 	popup::popup(std::string name)

@@ -9,13 +9,15 @@ namespace imtk
 		case error_code::none:
 			return "none";
 		case error_code::init_glfw:
-			return "init_glfw";
+			return "init glfw";
 		case error_code::init_glew:
-			return "init_glew";
+			return "init glew";
 		case error_code::existing_active_instance:
-			return "existing_active_instance";
+			return "existing active instance";
 		case error_code::no_active_instance:
-			return "no_active_instance";
+			return "no active instance";
+		case error_code::dead_object:
+			return "dead object";
 		default:
 			return "";
 		}

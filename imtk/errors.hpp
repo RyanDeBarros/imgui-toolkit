@@ -11,6 +11,7 @@ namespace imtk
 		init_glew,
 		existing_active_instance,
 		no_active_instance,
+		dead_object
 	};
 
 	struct error : public std::runtime_error

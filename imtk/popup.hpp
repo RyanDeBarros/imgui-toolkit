@@ -16,6 +16,7 @@ namespace imtk
 		{
 		private:
 			bool _alive;
+			bool _open;
 
 			friend popup;
 			draw_impl(const char* name, bool modal, ImGuiWindowFlags window_flags);
@@ -27,6 +28,8 @@ namespace imtk
 			draw_impl& operator=(draw_impl&&) = delete;
 
 			void close();
+
+			operator bool() const;
 		};
 
 	public:
