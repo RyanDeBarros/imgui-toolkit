@@ -22,7 +22,8 @@ namespace imtk
 
 	popup::draw_impl::~draw_impl()
 	{
-		ImGui::EndPopup();
+		if (_alive)
+			ImGui::EndPopup();
 	}
 
 	void popup::draw_impl::close()
