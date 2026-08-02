@@ -5,12 +5,13 @@
 namespace imtk
 {
 	popup::draw_impl::draw_impl(const char* name, bool modal, ImGuiWindowFlags window_flags)
-		: _alive(true), _open(true)
 	{
 		if (modal)
-			ImGui::BeginPopupModal(name, 0, window_flags);
+			_alive = ImGui::BeginPopupModal(name, 0, window_flags);
 		else
-			ImGui::BeginPopup(name, window_flags);
+			_alive = ImGui::BeginPopup(name, window_flags);
+
+		_open = _alive;
 	}
 
 	popup::draw_impl::draw_impl(draw_impl&& o) noexcept
