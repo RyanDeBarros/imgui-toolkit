@@ -14,7 +14,7 @@ namespace imtk
 	}
 
 	popup::draw_impl::draw_impl(draw_impl&& o) noexcept
-		: _alive(o._alive)
+		: _alive(o._alive), _open(o._open)
 	{
 		o._alive = false;
 	}
@@ -48,6 +48,11 @@ namespace imtk
 	void popup::open()
 	{
 		_trigger_open = true;
+	}
+
+	bool popup::is_opening() const
+	{
+		return _trigger_open;
 	}
 
 	popup::draw_impl popup::draw(bool modal, ImGuiWindowFlags window_flags)

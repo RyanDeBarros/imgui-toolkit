@@ -36,6 +36,7 @@ namespace imtk
 		popup(std::string name);
 
 		void open();
+		bool is_opening() const;
 		draw_impl draw(bool modal = false, ImGuiWindowFlags window_flags = 0);
 	};
 }
