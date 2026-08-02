@@ -1,16 +1,14 @@
 #include "popup.hpp"
 
-#include <imgui.h>
-
 namespace imtk
 {
-	popup::draw_impl::draw_impl(const char* name, bool modal)
+	popup::draw_impl::draw_impl(const char* name, bool modal, ImGuiWindowFlags window_flags)
 		: _alive(true)
 	{
 		if (modal)
-			ImGui::BeginPopupModal(name);
+			ImGui::BeginPopupModal(name, 0, window_flags);
 		else
-			ImGui::BeginPopup(name);
+			ImGui::BeginPopup(name, window_flags);
 	}
 
 	popup::draw_impl::draw_impl(draw_impl&& o) noexcept
@@ -39,7 +37,7 @@ namespace imtk
 		_trigger_open = true;
 	}
 
-	popup::draw_impl popup::draw(bool modal)
+	popup::draw_impl popup::draw(bool modal, ImGuiWindowFlags window_flags)
 	{
 		if (_trigger_open)
 		{
@@ -47,6 +45,6 @@ namespace imtk
 			_trigger_open = false;
 		}
 
-		return draw_impl(_name.c_str(), modal);
+		return draw_impl(_name.c_str(), modal, window_flags);
 	}
 }

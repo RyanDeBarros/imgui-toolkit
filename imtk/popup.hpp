@@ -2,6 +2,9 @@
 
 #include <string>
 
+// TODO don't include imgui.h: wrap ImGuiWindowFlags
+#include <imgui.h>
+
 namespace imtk
 {
 	class popup
@@ -15,7 +18,7 @@ namespace imtk
 			bool _alive;
 
 			friend popup;
-			draw_impl(const char* name, bool modal);
+			draw_impl(const char* name, bool modal, ImGuiWindowFlags window_flags);
 
 		public:
 			draw_impl(const draw_impl&) = delete;
@@ -30,6 +33,6 @@ namespace imtk
 		popup(std::string name);
 
 		void open();
-		draw_impl draw(bool modal = false);
+		draw_impl draw(bool modal = false, ImGuiWindowFlags window_flags = 0);
 	};
 }
