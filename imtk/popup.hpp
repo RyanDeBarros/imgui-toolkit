@@ -8,10 +8,18 @@
 
 namespace imtk
 {
+	enum class center_window : char
+	{
+		never,
+		always,
+		appearing
+	};
+
 	class popup
 	{
 		std::string _name;
 		bool _trigger_open = false;
+		center_window _center_window;
 		bool _modal;
 		window_flags _window_flags;
 
@@ -22,7 +30,7 @@ namespace imtk
 			bool _open;
 
 			friend popup;
-			draw_impl(const char* name, bool modal, window_flags window_flags);
+			draw_impl(const char* name, center_window center_window, bool modal, window_flags window_flags);
 
 		public:
 			draw_impl(const draw_impl&) = delete;
@@ -36,10 +44,11 @@ namespace imtk
 		};
 
 	public:
-		popup(std::string name, bool modal = false, window_flags window_flags = {});
+		popup(std::string name, center_window center_window = center_window::never, bool modal = false, window_flags window_flags = {});
 
 		void open();
 		bool is_opening() const;
-		draw_impl draw(std::optional<bool> modal_override = std::nullopt, enum_override<window_flags> window_flags_override = {});
+		draw_impl draw(std::optional<center_window> center_window_override = std::nullopt, std::optional<bool> modal_override = std::nullopt,
+			enum_override<window_flags> window_flags_override = {});
 	};
 }
