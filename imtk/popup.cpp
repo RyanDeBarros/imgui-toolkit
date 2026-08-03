@@ -6,17 +6,17 @@
 
 namespace imtk
 {
-	popup::draw_impl::draw_impl(const char* name, center_window center_window, bool modal, ImGuiWindowFlags window_flags)
+	popup::draw_impl::draw_impl(const char* name, popup_config config)
 	{
-		if (center_window == center_window::always)
+		if (config.center_window == center_window::always)
 			ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-		else if (center_window == center_window::appearing)
+		else if (config.center_window == center_window::appearing)
 			ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-		if (modal)
-			_alive = ImGui::BeginPopupModal(name, 0, window_flags);
+		if (config.modal)
+			_alive = ImGui::BeginPopupModal(name, 0, config.window_flags);
 		else
-			_alive = ImGui::BeginPopup(name, window_flags);
+			_alive = ImGui::BeginPopup(name, config.window_flags);
 
 		_open = _alive;
 	}
@@ -49,8 +49,8 @@ namespace imtk
 		return _alive && _open;
 	}
 
-	popup::popup(std::string name, center_window center_window, bool modal, ImGuiWindowFlags window_flags)
-		: _name(std::move(name)), _center_window(center_window), _modal(modal), _window_flags(window_flags)
+	popup::popup(std::string name, popup_config default_config)
+		: _name(std::move(name)), _default_config(default_config)
 	{
 	}
 
@@ -64,7 +64,7 @@ namespace imtk
 		return _trigger_open;
 	}
 
-	popup::draw_impl popup::draw(std::optional<center_window> center_window_override, std::optional<bool> modal_override, enum_override<ImGuiWindowFlags> window_flags_override)
+	popup::draw_impl popup::draw(std::optional<popup_config> config_override)
 	{
 		if (_trigger_open)
 		{
@@ -72,7 +72,6 @@ namespace imtk
 			_trigger_open = false;
 		}
 
-		return draw_impl(_name.c_str(), center_window_override ? *center_window_override : _center_window,
-			modal_override ? *modal_override : _modal, window_flags_override.eval(_window_flags));
+		return draw_impl(_name.c_str(), config_override ? *config_override : _default_config);
 	}
 }
