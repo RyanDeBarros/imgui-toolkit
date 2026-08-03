@@ -4,5 +4,6 @@ target_sources(imgui-toolkit PRIVATE
 	nav.cpp
 	os_window.cpp
 	popup.cpp
+	simple_scopes.cpp
 	wrapper.cpp
 )

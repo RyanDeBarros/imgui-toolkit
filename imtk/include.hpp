@@ -7,4 +7,5 @@
 #include "imtk/nav.hpp"
 #include "imtk/os_window.hpp"
 #include "imtk/popup.hpp"
+#include "imtk/simple_scopes.hpp"
 #include "imtk/wrapper.hpp"
