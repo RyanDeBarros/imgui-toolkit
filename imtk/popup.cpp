@@ -6,7 +6,7 @@
 
 namespace imtk
 {
-	popup::draw_impl::draw_impl(const char* name, center_window center_window, bool modal, window_flags window_flags)
+	popup::draw_impl::draw_impl(const char* name, center_window center_window, bool modal, ImGuiWindowFlags window_flags)
 	{
 		if (center_window == center_window::always)
 			ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
@@ -49,7 +49,7 @@ namespace imtk
 		return _alive && _open;
 	}
 
-	popup::popup(std::string name, center_window center_window, bool modal, window_flags window_flags)
+	popup::popup(std::string name, center_window center_window, bool modal, ImGuiWindowFlags window_flags)
 		: _name(std::move(name)), _center_window(center_window), _modal(modal), _window_flags(window_flags)
 	{
 	}
@@ -64,7 +64,7 @@ namespace imtk
 		return _trigger_open;
 	}
 
-	popup::draw_impl popup::draw(std::optional<center_window> center_window_override, std::optional<bool> modal_override, enum_override<window_flags> window_flags_override)
+	popup::draw_impl popup::draw(std::optional<center_window> center_window_override, std::optional<bool> modal_override, enum_override<ImGuiWindowFlags> window_flags_override)
 	{
 		if (_trigger_open)
 		{

@@ -1,7 +1,8 @@
 #pragma once
 
 #include "imtk/util.hpp"
-#include "imtk/flags.hpp"
+
+#include <imgui.h>
 
 #include <string>
 #include <optional>
@@ -21,7 +22,7 @@ namespace imtk
 		bool _trigger_open = false;
 		center_window _center_window;
 		bool _modal;
-		window_flags _window_flags;
+		ImGuiWindowFlags _window_flags;
 
 		struct draw_impl
 		{
@@ -30,7 +31,7 @@ namespace imtk
 			bool _open;
 
 			friend popup;
-			draw_impl(const char* name, center_window center_window, bool modal, window_flags window_flags);
+			draw_impl(const char* name, center_window center_window, bool modal, ImGuiWindowFlags window_flags);
 
 		public:
 			draw_impl(const draw_impl&) = delete;
@@ -44,11 +45,11 @@ namespace imtk
 		};
 
 	public:
-		popup(std::string name, center_window center_window = center_window::never, bool modal = false, window_flags window_flags = {});
+		popup(std::string name, center_window center_window = center_window::never, bool modal = false, ImGuiWindowFlags window_flags = 0);
 
 		void open();
 		bool is_opening() const;
 		draw_impl draw(std::optional<center_window> center_window_override = std::nullopt, std::optional<bool> modal_override = std::nullopt,
-			enum_override<window_flags> window_flags_override = {});
+			enum_override<ImGuiWindowFlags> window_flags_override = {});
 	};
 }
