@@ -2,9 +2,11 @@
 
 #include "imtk/errors.hpp"
 
+#include <imgui.h>
+
 namespace imtk
 {
-	popup::draw_impl::draw_impl(const char* name, bool modal, ImGuiWindowFlags window_flags)
+	popup::draw_impl::draw_impl(const char* name, bool modal, window_flags window_flags)
 	{
 		if (modal)
 			_alive = ImGui::BeginPopupModal(name, 0, window_flags);
@@ -42,8 +44,8 @@ namespace imtk
 		return _alive && _open;
 	}
 
-	popup::popup(std::string name)
-		: _name(std::move(name))
+	popup::popup(std::string name, bool modal, window_flags window_flags)
+		: _name(std::move(name)), _modal(modal), _window_flags(window_flags)
 	{
 	}
 
@@ -57,7 +59,7 @@ namespace imtk
 		return _trigger_open;
 	}
 
-	popup::draw_impl popup::draw(bool modal, ImGuiWindowFlags window_flags)
+	popup::draw_impl popup::draw(std::optional<bool> modal_override, enum_override<window_flags> window_flags_override)
 	{
 		if (_trigger_open)
 		{
@@ -65,6 +67,6 @@ namespace imtk
 			_trigger_open = false;
 		}
 
-		return draw_impl(_name.c_str(), modal, window_flags);
+		return draw_impl(_name.c_str(), modal_override ? *modal_override : _modal, window_flags_override.eval(_window_flags));
 	}
 }

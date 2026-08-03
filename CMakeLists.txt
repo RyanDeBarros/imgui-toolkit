@@ -152,7 +152,3 @@ target_include_directories(imgui-toolkit PUBLIC
 
 # Add subdirectories
 add_subdirectory(imtk)
-
-add_executable(imtk_build build.cpp)
-target_include_directories(imtk_build PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(imtk_build PUBLIC imgui-toolkit)

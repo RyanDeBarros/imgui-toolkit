@@ -1,9 +1,10 @@
 #pragma once
 
-#include <string>
+#include "imtk/util.hpp"
+#include "imtk/flags.hpp"
 
-// TODO don't include imgui.h: wrap ImGuiWindowFlags
-#include <imgui.h>
+#include <string>
+#include <optional>
 
 namespace imtk
 {
@@ -11,6 +12,8 @@ namespace imtk
 	{
 		std::string _name;
 		bool _trigger_open = false;
+		bool _modal;
+		window_flags _window_flags;
 
 		struct draw_impl
 		{
@@ -19,7 +22,7 @@ namespace imtk
 			bool _open;
 
 			friend popup;
-			draw_impl(const char* name, bool modal, ImGuiWindowFlags window_flags);
+			draw_impl(const char* name, bool modal, window_flags window_flags);
 
 		public:
 			draw_impl(const draw_impl&) = delete;
@@ -33,10 +36,10 @@ namespace imtk
 		};
 
 	public:
-		popup(std::string name);
+		popup(std::string name, bool modal = false, window_flags window_flags = {});
 
 		void open();
 		bool is_opening() const;
-		draw_impl draw(bool modal = false, ImGuiWindowFlags window_flags = 0);
+		draw_impl draw(std::optional<bool> modal_override = std::nullopt, enum_override<window_flags> window_flags_override = {});
 	};
 }
