@@ -1,5 +1,6 @@
 #pragma once
 
+#include "imtk/dock.hpp"
 #include "imtk/errors.hpp"
 #include "imtk/id_scope.hpp"
 #include "imtk/instance_guard.hpp"

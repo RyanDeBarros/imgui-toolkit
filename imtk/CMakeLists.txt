@@ -1,4 +1,5 @@
 target_sources(imgui-toolkit PRIVATE
+	dock.cpp
 	errors.cpp
 	id_scope.cpp
 	nav.cpp
