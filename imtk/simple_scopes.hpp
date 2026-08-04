@@ -244,4 +244,46 @@ namespace imtk
 
 		operator bool() const;
 	};
+
+	class context_menu
+	{
+		bool _alive;
+
+		enum class target
+		{
+			window,
+			item,
+			nothing
+		};
+
+		context_menu(target target, const std::string_view str_id = "", ImGuiPopupFlags flags = 0);
+
+	public:
+		context_menu(const context_menu&) = delete;
+		context_menu(context_menu&&) noexcept;
+		~context_menu();
+		context_menu& operator=(context_menu&&) = delete;
+
+		static context_menu window(const std::string_view str_id = "", ImGuiPopupFlags flags = 0);
+		static context_menu item(const std::string_view str_id = "", ImGuiPopupFlags flags = 0);
+		static context_menu nothing(const std::string_view str_id = "", ImGuiPopupFlags flags = 0);
+
+		operator bool() const;
+	};
+
+	class child
+	{
+		bool _alive;
+		bool _visible;
+
+	public:
+		child(const std::string_view str_id, ImVec2 size = ImVec2(0, 0), ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0);
+		child(ImGuiID id, ImVec2 size = ImVec2(0, 0), ImGuiChildFlags child_flags = 0, ImGuiWindowFlags window_flags = 0);
+		child(const child&) = delete;
+		child(child&&) noexcept;
+		~child();
+		child& operator=(child&&) = delete;
+
+		operator bool() const;
+	};
 }

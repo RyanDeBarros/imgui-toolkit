@@ -411,4 +411,86 @@ namespace imtk
 	{
 		return _alive;
 	}
+
+	context_menu::context_menu(target target, const std::string_view str_id, ImGuiPopupFlags flags)
+	{
+		switch (target)
+		{
+		case target::window:
+			_alive = ImGui::BeginPopupContextWindow(str_id.data(), flags);
+			break;
+
+		case target::item:
+			_alive = ImGui::BeginPopupContextItem(str_id.data(), flags);
+			break;
+
+		case target::nothing:
+			_alive = ImGui::BeginPopupContextVoid(str_id.data(), flags);
+			break;
+
+		default:
+			_alive = false;
+		}
+	}
+
+	context_menu::context_menu(context_menu&& o) noexcept
+		: _alive(o._alive)
+	{
+		o._alive = false;
+	}
+
+	context_menu::~context_menu()
+	{
+		if (_alive)
+			ImGui::EndPopup();
+	}
+
+	context_menu context_menu::window(const std::string_view str_id, ImGuiPopupFlags flags)
+	{
+		return context_menu(target::window, str_id, flags);
+	}
+
+	context_menu context_menu::item(const std::string_view str_id, ImGuiPopupFlags flags)
+	{
+		return context_menu(target::item, str_id, flags);
+	}
+
+	context_menu context_menu::nothing(const std::string_view str_id, ImGuiPopupFlags flags)
+	{
+		return context_menu(target::nothing, str_id, flags);
+	}
+
+	context_menu::operator bool() const
+	{
+		return _alive;
+	}
+
+	child::child(const std::string_view str_id, ImVec2 size, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags)
+	{
+		_visible = ImGui::BeginChild(str_id.data(), size, child_flags, window_flags);
+		_alive = true;
+	}
+
+	child::child(ImGuiID id, ImVec2 size, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags)
+	{
+		_visible = ImGui::BeginChild(id, size, child_flags, window_flags);
+		_alive = true;
+	}
+
+	child::child(child&& o) noexcept
+		: _alive(o._alive), _visible(o._visible)
+	{
+		o._alive = false;
+	}
+
+	child::~child()
+	{
+		if (_alive)
+			ImGui::EndChild();
+	}
+
+	child::operator bool() const
+	{
+		return _alive && _visible;
+	}
 }
