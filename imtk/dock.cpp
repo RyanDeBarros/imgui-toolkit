@@ -4,28 +4,28 @@
 
 namespace imtk
 {
-    void dock_node::split_layout(ImGuiID id, const std::function<const char* (const void*)>& name) const
+    void dock_node::split_layout(ImGuiID id) const
     {
-        if (!_indexes.empty())
+        if (!_names.empty())
         {
-            for (const void* index : _indexes)
-                ImGui::DockBuilderDockWindow(name(index), id);
+            for (const auto& name : _names)
+                ImGui::DockBuilderDockWindow(name.c_str(), id);
         }
         else if (_first && _second)
         {
             ImGuiID dock_first, dock_second;
             dock_second = ImGui::DockBuilderSplitNode(id, _direction, 1.f - _split_factor, nullptr, &dock_first);
-            _first->split_layout(dock_first, name);
-            _second->split_layout(dock_second, name);
+            _first->split_layout(dock_first);
+            _second->split_layout(dock_second);
         }
     }
 
-    void dock_node::setup_layout(ImGuiID dockspace_id, const std::function<const char* (const void*)>& name) const
+    void dock_node::setup_layout(ImGuiID dockspace_id) const
     {
         ImGui::DockBuilderRemoveNode(dockspace_id);
         ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace);
         ImGui::DockBuilderSetNodeSize(dockspace_id, ImGui::GetMainViewport()->WorkSize);
-        split_layout(dockspace_id, name);
+        split_layout(dockspace_id);
         ImGui::DockBuilderFinish(dockspace_id);
     }
 
@@ -39,10 +39,10 @@ namespace imtk
         return std::make_unique<dock_node>(std::move(node));
     }
 
-    std::unique_ptr<dock_node> dock::make_leaf(std::vector<const void*>&& indexes)
+    std::unique_ptr<dock_node> dock::make_leaf(std::vector<std::string>&& names)
     {
         dock_node node;
-        node._indexes = std::move(indexes);
+        node._names = std::move(names);
         return std::make_unique<dock_node>(std::move(node));
     }
 }

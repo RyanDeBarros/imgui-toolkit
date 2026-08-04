@@ -1,5 +1,7 @@
 #include "simple_scopes.hpp"
 
+#include "imtk/errors.hpp"
+
 namespace imtk
 {
 	group::group()
@@ -168,5 +170,187 @@ namespace imtk
 	tab_item::operator bool() const
 	{
 		return _alive;
+	}
+
+	style_color::style_color(ImGuiCol idx, ImU32 col)
+	{
+		ImGui::PushStyleColor(idx, col);
+		_active = true;
+	}
+
+	style_color::style_color(style_color&& o) noexcept
+		: _active(o._active)
+	{
+		o._active = false;
+	}
+
+	style_color::~style_color()
+	{
+		kill();
+	}
+
+	style_color::operator bool() const
+	{
+		return _active;
+	}
+
+	void style_color::kill()
+	{
+		if (_active)
+		{
+			ImGui::PopStyleColor();
+			_active = false;
+		}
+	}
+
+	style_var::style_var(ImGuiStyleVar idx, float value)
+	{
+		ImGui::PushStyleVar(idx, value);
+		_active = true;
+	}
+
+	style_var::style_var(ImGuiStyleVar idx, ImVec2 value)
+	{
+		ImGui::PushStyleVar(idx, value);
+		_active = true;
+	}
+
+	style_var::style_var(style_var&& o) noexcept
+		: _active(o._active)
+	{
+		o._active = false;
+	}
+
+	style_var::~style_var()
+	{
+		kill();
+	}
+
+	style_var::operator bool() const
+	{
+		return _active;
+	}
+
+	void style_var::kill()
+	{
+		if (_active)
+		{
+			ImGui::PopStyleVar();
+			_active = false;
+		}
+	}
+
+	void style_stack::impl::kill()
+	{
+		_styles.clear();
+	}
+
+	style_stack::impl style_stack::apply()
+	{
+		std::vector<style_variant> styles;
+		styles.reserve(_ctors.size());
+		for (const auto& ctor : _ctors)
+		{
+			std::visit([&styles](auto&& ctor) {
+				using C = std::decay_t<decltype(ctor)>;
+				if constexpr (std::is_same_v<C, color_ctor>)
+					styles.push_back(style_color(ctor.idx, ctor.col));
+
+				if constexpr (std::is_same_v<C, var_1d_ctor>)
+					styles.push_back(style_var(ctor.idx, ctor.value));
+
+				if constexpr (std::is_same_v<C, var_2d_ctor>)
+					styles.push_back(style_var(ctor.idx, ctor.value));
+			}, ctor);
+		}
+
+		impl i;
+		i._styles = std::move(styles);
+		return i;
+	}
+
+	style_stack& style_stack::push(ImGuiCol idx, ImU32 col)
+	{
+		_ctors.push_back(color_ctor{ .idx = idx, .col = col });
+		return *this;
+	}
+
+	style_stack& style_stack::push(ImGuiStyleVar idx, float value)
+	{
+		_ctors.push_back(var_1d_ctor{ .idx = idx, .value = value });
+		return *this;
+	}
+
+	style_stack& style_stack::push(ImGuiStyleVar idx, ImVec2 value)
+	{
+		_ctors.push_back(var_2d_ctor{ .idx = idx, .value = value });
+		return *this;
+	}
+
+	void style_stack::pop()
+	{
+		_ctors.pop_back();
+	}
+
+	void style_stack::clear()
+	{
+		_ctors.clear();
+	}
+
+	style_substack::style_substack(style_stack& stack)
+		: _stack(stack), _count(0)
+	{
+	}
+
+	style_substack::style_substack(style_substack&& o) noexcept
+		: _stack(o._stack), _count(o._count)
+	{
+		o._count = 0;
+	}
+
+	style_substack::~style_substack()
+	{
+		clear();
+	}
+	
+	style_substack& style_substack::push(ImGuiCol idx, ImU32 col)
+	{
+		_stack.push(idx, col);
+		++_count;
+		return *this;
+	}
+
+	style_substack& style_substack::push(ImGuiStyleVar idx, float value)
+	{
+		_stack.push(idx, value);
+		++_count;
+		return *this;
+	}
+
+	style_substack& style_substack::push(ImGuiStyleVar idx, ImVec2 value)
+	{
+		_stack.push(idx, value);
+		++_count;
+		return *this;
+	}
+
+	void style_substack::pop()
+	{
+		if (_count > 0)
+		{
+			_stack.pop();
+			--_count;
+		}
+		else
+			throw error(error_code::bad_size);
+	}
+
+	void style_substack::clear()
+	{
+		while (_count > 0)
+		{
+			_stack.pop();
+			--_count;
+		}
 	}
 }

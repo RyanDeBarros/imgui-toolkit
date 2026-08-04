@@ -3,6 +3,8 @@
 #include <imgui.h>
 
 #include <string_view>
+#include <vector>
+#include <variant>
 
 namespace imtk
 {
@@ -106,5 +108,106 @@ namespace imtk
 		tab_item& operator=(tab_item&&) = delete;
 
 		operator bool() const;
+	};
+
+	class style_color
+	{
+		bool _active = false;
+
+	public:
+		style_color(ImGuiCol idx, ImU32 col);
+		style_color(const style_color&) = delete;
+		style_color(style_color&&) noexcept;
+		~style_color();
+		style_color& operator=(style_color&&) = delete;
+
+		operator bool() const;
+
+		void kill();
+	};
+
+	class style_var
+	{
+		bool _active = false;
+
+	public:
+		style_var(ImGuiStyleVar idx, float value);
+		style_var(ImGuiStyleVar idx, ImVec2 value);
+		style_var(const style_var&) = delete;
+		style_var(style_var&&) noexcept;
+		~style_var();
+		style_var& operator=(style_var&&) = delete;
+
+		operator bool() const;
+
+		void kill();
+	};
+
+	class style_stack
+	{
+		struct color_ctor
+		{
+			ImGuiCol idx;
+			ImU32 col;
+		};
+
+		struct var_1d_ctor
+		{
+			ImGuiStyleVar idx;
+			float value;
+		};
+
+		struct var_2d_ctor
+		{
+			ImGuiStyleVar idx;
+			ImVec2 value;
+		};
+
+		using ctor_variant = std::variant<color_ctor, var_1d_ctor, var_2d_ctor>;
+		using style_variant = std::variant<style_color, style_var>;
+
+		std::vector<ctor_variant> _ctors;
+
+		class impl
+		{
+			friend style_stack;
+
+			std::vector<style_variant> _styles;
+
+			impl() = default;
+
+		public:
+			void kill();
+		};
+
+	public:
+		impl apply();
+
+		style_stack& push(ImGuiCol idx, ImU32 col);
+		style_stack& push(ImGuiStyleVar idx, float value);
+		style_stack& push(ImGuiStyleVar idx, ImVec2 value);
+
+		void pop();
+		void clear();
+	};
+
+	class style_substack
+	{
+		style_stack& _stack;
+		size_t _count;
+
+	public:
+		style_substack(style_stack& stack);
+		style_substack(const style_substack&) = delete;
+		style_substack(style_substack&&) noexcept;
+		~style_substack();
+		style_substack& operator=(style_substack&&) = delete;
+
+		style_substack& push(ImGuiCol idx, ImU32 col);
+		style_substack& push(ImGuiStyleVar idx, float value);
+		style_substack& push(ImGuiStyleVar idx, ImVec2 value);
+
+		void pop();
+		void clear();
 	};
 }
