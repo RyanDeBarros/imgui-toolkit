@@ -301,6 +301,20 @@ namespace imtk
 
 		operator bool() const;
 	};
+	
+	class table
+	{
+		bool _alive;
+
+	public:
+		table(const std::string_view str_id, int columns, ImGuiTableFlags flags = 0, ImVec2 outer_size = ImVec2(0, 0), float inner_width = 0.f);
+		table(const table&) = delete;
+		table(table&&) noexcept;
+		~table();
+		table& operator=(table&&) = delete;
+
+		operator bool() const;
+	};
 
 	class drag_drop_source
 	{

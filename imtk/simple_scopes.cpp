@@ -517,6 +517,28 @@ namespace imtk
 		return _alive && _visible;
 	}
 
+	table::table(const std::string_view str_id, int columns, ImGuiTableFlags flags, ImVec2 outer_size, float inner_width)
+	{
+		_alive = ImGui::BeginTable(str_id.data(), columns, flags, outer_size, inner_width);
+	}
+
+	table::table(table&& o) noexcept
+		: _alive(o._alive)
+	{
+		o._alive = false;
+	}
+
+	table::~table()
+	{
+		if (_alive)
+			ImGui::EndTable();
+	}
+
+	table::operator bool() const
+	{
+		return _alive;
+	}
+
 	drag_drop_source::drag_drop_source(ImGuiDragDropFlags flags)
 	{
 		_alive = ImGui::BeginDragDropSource(flags);
