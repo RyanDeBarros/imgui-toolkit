@@ -271,6 +271,21 @@ namespace imtk
 		operator bool() const;
 	};
 
+	class window
+	{
+		bool _alive;
+		bool _visible;
+
+	public:
+		window(const std::string_view name, ImGuiWindowFlags flags = 0, bool* p_open = nullptr);
+		window(const window&) = delete;
+		window(window&&) noexcept;
+		~window();
+		window& operator=(window&&) = delete;
+
+		operator bool() const;
+	};
+
 	class child
 	{
 		bool _alive;

@@ -465,6 +465,29 @@ namespace imtk
 		return _alive;
 	}
 
+	window::window(const std::string_view name, ImGuiWindowFlags flags, bool* p_open)
+	{
+		_visible = ImGui::Begin(name.data(), p_open, flags);
+		_alive = true;
+	}
+
+	window::window(window&& o) noexcept
+		: _alive(o._alive), _visible(o._visible)
+	{
+		o._alive = false;
+	}
+
+	window::~window()
+	{
+		if (_alive)
+			ImGui::End();
+	}
+
+	window::operator bool() const
+	{
+		return _alive && _visible;
+	}
+
 	child::child(const std::string_view str_id, ImVec2 size, ImGuiChildFlags child_flags, ImGuiWindowFlags window_flags)
 	{
 		_visible = ImGui::BeginChild(str_id.data(), size, child_flags, window_flags);
