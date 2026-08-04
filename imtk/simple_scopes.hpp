@@ -210,4 +210,38 @@ namespace imtk
 		void pop();
 		void clear();
 	};
+
+	class font_scope
+	{
+		bool _alive;
+
+	public:
+		font_scope(ImFont* font);
+		font_scope(ImFont* font, float font_size_base_unscaled);
+		font_scope(const font_scope&) = delete;
+		font_scope(font_scope&&) noexcept;
+		~font_scope();
+		font_scope& operator=(font_scope&&) = delete;
+
+		operator bool() const;
+	};
+
+	struct expand_item_width
+	{
+	};
+
+	class item_width_scope
+	{
+		bool _alive;
+
+	public:
+		item_width_scope(float item_width);
+		item_width_scope(expand_item_width);
+		item_width_scope(const item_width_scope&) = delete;
+		item_width_scope(item_width_scope&&) noexcept;
+		~item_width_scope();
+		item_width_scope& operator=(item_width_scope&&) = delete;
+
+		operator bool() const;
+	};
 }

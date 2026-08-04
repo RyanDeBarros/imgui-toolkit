@@ -353,4 +353,62 @@ namespace imtk
 			--_count;
 		}
 	}
+
+	font_scope::font_scope(ImFont* font)
+	{
+		ImGui::PushFont(font);
+		_alive = true;
+	}
+
+	font_scope::font_scope(ImFont* font, float font_size_base_unscaled)
+	{
+		ImGui::PushFont(font, font_size_base_unscaled);
+		_alive = true;
+	}
+
+	font_scope::font_scope(font_scope&& o) noexcept
+		: _alive(o._alive)
+	{
+		o._alive = false;
+	}
+
+	font_scope::~font_scope()
+	{
+		if (_alive)
+			ImGui::PopFont();
+	}
+
+	font_scope::operator bool() const
+	{
+		return _alive;
+	}
+
+	item_width_scope::item_width_scope(float item_width)
+	{
+		ImGui::PushItemWidth(item_width);
+		_alive = true;
+	}
+
+	item_width_scope::item_width_scope(expand_item_width)
+	{
+		ImGui::PushItemWidth(-FLT_MIN);
+		_alive = true;
+	}
+
+	item_width_scope::item_width_scope(item_width_scope&& o) noexcept
+		: _alive(o._alive)
+	{
+		o._alive = false;
+	}
+
+	item_width_scope::~item_width_scope()
+	{
+		if (_alive)
+			ImGui::PopItemWidth();
+	}
+
+	item_width_scope::operator bool() const
+	{
+		return _alive;
+	}
 }
