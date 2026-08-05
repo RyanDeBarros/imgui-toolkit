@@ -35,5 +35,10 @@ namespace imtk
 			else
 				throw error(error_code::no_active_instance);
 		}
+
+		static derived* active_instance()
+		{
+			return _instance;
+		}
 	};
 }

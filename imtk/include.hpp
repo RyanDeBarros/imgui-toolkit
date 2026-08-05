@@ -1,6 +1,7 @@
 #pragma once
 
 #include "imtk/dock.hpp"
+#include "imtk/drag_drop.hpp"
 #include "imtk/errors.hpp"
 #include "imtk/id_scope.hpp"
 #include "imtk/instance_guard.hpp"
@@ -9,4 +10,5 @@
 #include "imtk/os_window.hpp"
 #include "imtk/popup.hpp"
 #include "imtk/simple_scopes.hpp"
+#include "imtk/util.hpp"
 #include "imtk/wrapper.hpp"

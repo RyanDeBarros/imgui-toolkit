@@ -1,5 +1,7 @@
 #pragma once
 
+#include "imtk/instance_guard.hpp"
+
 #include <imgui.h>
 
 #include <string_view>
@@ -68,7 +70,7 @@ namespace imtk
 		operator bool() const;
 	};
 
-	class main_menu_bar
+	class main_menu_bar : public instance_guard<main_menu_bar>
 	{
 		bool _alive;
 
@@ -245,7 +247,7 @@ namespace imtk
 		operator bool() const;
 	};
 
-	class context_menu
+	class context_menu : public instance_guard<context_menu>
 	{
 		bool _alive;
 
@@ -312,34 +314,6 @@ namespace imtk
 		table(table&&) noexcept;
 		~table();
 		table& operator=(table&&) = delete;
-
-		operator bool() const;
-	};
-
-	class drag_drop_source
-	{
-		bool _alive;
-
-	public:
-		drag_drop_source(ImGuiDragDropFlags flags = 0);
-		drag_drop_source(const drag_drop_source&) = delete;
-		drag_drop_source(drag_drop_source&&) noexcept;
-		~drag_drop_source();
-		drag_drop_source& operator=(drag_drop_source&&) = delete;
-
-		operator bool() const;
-	};
-
-	class drag_drop_target
-	{
-		bool _alive;
-
-	public:
-		drag_drop_target();
-		drag_drop_target(const drag_drop_target&) = delete;
-		drag_drop_target(drag_drop_target&&) noexcept;
-		~drag_drop_target();
-		drag_drop_target& operator=(drag_drop_target&&) = delete;
 
 		operator bool() const;
 	};
