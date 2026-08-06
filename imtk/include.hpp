@@ -1,5 +1,6 @@
 #pragma once
 
+#include "imtk/controls.hpp"
 #include "imtk/dock.hpp"
 #include "imtk/drag_drop.hpp"
 #include "imtk/errors.hpp"
