@@ -3,6 +3,7 @@
 #include "imtk/controls.hpp"
 #include "imtk/dock.hpp"
 #include "imtk/drag_drop.hpp"
+#include "imtk/edit_session.hpp"
 #include "imtk/errors.hpp"
 #include "imtk/id_scope.hpp"
 #include "imtk/instance_guard.hpp"
