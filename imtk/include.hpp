@@ -1,6 +1,7 @@
 #pragma once
 
 #include "imtk/controls.hpp"
+#include "imtk/data_path.hpp"
 #include "imtk/dock.hpp"
 #include "imtk/drag_drop.hpp"
 #include "imtk/edit_session.hpp"
