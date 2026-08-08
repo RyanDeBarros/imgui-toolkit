@@ -28,13 +28,13 @@ namespace imtk
 		tick_processor& operator=(const tick_processor&);
 		tick_processor& operator=(tick_processor&&) noexcept;
 
-		virtual void on_last_process_frame() {}
-
 	protected:
+		virtual void on_last_process_frame() {}
 		void processed_this_frame();
 
 	private:
 		friend void end_frame();
+		static void process_last_frames(tick_process_phase phase);
 		void check_for_last_processed_frame();
 
 	public:

@@ -14,19 +14,13 @@ namespace imtk
 		++frame_counter;
 	}
 
-	static void process_last_frames(tick_process_phase phase)
-	{
-		for (tick_processor* o : tick_processors[phase])
-			o->on_last_process_frame();
-	}
-
 	void end_frame()
 	{
 		++frame_counter;
 
-		process_last_frames(tick_process_phase::submit_edit);
-		process_last_frames(tick_process_phase::check_undo);
-		process_last_frames(tick_process_phase::query_dirty);
+		tick_processor::process_last_frames(tick_process_phase::submit_edit);
+		tick_processor::process_last_frames(tick_process_phase::check_undo);
+		tick_processor::process_last_frames(tick_process_phase::query_dirty);
 	}
 
 	frame_number frame()
@@ -84,12 +78,17 @@ namespace imtk
 		_last_frame_processed = frame();
 	}
 
+	void tick_processor::process_last_frames(tick_process_phase phase)
+	{
+		for (tick_processor* o : tick_processors[phase])
+			o->check_for_last_processed_frame();
+	}
+
 	void tick_processor::check_for_last_processed_frame()
 	{
 		if (_last_frame_processed + 1 == frame())
 			on_last_process_frame();
 	}
-
 	void tick_processor::set_phase(tick_process_phase phase)
 	{
 		if (phase != _phase)
