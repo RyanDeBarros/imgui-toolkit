@@ -1,24 +1,29 @@
 #pragma once
 
 #include "imtk/item_state.hpp"
+#include "imtk/tick.hpp"
 
 namespace imtk
 {
 	template<typename ty>
-	class edit_session
+	class edit_session : public tick_processor
 	{
 		ty& _truth;
 		ty _buffer = ty();
 		ty _original = ty();
 
 		bool _editing = false;
-		bool _seen_this_frame = false;
 		bool _published = false;
 
 	public:
 		edit_session(ty& truth)
 			: _truth(truth)
 		{
+		}
+
+		ty& buffer()
+		{
+			return _buffer;
 		}
 
 		void pre_edit()
@@ -29,7 +34,7 @@ namespace imtk
 				_original = _buffer;
 			}
 
-			_seen_this_frame = true;
+			processed_this_frame();
 			_published = false;
 		}
 
@@ -46,18 +51,18 @@ namespace imtk
 				_editing = true;
 		}
 
-		void draw_finalize()
+	protected:
+		void on_last_process_frame_plus_one() override
 		{
-			if (!_seen_this_frame && _editing)
+			if (_editing)
 			{
 				_editing = false;
 				_truth = _buffer;
 				_published = true;
 			}
-
-			_seen_this_frame = false;
 		}
 
+	public:
 		bool modified() const
 		{
 			return _published && _buffer != _original;
