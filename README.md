@@ -13,3 +13,6 @@ All third-party licenses can be found in the `licenses/` folder. The following l
 - **GLFW**
 - **nothings/stb**
 - **memononen/nanosvg**
+
+
+TODO: mkdocs website documentation
