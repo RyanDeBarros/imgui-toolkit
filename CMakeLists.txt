@@ -183,4 +183,5 @@ target_include_directories(imgui-toolkit PUBLIC
 )
 
 # Add subdirectories
+add_subdirectory(external)
 add_subdirectory(imtk)
