@@ -151,6 +151,20 @@ FetchContent_MakeAvailable(tomlplusplus)
 
 
 # ====================
+#      imperious
+# ====================
+
+FetchContent_Declare(
+    imperious
+    GIT_REPOSITORY https://github.com/RyanDeBarros/Imperious.git
+    GIT_TAG        main
+    # TODO v9.3 use specific tag
+)
+
+FetchContent_MakeAvailable(imperious)
+
+
+# ====================
 #    Build Toolkit
 # ====================
 
@@ -174,6 +188,7 @@ target_link_libraries(imgui-toolkit PUBLIC
 	libglew_static
     glm::glm
     tomlplusplus::tomlplusplus
+    imperious
 )
 
 target_include_directories(imgui-toolkit PUBLIC

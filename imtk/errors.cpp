@@ -2,6 +2,13 @@
 
 namespace imtk
 {
+	static std::function<void(const char*)> error_logger;
+
+	void set_error_logger(std::function<void(const char*)> logger)
+	{
+		error_logger = std::move(logger);
+	}
+
 	static std::string repr(error_code ec)
 	{
 		switch (ec)
@@ -18,6 +25,8 @@ namespace imtk
 			return "no active instance";
 		case error_code::dead_object:
 			return "dead object";
+		case error_code::load_texture:
+			return "load texture";
 		default:
 			return "";
 		}
@@ -26,5 +35,14 @@ namespace imtk
 	error::error(error_code ec)
 		: ec(ec), std::runtime_error("Error [" + repr(ec) + "]")
 	{
+		if (error_logger)
+			error_logger(what());
+	}
+
+	error::error(error_code ec, std::string info)
+		: ec(ec), std::runtime_error("Error [" + repr(ec) + "]: " + std::string(info))
+	{
+		if (error_logger)
+			error_logger(what());
 	}
 }

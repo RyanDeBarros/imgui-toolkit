@@ -15,6 +15,7 @@
 #include "os_window.hpp"
 #include "popup.hpp"
 #include "simple_scopes.hpp"
+#include "texture.hpp"
 #include "tick.hpp"
 #include "util.hpp"
 #include "widget.hpp"

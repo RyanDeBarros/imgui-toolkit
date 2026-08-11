@@ -7,6 +7,7 @@ namespace imtk
 	extern void begin_frame();
 	extern void end_frame();
 	extern frame_number frame();
+	extern float delta_seconds();
 
 	enum class tick_process_phase
 	{

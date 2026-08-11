@@ -1,5 +1,9 @@
 #include "tick.hpp"
 
+#include "imtk/texture.hpp"
+
+#include <imgui.h>
+
 #include <unordered_map>
 #include <unordered_set>
 
@@ -12,6 +16,8 @@ namespace imtk
 	void begin_frame()
 	{
 		++frame_counter;
+
+		texture::update_textures();
 	}
 
 	void end_frame()
@@ -26,6 +32,11 @@ namespace imtk
 	frame_number frame()
 	{
 		return frame_counter;
+	}
+
+	float delta_seconds()
+	{
+		return ImGui::GetIO().DeltaTime;
 	}
 
 	tick_processor::tick_processor(tick_process_phase phase)
