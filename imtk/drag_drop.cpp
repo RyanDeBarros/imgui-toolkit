@@ -6,7 +6,7 @@ namespace imtk
 {
 	std::string drag_drop_type_repr(imp::type_erasure type_erasure)
 	{
-		return "imtk-" + std::to_string(type_erasure);
+		return "imtk-" + type_erasure.repr();
 	}
 
 	drag_drop_source::drag_drop_source(ImGuiDragDropFlags flags)

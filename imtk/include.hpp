@@ -1,6 +1,7 @@
 #pragma once
 
 #include "desc/include.hpp"
+#include "prop/include.hpp"
 
 #include "controls.hpp"
 #include "dock.hpp"

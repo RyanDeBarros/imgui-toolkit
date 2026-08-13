@@ -17,3 +17,4 @@ target_sources(imgui-toolkit PRIVATE
 )
 
 add_subdirectory(desc)
+add_subdirectory(prop)
