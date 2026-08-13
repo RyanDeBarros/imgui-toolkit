@@ -5,6 +5,7 @@ target_sources(imgui-toolkit PRIVATE
 	errors.cpp
 	id_scope.cpp
 	item_state.cpp
+	label_registry.cpp
 	nav.cpp
 	os_window.cpp
 	popup.cpp

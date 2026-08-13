@@ -11,6 +11,7 @@
 #include "instance_guard.hpp"
 #include "instance_stack.hpp"
 #include "item_state.hpp"
+#include "label_registry.hpp"
 #include "nav.hpp"
 #include "os_window.hpp"
 #include "popup.hpp"
