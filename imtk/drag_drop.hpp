@@ -3,30 +3,16 @@
 #include "imtk/instance_guard.hpp"
 #include "imtk/util.hpp"
 
+#include <imp/type_erasure.hpp>
+
 #include <imgui.h>
 
 #include <functional>
 #include <optional>
-#include <typeindex>
 
 namespace imtk
 {
-	class drag_drop_type
-	{
-		std::type_index _ti;
-
-	public:
-		drag_drop_type(std::type_index ti);
-
-		std::string repr() const;
-		operator bool() const;
-	};
-
-	template<typename ty>
-	drag_drop_type make_drag_drop_type()
-	{
-		return drag_drop_type(typeid(ty));
-	}
+	extern std::string drag_drop_type_repr(imp::type_erasure type_erasure);
 
 	struct drag_droppable
 	{
@@ -45,21 +31,21 @@ namespace imtk
 	template<std::derived_from<drag_droppable> dd>
 	void send_drag_drop_payload(dd obj, ImGuiCond cond = 0)
 	{
-		obj.send([cond](const void* buf, size_t size) { ImGui::SetDragDropPayload(make_drag_drop_type<dd>().repr().c_str(), buf, size, cond); });
+		obj.send([cond](const void* buf, size_t size) { ImGui::SetDragDropPayload(drag_drop_type_repr(imp::erase_type<dd>()).c_str(), buf, size, cond); });
 	}
 
 	template<std::derived_from<drag_droppable> dd>
 	bool drag_drop_is_type()
 	{
 		const ImGuiPayload* payload = ImGui::GetDragDropPayload();
-		return payload && payload->IsDataType(make_drag_drop_type<dd>().repr().c_str());
+		return payload && payload->IsDataType(drag_drop_type_repr(imp::erase_type<dd>()).c_str());
 	}
 
 	template<std::derived_from<drag_droppable> dd>
 	std::optional<typename drag_drop_convert<dd>::payload_view> drag_drop_get()
 	{
 		const ImGuiPayload* payload = ImGui::GetDragDropPayload();
-		if (payload && payload->IsDataType(make_drag_drop_type<dd>().repr().c_str()))
+		if (payload && payload->IsDataType(drag_drop_type_repr(imp::erase_type<dd>()).c_str()))
 			return drag_drop_convert<dd>{}.view(payload->Data, payload->DataSize);
 		else
 			return std::nullopt;
@@ -131,7 +117,7 @@ namespace imtk
 		std::optional<typename drag_drop_convert<dd>::payload_view> accept(ImGuiDragDropFlags flags = 0) const
 		{
 			// accept() is method of drag_drop_target since a drag-drop target needs to be active when accepting a payload
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(make_drag_drop_type<dd>().repr().c_str(), flags))
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(drag_drop_type_repr(imp::erase_type<dd>()).c_str(), flags))
 				return drag_drop_convert<dd>{}.view(payload->Data, payload->DataSize);
 			else
 				return std::nullopt;
