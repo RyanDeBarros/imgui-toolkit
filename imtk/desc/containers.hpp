@@ -188,10 +188,11 @@ namespace imtk::desc
 		{
 		}
 
-		// TODO remove?
-		variant(std::variant<ds...> d)
-			: link(std::visit([](const auto& desc) { return desc.link.share(); }, d)), _variant(std::move(d))
+		template<typename d>
+		variant(datapath_link link, d&& val)
+			: link(std::move(link)), _variant(std::forward<d>(val))
 		{
+			std::visit([this](auto& v) { v.link = this->link.share(); }, _variant);
 		}
 
 		template<typename d>
