@@ -7,11 +7,16 @@ namespace imtk::w
 		return _state;
 	}
 
+	bool widget::modified() const
+	{
+		return _modified;
+	}
+
 	bool widget::draw()
 	{
-		bool modified;
+		_modified = false;
 		_state = {};
-		draw_impl(modified, _state);
-		return modified;
+		draw_impl(_modified, _state);
+		return _modified;
 	}
 }

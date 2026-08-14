@@ -12,9 +12,9 @@ target_sources(imgui-toolkit PRIVATE
 	simple_scopes.cpp
 	texture.cpp
 	tick.cpp
-	widget.cpp
 	wrapper.cpp
 )
 
 add_subdirectory(desc)
 add_subdirectory(prop)
+add_subdirectory(w)

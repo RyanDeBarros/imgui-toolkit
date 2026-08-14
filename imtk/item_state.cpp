@@ -68,7 +68,7 @@ namespace imtk
 		return state;
 	}
 
-	item_state item_state::operator | (const item_state& o)
+	item_state item_state::operator|(item_state o) const
 	{
 		item_state result;
 		result._flags = _flags | o._flags;
@@ -149,5 +149,27 @@ namespace imtk
 	bool item_state::toggled_selection() const
 	{
 		return _flags & flags::toggled_selection;
+	}
+
+	item_result item_result::query(bool modified)
+	{
+		return { .modified = modified, .state = item_state::query() };
+	}
+
+	item_result item_result::operator|(item_result o) const
+	{
+		return { .modified = modified || o.modified, .state = state | o.state };
+	}
+
+	item_result& item_result::operator|=(const item_result& o)
+	{
+		modified |= o.modified;
+		state |= o.state;
+		return *this;
+	}
+
+	item_result::operator bool() const
+	{
+		return modified;
 	}
 }

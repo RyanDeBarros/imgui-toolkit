@@ -9,7 +9,7 @@ namespace imtk
 	public:
 		static item_state query();
 
-		item_state operator|(const item_state&);
+		item_state operator|(item_state) const;
 		item_state& operator|=(const item_state&);
 
 		bool hovered() const;
@@ -26,5 +26,17 @@ namespace imtk
 		bool visible() const;
 		bool toggled_open() const;
 		bool toggled_selection() const;
+	};
+
+	struct item_result
+	{
+		bool modified = false;
+		item_state state;
+
+		static item_result query(bool modified);
+
+		item_result operator|(item_result) const;
+		item_result& operator|=(const item_result&);
+		operator bool() const;
 	};
 }

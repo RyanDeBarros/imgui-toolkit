@@ -17,13 +17,28 @@ namespace imtk
 
 	public:
 		edit_session(ty& truth)
-			: _truth(truth)
+			: tick_processor(tick_process_phase::submit_edit), _truth(truth)
 		{
+		}
+
+		const ty& truth() const
+		{
+			return _truth;
+		}
+
+		const ty& buffer() const
+		{
+			return _buffer;
 		}
 
 		ty& buffer()
 		{
 			return _buffer;
+		}
+
+		ty original() const
+		{
+			return _original;
 		}
 
 		void pre_edit()
@@ -52,7 +67,7 @@ namespace imtk
 		}
 
 	protected:
-		void on_last_process_frame_plus_one() override
+		void on_last_process_frame() override
 		{
 			if (_editing)
 			{

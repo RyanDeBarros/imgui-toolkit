@@ -2,6 +2,7 @@
 
 #include "desc/include.hpp"
 #include "prop/include.hpp"
+#include "w/include.hpp"
 
 #include "controls.hpp"
 #include "dock.hpp"
@@ -20,5 +21,4 @@
 #include "texture.hpp"
 #include "tick.hpp"
 #include "util.hpp"
-#include "widget.hpp"
 #include "wrapper.hpp"

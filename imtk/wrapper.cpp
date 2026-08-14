@@ -11,7 +11,8 @@ namespace imtk::controls
 		ImGui::SameLine();
 	}
 
-	bool combo(const char* label, int& current_item, const std::vector<std::string>& items)
+	// TODO property + item query
+	item_result combo(const char* label, int& current_item, const std::vector<std::string>& items)
 	{
 		float width = 0.0f;
 		for (int i = 0; i < items.size(); i++)
@@ -19,16 +20,17 @@ namespace imtk::controls
 		width += 2 * ImGui::GetFrameHeight(); // roughly covers dropdown arrow + padding
 		ImGui::SetNextItemWidth(width);
 
-		return ImGui::Combo(label, &current_item, [](void* data, int idx) -> const char* {
+		return item_result::query(ImGui::Combo(label, &current_item, [](void* data, int idx) -> const char* {
 			const std::vector<std::string>& items = *static_cast<const std::vector<std::string>*>(data);
 			if (idx < 0 || idx >= items.size())
 				return nullptr;
 			else
 				return items[idx].c_str();
-		}, const_cast<std::vector<std::string>*>(&items), static_cast<int>(items.size()));
+		}, const_cast<std::vector<std::string>*>(&items), static_cast<int>(items.size())));
 	}
 
-	bool input_text(const char* label, std::string& string, size_t max_size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
+	// TODO property + item query
+	item_result input_text(const char* label, std::string& string, size_t max_size, ImGuiInputTextFlags flags, ImGuiInputTextCallback callback, void* user_data)
 	{
 		std::string buf;
 		buf.resize(max_size);
@@ -40,9 +42,9 @@ namespace imtk::controls
 			if (n != std::string::npos)
 				string.resize(n);
 
-			return true;
+			return item_result::query(true);
 		}
 		else
-			return false;
+			return item_result::query(false);
 	}
 }
