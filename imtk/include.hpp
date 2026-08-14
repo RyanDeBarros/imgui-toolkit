@@ -17,6 +17,7 @@
 #include "nav.hpp"
 #include "os_window.hpp"
 #include "popup.hpp"
+#include "resource_loader.hpp"
 #include "simple_scopes.hpp"
 #include "texture.hpp"
 #include "tick.hpp"

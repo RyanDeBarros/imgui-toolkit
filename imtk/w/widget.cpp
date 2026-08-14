@@ -2,21 +2,14 @@
 
 namespace imtk::w
 {
-	item_state widget::state() const
+	item_result widget::result() const
 	{
-		return _state;
-	}
-
-	bool widget::modified() const
-	{
-		return _modified;
+		return _result;
 	}
 
 	bool widget::draw()
 	{
-		_modified = false;
-		_state = {};
-		draw_impl(_modified, _state);
-		return _modified;
+		_result = draw_impl();
+		return _result;
 	}
 }

@@ -9,6 +9,7 @@ target_sources(imgui-toolkit PRIVATE
 	nav.cpp
 	os_window.cpp
 	popup.cpp
+	resource_loader.cpp
 	simple_scopes.cpp
 	texture.cpp
 	tick.cpp
