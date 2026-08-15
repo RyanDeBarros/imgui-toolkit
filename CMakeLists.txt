@@ -197,6 +197,9 @@ target_include_directories(imgui-toolkit PUBLIC
 	${nanosvg_SOURCE_DIR}/src
 )
 
-# Add subdirectories
+target_sources(imgui-toolkit PRIVATE
+    imtk.cpp
+)
+
 add_subdirectory(external)
 add_subdirectory(imtk)

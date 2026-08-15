@@ -3,4 +3,5 @@ target_sources(imgui-toolkit PRIVATE
 	common_interfaces.cpp
 	common_views.cpp
 	payload.cpp
+	property_grid.cpp
 )

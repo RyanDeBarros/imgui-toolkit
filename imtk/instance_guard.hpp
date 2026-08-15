@@ -2,6 +2,7 @@
 
 #include "imtk/errors.hpp"
 
+// TODO put in imp? (instance_stack too)
 namespace imtk
 {
 	template<typename derived>

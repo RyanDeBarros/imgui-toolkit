@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imtk/item_state.hpp"
+#include "imtk/item_result.hpp"
 
 namespace imtk::w
 {

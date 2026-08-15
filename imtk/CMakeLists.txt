@@ -4,7 +4,7 @@ target_sources(imgui-toolkit PRIVATE
 	drag_drop.cpp
 	errors.cpp
 	id_scope.cpp
-	item_state.cpp
+	item_result.cpp
 	label_registry.cpp
 	nav.cpp
 	os_window.cpp
