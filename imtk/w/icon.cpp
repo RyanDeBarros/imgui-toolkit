@@ -1,4 +1,4 @@
-#include "toolbar.hpp"
+#include "icon.hpp"
 
 namespace imtk::w
 {
