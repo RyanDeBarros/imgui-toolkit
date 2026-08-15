@@ -12,7 +12,7 @@ namespace imtk::w
 		virtual ~widget() = default;
 
 		item_result result() const;
-		bool draw();
+		item_result draw();
 
 	protected:
 		virtual item_result draw_impl() = 0;

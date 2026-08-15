@@ -7,7 +7,7 @@ namespace imtk::w
 		return _result;
 	}
 
-	bool widget::draw()
+	item_result widget::draw()
 	{
 		_result = draw_impl();
 		return _result;

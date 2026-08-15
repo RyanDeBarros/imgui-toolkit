@@ -1,6 +1,7 @@
 #include "item_state.hpp"
 
 #include <imgui.h>
+#include <imgui_internal.h>
 
 namespace imtk
 {
@@ -62,7 +63,7 @@ namespace imtk
 		if (ImGui::IsItemToggledOpen())
 			state._flags |= flags::toggled_open;
 
-		if (ImGui::IsItemToggledSelection())
+		if (ImGui::GetCurrentContext()->CurrentMultiSelect && ImGui::IsItemToggledSelection())
 			state._flags |= flags::toggled_selection;
 
 		return state;
