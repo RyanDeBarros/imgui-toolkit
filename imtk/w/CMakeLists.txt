@@ -1,4 +1,4 @@
 target_sources(imgui-toolkit PRIVATE
-	toolbar.cpp
+	icon.cpp
 	widget.cpp
 )

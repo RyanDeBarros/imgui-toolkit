@@ -1,4 +1,4 @@
 #pragma once
 
-#include "toolbar.hpp"
+#include "icon.hpp"
 #include "widget.hpp"
