@@ -1,28 +1,43 @@
 #include "common_widgets.hpp"
 
-#include <imgui.h>
+#include "imtk/id_scope.hpp"
+#include "imtk/simple_scopes.hpp"
+#include "imtk/wrapper.hpp"
+
+#include "imtk/prop/common_views.hpp"
 
 namespace imtk::w
 {
-	generic_widget::generic_widget(std::function<item_result()> draw_fn)
-		: draw_fn(std::move(draw_fn))
-	{
-	}
-
 	item_result generic_widget::draw_impl()
 	{
 		return draw_fn();
 	}
 
-	item_result text::draw_impl()
+	item_result subsequent::draw_impl()
 	{
-		ImGui::TextUnformatted(text.c_str());
-		return item_result::query(false);
+		controls::vertical_separator();
+		return item->draw();
 	}
 
-	item_result text_view::draw_impl()
+	item_result optional_widget::draw_impl()
 	{
-		ImGui::TextUnformatted(text.data(), text.data() + text.size());
-		return item_result::query(false);
+		auto result = enable.draw();
+		if (auto d = disabled(!enable.data))
+		{
+			ImGui::SameLine();
+			result |= item->draw();
+		}
+		return result;
+	}
+
+	item_result combo_widget::draw_impl()
+	{
+		id_scope scope(&index);
+		auto result = prefix_label(config.label);
+
+		result |= item_result::query(ImGui::Combo("", &index, &label_span_registry::combo_getter, &names, label_span_registry::count(names)));
+
+		result.modified |= check_property(std::make_unique<prop::combo_view>(index, names));
+		return result;
 	}
 }

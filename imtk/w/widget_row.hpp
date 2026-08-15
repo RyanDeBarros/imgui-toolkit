@@ -10,6 +10,7 @@ namespace imtk::w
 {
 	struct widget_row : public widget
 	{
+		// TODO use span and update editor
 		std::vector<std::unique_ptr<widget>> subwidgets;
 
 	protected:

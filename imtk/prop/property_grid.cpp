@@ -93,6 +93,7 @@ namespace imtk::prop
 
 		void add_component(std::unique_ptr<w::widget> component)
 		{
+			w::internal::add_to_grid(*component);
 			components.subwidgets.push_back(std::move(component));
 		}
 
