@@ -4,6 +4,7 @@
 #include "prop/include.hpp"
 #include "w/include.hpp"
 
+#include "collapsing_section.hpp"
 #include "controls.hpp"
 #include "dock.hpp"
 #include "drag_drop.hpp"

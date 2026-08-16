@@ -46,10 +46,6 @@ namespace imtk::prop
 
 		static bool dirty();
 		static bool check_header(const view_generator& generator);
-
-		// TODO begin_form()/end_form() should be internal and handled by imtk::prop::form
-		static bool begin_form(ImGuiID id);
-		static void end_form(bool table_visible);
 	};
 
 	extern void assign_reset_icon(res::icon_id icon);

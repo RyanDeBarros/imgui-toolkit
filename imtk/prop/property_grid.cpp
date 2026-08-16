@@ -63,9 +63,6 @@ namespace imtk::prop
 
 	static bool dirty_grid = false;
 
-	static std::unique_ptr<child> form_child;
-	static std::unique_ptr<table> form_table;
-
 	namespace key
 	{
 		void set_label(const std::string_view label)
@@ -211,33 +208,6 @@ namespace imtk::prop
 		bool dirty = clipboard::context_menu(generator);
 		dirty_grid |= dirty;
 		return dirty;
-	}
-
-	bool grid::begin_form(ImGuiID id)
-	{
-		form_table.reset();
-		form_child = std::make_unique<child>(id, ImVec2(0.f, 0.f), ImGuiChildFlags_AutoResizeY);
-		if (*form_child)
-		{
-			form_table = std::make_unique<table>("", 3, ImGuiTableFlags_BordersInner | ImGuiTableFlags_SizingFixedFit);
-			if (*form_table)
-			{
-				ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);
-				ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthStretch);
-				ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFrameHeight());
-				return true;
-			}
-			else
-				return false;
-		}
-		else
-			return false;
-	}
-
-	void grid::end_form(bool table_visible)
-	{
-		form_table.reset();
-		form_child.reset();
 	}
 
 	void assign_reset_icon(res::icon_id icon)
