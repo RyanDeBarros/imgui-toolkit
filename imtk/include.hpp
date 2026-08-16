@@ -21,5 +21,6 @@
 #include "simple_scopes.hpp"
 #include "texture.hpp"
 #include "tick.hpp"
+#include "types.hpp"
 #include "util.hpp"
 #include "wrapper.hpp"

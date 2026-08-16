@@ -33,12 +33,23 @@ namespace imtk::w
 		item_result draw_impl();
 	};
 
-	struct optional_widget : public widget
+	struct bound_optional : public widget
+	{
+		bound_widget<bool> enable;
+		std::unique_ptr<widget> item;
+
+		bound_optional(std::unique_ptr<widget>&& item, bool& enable, bound_widget<bool>::config_impl config = {}) : enable(enable, std::move(config)), item(std::move(item)) {}
+
+	protected:
+		item_result draw_impl() override;
+	};
+
+	struct simple_optional : public widget
 	{
 		simple_widget<bool> enable;
 		std::unique_ptr<widget> item;
 
-		optional_widget(std::unique_ptr<widget>&& item, bool& enable, simple_widget<bool>::config_impl config = {}) : enable(enable, std::move(config)), item(std::move(item)) {}
+		simple_optional(std::unique_ptr<widget>&& item, bool& enable, simple_widget<bool>::config_impl config = {}) : enable(enable, std::move(config)), item(std::move(item)) {}
 
 	protected:
 		item_result draw_impl() override;

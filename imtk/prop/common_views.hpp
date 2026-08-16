@@ -23,25 +23,41 @@ namespace imtk::prop
 
 		payload dump() const override
 		{
-			return payload_interface<ty>::dump(ref);
+			return payload::pod(ref);
 		}
 
 		bool can_load(const payload& pld) const override
 		{
-			return payload_interface<ty>::can_load(pld);
+			return pld.resolve<ty>();
 		}
 
 		bool try_load(const payload& pld) const override
 		{
-			auto obj = payload_interface<ty>::load(pld);
-			if (obj && ref != *obj)
+			if (auto data = pld.resolve<ty>())
 			{
-				ref = *obj;
-				return true;
+				if (ref != *data)
+				{
+					ref = *data;
+					return true;
+				}
+				else
+					return false;
 			}
 			else
 				return false;
 		}
+	};
+
+	template<>
+	struct simple_view<std::string> : public iview
+	{
+		std::string& ref;
+
+		simple_view(std::string& ref) : ref(ref) {}
+
+		payload dump() const override;
+		bool can_load(const payload&) const override;
+		bool try_load(const payload&) const override;
 	};
 
 	struct combo_view : public iview

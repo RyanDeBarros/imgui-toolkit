@@ -9,7 +9,7 @@
 
 namespace imtk::w
 {
-	item_result simple_widget<bool>::draw_impl()
+	item_result bound_widget<bool>::draw_impl()
 	{
 		id_scope scope(&data);
 		auto result = prefix_label(config.label);
@@ -20,7 +20,7 @@ namespace imtk::w
 		return result;
 	}
 
-	item_result simple_widget<int>::draw_impl()
+	item_result bound_widget<int>::draw_impl()
 	{
 		id_scope scope(&data);
 		auto result = prefix_label(config.label);
@@ -34,7 +34,7 @@ namespace imtk::w
 		return result;
 	}
 
-	item_result simple_widget<float>::draw_impl()
+	item_result bound_widget<float>::draw_impl()
 	{
 		id_scope scope(&data);
 		auto result = prefix_label(config.label);
@@ -48,7 +48,7 @@ namespace imtk::w
 		return result;
 	}
 
-	item_result simple_widget<double>::draw_impl()
+	item_result bound_widget<double>::draw_impl()
 	{
 		id_scope scope(&data);
 		auto result = prefix_label(config.label);
@@ -62,7 +62,7 @@ namespace imtk::w
 		return result;
 	}
 
-	item_result simple_widget<glm::vec2>::draw_impl()
+	item_result bound_widget<glm::vec2>::draw_impl()
 	{
 		id_scope scope(&data);
 		auto result = prefix_label(config.label);
@@ -76,7 +76,7 @@ namespace imtk::w
 		return result;
 	}
 
-	item_result simple_widget<glm::vec3>::draw_impl()
+	item_result bound_widget<glm::vec3>::draw_impl()
 	{
 		id_scope scope(&data);
 		auto result = prefix_label(config.label);
@@ -90,7 +90,7 @@ namespace imtk::w
 		return result;
 	}
 
-	item_result simple_widget<glm::vec4>::draw_impl()
+	item_result bound_widget<glm::vec4>::draw_impl()
 	{
 		id_scope scope(&data);
 		auto result = prefix_label(config.label);
@@ -104,7 +104,7 @@ namespace imtk::w
 		return result;
 	}
 
-	item_result simple_widget<std::string>::draw_impl()
+	item_result bound_widget<std::string>::draw_impl()
 	{
 		id_scope scope(&data);
 		auto result = prefix_label(config.label);
@@ -112,6 +112,17 @@ namespace imtk::w
 		result |= item_result::query(controls::input_text("", data));
 
 		result.modified |= check_property(std::make_unique<prop::simple_view<std::string>>(data));
+		return result;
+	}
+
+	item_result bound_widget<color4>::draw_impl()
+	{
+		id_scope scope(&data);
+		auto result = prefix_label(config.label);
+
+		result |= item_result::query(ImGui::ColorEdit4("", data.ptr()));
+
+		result.modified |= check_property(std::make_unique<prop::simple_view<color4>>(data));
 		return result;
 	}
 }

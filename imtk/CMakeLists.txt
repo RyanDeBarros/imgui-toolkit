@@ -13,6 +13,7 @@ target_sources(imgui-toolkit PRIVATE
 	simple_scopes.cpp
 	texture.cpp
 	tick.cpp
+	types.cpp
 	wrapper.cpp
 )
 

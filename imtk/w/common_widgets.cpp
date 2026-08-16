@@ -19,10 +19,21 @@ namespace imtk::w
 		return item->draw();
 	}
 
-	item_result optional_widget::draw_impl()
+	item_result bound_optional::draw_impl()
 	{
 		auto result = enable.draw();
 		if (auto d = disabled(!enable.data))
+		{
+			ImGui::SameLine();
+			result |= item->draw();
+		}
+		return result;
+	}
+
+	item_result simple_optional::draw_impl()
+	{
+		auto result = enable.draw();
+		if (auto d = disabled(!enable.value))
 		{
 			ImGui::SameLine();
 			result |= item->draw();

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "imtk/types.hpp"
+
 #include "external/toml.hpp"
 #include "external/glm.hpp"
 
@@ -306,6 +308,37 @@ namespace imtk
 			arr.reserve(obj.size());
 			for (const T& el : obj)
 				arr.push_back(serializer<T>{}.dump(el));
+			return arr;
+		}
+	};
+
+	template<>
+	struct serializer<color4>
+	{
+		bool load(color4& obj, imtk::toml_node node) const
+		{
+			if (auto array = node.as_array())
+			{
+				bool fully_loaded = true;
+				for (size_t i = 0; i < std::min(array->size(), size_t(4)); ++i)
+				{
+					if (auto v = array->get_as<double>(i))
+						obj[i] = v->get();
+					else
+						fully_loaded = false;
+				}
+				return fully_loaded;
+			}
+			else
+				return false;
+		}
+
+		toml::array dump(const color4 obj) const
+		{
+			toml::array arr;
+			arr.reserve(4);
+			for (size_t i = 0; i < 4; ++i)
+				arr.push_back(obj[i]);
 			return arr;
 		}
 	};

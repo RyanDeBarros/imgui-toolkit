@@ -29,28 +29,6 @@ namespace imtk::prop
 		}
 	};
 
-	template<typename ty>
-	struct payload_interface
-	{
-		static payload dump(const ty& value)
-		{
-			return payload::pod(value);
-		}
-
-		static bool can_load(const payload& pld)
-		{
-			return pld.resolve<ty>();
-		}
-
-		static std::optional<ty> load(const payload& pld)
-		{
-			if (auto data = pld.resolve<ty>())
-				return *data;
-			else
-				return std::nullopt;
-		}
-	};
-
 	struct iview
 	{
 		virtual ~iview() = default;

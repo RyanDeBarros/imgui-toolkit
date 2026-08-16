@@ -55,6 +55,32 @@ namespace imtk::prop
 			return false;
 	}
 
+	payload simple_view<std::string>::dump() const
+	{
+		return payload(ref.data(), ref.size(), imp::erase_type<std::string>());
+	}
+
+	bool simple_view<std::string>::can_load(const payload& pld) const
+	{
+		return pld.type == imp::erase_type<std::string>();
+	}
+
+	bool simple_view<std::string>::try_load(const payload& pld) const
+	{
+		if (pld.type == imp::erase_type<std::string>())
+		{
+			std::string_view sv(reinterpret_cast<const char*>(pld.data.data()), pld.data.size());
+			if (ref != sv)
+			{
+				ref = sv;
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+			return false;
+	}
 
 	struct combo_payload
 	{
