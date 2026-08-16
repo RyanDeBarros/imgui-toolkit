@@ -11,10 +11,11 @@ namespace imtk::prop
 {
 	struct payload
 	{
-		std::vector<std::byte> data;
 		imp::type_erasure type;
+		std::vector<std::byte> data;
 
 		payload(const void* data, size_t size, imp::type_erasure type);
+		payload(std::vector<std::byte> data, imp::type_erasure type);
 
 		template<typename ty>
 		static payload pod(const ty& value)

@@ -83,6 +83,8 @@ namespace imtk::prop
 
 	namespace value
 	{
+		static bool drawing = false;
+
 		item_result get_draw_result()
 		{
 			return draw_result;
@@ -90,23 +92,17 @@ namespace imtk::prop
 
 		void add_component(std::unique_ptr<w::widget> component)
 		{
-			w::internal::add_to_grid(*component);
 			components.subwidgets.push_back(std::move(component));
-		}
-
-		bool check_property(std::unique_ptr<iview> prop)
-		{
-			bool dirty = clipboard::context_menu(*prop);
-			dirty_grid |= dirty;
-			properties.subviews.push_back(std::move(prop));
-			return dirty;
 		}
 
 		static void draw_cell()
 		{
 			ImGui::TableSetColumnIndex(1);
 			draw_result = {};
+
+			drawing = true;
 			draw_result |= components.draw();
+			drawing = false;
 		}
 	}
 
@@ -207,6 +203,17 @@ namespace imtk::prop
 	{
 		bool dirty = clipboard::context_menu(generator);
 		dirty_grid |= dirty;
+		return dirty;
+	}
+
+	bool check_property(std::unique_ptr<iview> prop)
+	{
+		bool dirty = clipboard::context_menu(*prop);
+		if (value::drawing)
+		{
+			dirty_grid |= dirty;
+			value::properties.subviews.push_back(std::move(prop));
+		}
 		return dirty;
 	}
 

@@ -82,6 +82,21 @@ namespace imtk::prop
 			return false;
 	}
 
+	payload readonly_view::dump() const
+	{
+		return view->dump();
+	}
+
+	bool readonly_view::can_load(const payload&) const
+	{
+		return false;
+	}
+	
+	bool readonly_view::try_load(const payload&) const
+	{
+		return false;
+	}
+
 	struct combo_payload
 	{
 		int index;
@@ -117,6 +132,57 @@ namespace imtk::prop
 			}
 			else
 				return false;
+		}
+		else
+			return false;
+	}
+
+	dynamic_combo_view::dynamic_combo_view(int& index, std::vector<std::string> items)
+		: index(index), items(std::move(items))
+	{
+	}
+
+	payload dynamic_combo_view::dump() const
+	{
+		return payload(items[index].data(), items[index].size(), imp::erase_type<dynamic_combo_view>());
+	}
+	
+	bool dynamic_combo_view::can_load(const payload& pld) const
+	{
+		if (pld.resolve<dynamic_combo_view>())
+		{
+			std::string_view sv(reinterpret_cast<const char*>(pld.data.data()), pld.data.size());
+			for (auto it = items.begin(); it != items.end(); ++it)
+			{
+				if (*it == sv)
+					return true;
+			}
+
+			return false;
+		}
+		else
+			return false;
+	}
+	
+	bool dynamic_combo_view::try_load(const payload& pld) const
+	{
+		if (pld.resolve<dynamic_combo_view>())
+		{
+			std::string_view sv(reinterpret_cast<const char*>(pld.data.data()), pld.data.size());
+			
+			if (items[index] == sv)
+				return false;
+
+			for (auto it = items.begin(); it != items.end(); ++it)
+			{
+				if (*it == sv)
+				{
+					index = it - items.begin();
+					return true;
+				}
+			}
+
+			return false;
 		}
 		else
 			return false;

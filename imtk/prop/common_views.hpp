@@ -60,12 +60,35 @@ namespace imtk::prop
 		bool try_load(const payload&) const override;
 	};
 
+	struct readonly_view : public iview
+	{
+		std::unique_ptr<iview> view;
+
+		readonly_view(std::unique_ptr<iview> view) : view(std::move(view)) {}
+
+		payload dump() const override;
+		bool can_load(const payload&) const override;
+		bool try_load(const payload&) const override;
+	};
+
 	struct combo_view : public iview
 	{
 		int& index;
 		label_span_registry::handle names;
 
 		combo_view(int& index, label_span_registry::handle names);
+
+		payload dump() const override;
+		bool can_load(const payload&) const override;
+		bool try_load(const payload&) const override;
+	};
+
+	struct dynamic_combo_view : public iview
+	{
+		int& index;
+		std::vector<std::string> items;
+
+		dynamic_combo_view(int& index, std::vector<std::string> items);
 
 		payload dump() const override;
 		bool can_load(const payload&) const override;

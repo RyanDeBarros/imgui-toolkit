@@ -5,6 +5,7 @@
 #include "imtk/wrapper.hpp"
 
 #include "imtk/prop/common_views.hpp"
+#include "imtk/prop/property_grid.hpp"
 
 namespace imtk::w
 {
@@ -48,7 +49,7 @@ namespace imtk::w
 
 		result |= item_result::query(ImGui::Combo("", &index, &label_span_registry::combo_getter, &names, label_span_registry::count(names)));
 
-		result.modified |= check_property(std::make_unique<prop::combo_view>(index, names));
+		result.modified |= prop::check_property(std::make_unique<prop::combo_view>(index, names));
 		return result;
 	}
 }

@@ -20,7 +20,6 @@ namespace imtk::prop
 		extern item_result get_draw_result();
 
 		extern void add_component(std::unique_ptr<w::widget> component);
-		extern bool check_property(std::unique_ptr<iview> prop);
 	}
 
 	namespace reset
@@ -48,5 +47,6 @@ namespace imtk::prop
 		static bool check_header(const view_generator& generator);
 	};
 
+	extern bool check_property(std::unique_ptr<iview> prop);
 	extern void assign_reset_icon(res::icon_id icon);
 }

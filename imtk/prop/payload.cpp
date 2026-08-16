@@ -8,4 +8,9 @@ namespace imtk::prop
 		this->data.resize(size);
 		std::memcpy(this->data.data(), data, size);
 	}
+
+	payload::payload(std::vector<std::byte> data, imp::type_erasure type)
+		: type(type), data(std::move(data))
+	{
+	}
 }
