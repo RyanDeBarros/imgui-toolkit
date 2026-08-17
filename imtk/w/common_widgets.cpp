@@ -2,7 +2,7 @@
 
 #include "imtk/id_scope.hpp"
 #include "imtk/simple_scopes.hpp"
-#include "imtk/wrapper.hpp"
+#include "imtk/controls.hpp"
 
 #include "imtk/prop/common_views.hpp"
 #include "imtk/prop/property_grid.hpp"
@@ -51,5 +51,16 @@ namespace imtk::w
 
 		result.modified |= prop::check_property(std::make_unique<prop::combo_view>(index, names));
 		return result;
+	}
+
+	item_result readonly_text::draw_impl()
+	{
+		id_scope scope(text.data());
+		return prefix_label(config.label) | controls::readonly_text("", text, config.flags);
+	}
+
+	item_result readonly_text_owned::draw_impl()
+	{
+		return view.draw();
 	}
 }

@@ -1,7 +1,7 @@
 #include "simple_widget.hpp"
 
 #include "imtk/id_scope.hpp"
-#include "imtk/wrapper.hpp"
+#include "imtk/controls.hpp"
 
 #include "imtk/prop/common_views.hpp"
 #include "imtk/prop/property_grid.hpp"

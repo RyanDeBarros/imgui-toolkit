@@ -82,6 +82,21 @@ namespace imtk::prop
 			return false;
 	}
 
+	payload readonly_text_view::dump() const
+	{
+		return payload(text.data(), text.size(), imp::erase_type<std::string>());
+	}
+
+	bool readonly_text_view::can_load(const payload& pld) const
+	{
+		return false;
+	}
+
+	bool readonly_text_view::try_load(const payload& pld) const
+	{
+		return false;
+	}
+
 	payload readonly_view::dump() const
 	{
 		return view->dump();

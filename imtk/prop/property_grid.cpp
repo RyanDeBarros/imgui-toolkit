@@ -206,14 +206,19 @@ namespace imtk::prop
 		return dirty;
 	}
 
-	bool check_property(std::unique_ptr<iview> prop)
+	void grid::add_property(std::unique_ptr<iview> prop, bool dirty)
 	{
-		bool dirty = clipboard::context_menu(*prop);
 		if (value::drawing)
 		{
 			dirty_grid |= dirty;
 			value::properties.subviews.push_back(std::move(prop));
 		}
+	}
+
+	bool check_property(std::unique_ptr<iview> prop)
+	{
+		bool dirty = clipboard::context_menu(*prop);
+		grid::add_property(std::move(prop), dirty);
 		return dirty;
 	}
 

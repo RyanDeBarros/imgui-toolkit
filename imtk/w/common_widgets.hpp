@@ -70,4 +70,32 @@ namespace imtk::w
 	protected:
 		item_result draw_impl() override;
 	};
+
+	struct readonly_text : public widget
+	{
+		std::string& text;
+
+		struct config_impl
+		{
+			std::string label;
+
+			ImGuiInputTextFlags flags = 0;
+		} config;
+
+		readonly_text(std::string& text, config_impl config = {}) : text(text), config(std::move(config)) {}
+
+	protected:
+		item_result draw_impl() override;
+	};
+
+	struct readonly_text_owned : public widget
+	{
+		std::string text;
+		readonly_text view;
+
+		readonly_text_owned(std::string text, readonly_text::config_impl config = {}) : text(std::move(text)), view(this->text, std::move(config)) {}
+
+	protected:
+		item_result draw_impl() override;
+	};
 }

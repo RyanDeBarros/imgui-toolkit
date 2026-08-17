@@ -60,6 +60,17 @@ namespace imtk::prop
 		bool try_load(const payload&) const override;
 	};
 
+	struct readonly_text_view : public iview
+	{
+		std::string text;
+
+		readonly_text_view(std::string text) : text(std::move(text)) {}
+
+		payload dump() const override;
+		bool can_load(const payload&) const override;
+		bool try_load(const payload&) const override;
+	};
+
 	struct readonly_view : public iview
 	{
 		std::unique_ptr<iview> view;

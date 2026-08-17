@@ -26,4 +26,3 @@
 #include "texture.hpp"
 #include "tick.hpp"
 #include "util.hpp"
-#include "wrapper.hpp"

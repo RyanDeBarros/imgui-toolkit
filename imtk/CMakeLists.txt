@@ -17,7 +17,6 @@ target_sources(imgui-toolkit PRIVATE
 	texture.cpp
 	tick.cpp
 	color.cpp
-	wrapper.cpp
 )
 
 add_subdirectory(desc)
