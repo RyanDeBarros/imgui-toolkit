@@ -1,7 +1,7 @@
 #pragma once
 
 #include "imtk/w/widget.hpp"
-#include "imtk/types.hpp"
+#include "imtk/color.hpp"
 
 #include "external/glm.hpp"
 

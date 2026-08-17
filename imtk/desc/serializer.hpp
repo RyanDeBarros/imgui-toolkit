@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imtk/types.hpp"
+#include "imtk/color.hpp"
 
 #include "external/toml.hpp"
 #include "external/glm.hpp"

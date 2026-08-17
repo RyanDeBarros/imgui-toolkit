@@ -30,7 +30,7 @@ namespace imtk::prop
 
 	extern bool in_form();
 
-	// TODO v9.3 add important library documentation: After pausing a form, make sure to check imtk::prop::in_form() before continuing to draw properties
+	// TODO add important library documentation: After pausing a form, make sure to check imtk::prop::in_form() before continuing to draw properties
 	class form_pause
 	{
 		form* _form = nullptr;

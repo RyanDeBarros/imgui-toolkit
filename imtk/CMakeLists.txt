@@ -9,12 +9,14 @@ target_sources(imgui-toolkit PRIVATE
 	label_registry.cpp
 	nav.cpp
 	os_window.cpp
+	outline.cpp
+	overlays.cpp
 	popup.cpp
 	resource_loader.cpp
 	simple_scopes.cpp
 	texture.cpp
 	tick.cpp
-	types.cpp
+	color.cpp
 	wrapper.cpp
 )
 
