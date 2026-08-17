@@ -74,53 +74,53 @@ namespace imtk::controls
 		return result;
 	}
 
-	bool float_popout(const char* label, float& value, float min, float max, const char* format, ImGuiSliderFlags slider_flags, float step, float step_fast)
+	item_result float_popout(const char* label, float& value, float min, float max, const char* format, ImGuiSliderFlags slider_flags, float step, float step_fast)
 	{
 		bool dirty_property = false;
 		auto property = std::make_unique<prop::simple_view<float>>(value);
 
-		bool changed = ImGui::SliderFloat(label, &value, min, max, format, slider_flags);
+		auto result = item_result::query(ImGui::SliderFloat(label, &value, min, max, format, slider_flags));
 		dirty_property |= prop::clipboard::context_menu(*property);
 
 		popup popup("Edit value##" + std::string(label));
 
-		if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		if (result.state.right_clicked())
 			popup.open();
 
 		if (auto d = popup.draw())
 		{
-			changed |= ImGui::InputFloat(label, &value, step, step_fast, format);
+			result |= item_result::query(ImGui::InputFloat(label, &value, step, step_fast, format));
 			dirty_property |= prop::clipboard::context_menu(*property);
 			value = std::max(value, min);
 			value = std::min(value, max);
 		}
 
 		prop::grid::add_property(std::move(property), dirty_property);
-		return changed;
+		return result;
 	}
 
-	bool int_popout(const char* label, int& value, int min, int max, const char* format, ImGuiSliderFlags slider_flags, int step, int step_fast)
+	item_result int_popout(const char* label, int& value, int min, int max, const char* format, ImGuiSliderFlags slider_flags, int step, int step_fast)
 	{
 		bool dirty_property = false;
 		auto property = std::make_unique<prop::simple_view<int>>(value);
 
-		bool changed = ImGui::SliderInt(label, &value, min, max, format, slider_flags);
+		auto result = item_result::query(ImGui::SliderInt(label, &value, min, max, format, slider_flags));
 		dirty_property |= prop::clipboard::context_menu(*property);
 
 		popup popup("Edit value##" + std::string(label));
 
-		if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		if (result.state.right_clicked())
 			popup.open();
 
 		if (auto d = popup.draw())
 		{
-			changed |= ImGui::InputInt(label, &value, step, step_fast);
+			result |= item_result::query(ImGui::InputInt(label, &value, step, step_fast));
 			dirty_property |= prop::clipboard::context_menu(*property);
 			value = std::max(value, min);
 			value = std::min(value, max);
 		}
 
 		prop::grid::add_property(std::move(property), dirty_property);
-		return changed;
+		return result;
 	}
 }

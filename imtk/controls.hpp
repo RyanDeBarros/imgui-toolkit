@@ -18,11 +18,11 @@ namespace imtk::controls
 
 	extern item_result readonly_text(const char* label, std::string_view string, ImGuiInputTextFlags flags = 0);
 
-	// TODO return item_result
-	extern bool float_popout(const char* label, float& value, float min, float max, const char* format = "%.3f",
+	// TODO w::popout<float>, w::popout<int>, etc.
+
+	extern item_result float_popout(const char* label, float& value, float min, float max, const char* format = "%.3f",
 		ImGuiSliderFlags slider_flags = 0, float step = 0.f, float step_fast = 0.f);
 
-	// TODO return item_result
-	extern bool int_popout(const char* label, int& value, int min, int max, const char* format = "%d",
+	extern item_result int_popout(const char* label, int& value, int min, int max, const char* format = "%d",
 		ImGuiSliderFlags slider_flags = 0, int step = 1, int step_fast = 100);
 }
