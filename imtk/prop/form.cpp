@@ -2,6 +2,8 @@
 
 #include "imtk/simple_scopes.hpp"
 
+#include "imtk/prop/property_grid.hpp"
+
 #include <memory>
 
 namespace imtk::prop
@@ -44,6 +46,9 @@ namespace imtk::prop
 
 	void form::begin_table()
 	{
+		if (active_form)
+			throw error(error_code::existing_active_instance);
+
 		active_form = this;
 		_scope.push(&active_form).push(_id_counter++);
 
@@ -78,8 +83,8 @@ namespace imtk::prop
 		return active_form && *active_form;
 	}
 
-	form_pause::form_pause()
-		: _form(active_form)
+	form::pause::pause(bool resume_after)
+		: _form(active_form), _resume_after(resume_after)
 	{
 		if (_form)
 			_was_drawing_content = _form->_draw_content;
@@ -88,14 +93,36 @@ namespace imtk::prop
 			_form->end_table();
 	}
 
-	form_pause::~form_pause()
+	form::pause::~pause()
 	{
-		if (_form)
+		if (_form && _resume_after)
 			_form->begin_table();
 	}
 
-	form_pause::operator bool() const
+	form::pause::operator bool() const
 	{
 		return _form && _form->_valid && _was_drawing_content;
+	}
+
+	// TODO DEBT use generators for as many headers as possible
+	subform::subform(const char* label, const view_generator& property_generator, config cfg)
+		: _pause(cfg.resume_after), _section(label, cfg.start_open)
+	{
+		grid::check_header(property_generator);
+
+		if (_section)
+			_subform.emplace();
+	}
+
+	subform::subform(const char* label, config cfg)
+		: _pause(cfg.resume_after), _section(label, cfg.start_open)
+	{
+		if (_section)
+			_subform.emplace();
+	}
+
+	subform::operator bool() const
+	{
+		return _pause && _section && _subform && *_subform;
 	}
 }
