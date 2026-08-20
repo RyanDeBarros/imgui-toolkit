@@ -4,7 +4,6 @@ namespace imtk::prop
 {
 	struct payload_list
 	{
-		// TODO DO NOT USE HEAP ALLOCATION FOR PAYLOADS. Make a note of this in documentations
 		std::vector<imp::box> payloads;
 	};
 

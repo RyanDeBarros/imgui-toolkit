@@ -73,7 +73,6 @@ namespace imtk::prop
 			{
 				if (ref.buffer() != *data)
 				{
-					// TODO just set ref.buffer() to value -> then call ref.force_confirm(). In that case, don't even specialize edit_session views - just pass buffer() and if try_load() returns true, call force_confirm() in widgets. Can generically define edit_session widgets in that case instead of specializing for each one.
 					ref.publish_reset(*data);
 					return true;
 				}

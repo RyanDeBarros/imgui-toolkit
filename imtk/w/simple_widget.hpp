@@ -59,6 +59,33 @@ namespace imtk::w
 		item_result draw_impl() override;
 	};
 
+	template<typename ty>
+	struct bound_widget<edit_session<ty>> : public widget
+	{
+		edit_session<ty>& data;
+		bound_widget<ty> subwidget;
+
+		template<typename... args>
+		bound_widget(edit_session<ty>& data, args&&... subwidget_args)
+			: data(data), subwidget(data.buffer(), std::forward<args>(subwidget_args)...)
+		{
+		}
+
+	protected:
+		item_result draw_impl() override
+		{
+			data.pre_edit();
+			item_result result;
+			{
+				prop::grid::subproperty_scope s;
+				result = subwidget.draw();
+			}
+			data.post_edit(result.state);
+			prop::grid::add_property(std::make_unique<prop::simple_view<edit_session<ty>>>(data));
+			return result;
+		}
+	};
+
 	template<>
 	struct bound_widget<edit_session<bool>> : public widget
 	{
@@ -80,10 +107,10 @@ namespace imtk::w
 	{
 		imp::potential<ty>& data;
 		bound_widget<bool> enable;
-		bound_widget<ty> subwidget;
+		bound_widget<ty> value;
 
 		bound_widget(imp::potential<ty>& data, typename bound_widget<ty>::config_impl value_cfg = {}, typename bound_widget<bool>::config_impl bool_cfg = {})
-			: data(data), enable(data.has_value, std::move(bool_cfg)), subwidget(data.value, std::move(value_cfg))
+			: data(data), enable(data.has_value, std::move(bool_cfg)), value(data.value, std::move(value_cfg))
 		{
 		}
 
@@ -99,49 +126,11 @@ namespace imtk::w
 				if (auto d = disabled(!enable.data))
 				{
 					ImGui::SameLine();
-					result |= subwidget.draw();
+					result |= value.draw();
 				}
 			}
 
 			prop::grid::add_property(std::make_unique<prop::simple_view<imp::potential<ty>>>(data));
-
-			return result;
-		}
-	};
-
-	template<typename ty>
-	struct bound_widget<edit_session<imp::potential<ty>>> : public widget
-	{
-		edit_session<imp::potential<ty>>& data;
-		bound_widget<bool> enable;
-		bound_widget<ty> subwidget;
-
-		bound_widget(edit_session<imp::potential<ty>>& data, typename bound_widget<ty>::config_impl value_cfg = {}, typename bound_widget<bool>::config_impl bool_cfg = {})
-			: data(data), enable(data.buffer().has_value, std::move(bool_cfg)), subwidget(data.buffer().value, std::move(value_cfg))
-		{
-		}
-
-	protected:
-		item_result draw_impl() override
-		{
-			data.pre_edit();
-
-			item_result result;
-
-			{
-				prop::grid::subproperty_scope s;
-
-				result |= enable.draw();
-				if (auto d = disabled(!enable.data))
-				{
-					ImGui::SameLine();
-					result |= subwidget.draw();
-				}
-			}
-
-			data.post_edit(result.state);
-
-			prop::grid::add_property(std::make_unique<prop::simple_view<edit_session<imp::potential<ty>>>>(data));
 
 			return result;
 		}
@@ -164,28 +153,6 @@ namespace imtk::w
 		} config;
 
 		bound_widget(int& data, config_impl config = {}) : data(data), config(std::move(config)) {}
-
-	protected:
-		item_result draw_impl() override;
-	};
-
-	template<>
-	struct bound_widget<edit_session<int>> : public widget
-	{
-		edit_session<int>& data;
-		
-		struct config_impl
-		{
-			std::string label;
-			imp::potential<int> min = imp::nullpotential;
-			imp::potential<int> max = imp::nullpotential;
-
-			int step = 1;
-			int step_fast = 100;
-			ImGuiInputTextFlags flags = 0;
-		} config;
-
-		bound_widget(edit_session<int>& data, config_impl config = {}) : data(data), config(std::move(config)) {}
 
 	protected:
 		item_result draw_impl() override;
@@ -215,29 +182,6 @@ namespace imtk::w
 	};
 
 	template<>
-	struct bound_widget<edit_session<float>> : public widget
-	{
-		edit_session<float>& data;
-
-		struct config_impl
-		{
-			std::string label;
-			imp::potential<float> min = imp::nullpotential;
-			imp::potential<float> max = imp::nullpotential;
-
-			float step = 0.f;
-			float step_fast = 0.f;
-			const char* format = "%.3f";
-			ImGuiInputTextFlags flags = 0;
-		} config;
-
-		bound_widget(edit_session<float>& data, config_impl config = {}) : data(data), config(std::move(config)) {}
-
-	protected:
-		item_result draw_impl() override;
-	};
-
-	template<>
 	struct bound_widget<double> : public widget
 	{
 		double& data;
@@ -255,29 +199,6 @@ namespace imtk::w
 		} config;
 
 		bound_widget(double& data, config_impl config = {}) : data(data), config(std::move(config)) {}
-
-	protected:
-		item_result draw_impl() override;
-	};
-
-	template<>
-	struct bound_widget<edit_session<double>> : public widget
-	{
-		edit_session<double>& data;
-		
-		struct config_impl
-		{
-			std::string label;
-			imp::potential<double> min = imp::nullpotential;
-			imp::potential<double> max = imp::nullpotential;
-
-			double step = 0.;
-			double step_fast = 0.;
-			const char* format = "%.6f";
-			ImGuiInputTextFlags flags = 0;
-		} config;
-
-		bound_widget(edit_session<double>& data, config_impl config = {}) : data(data), config(std::move(config)) {}
 
 	protected:
 		item_result draw_impl() override;
@@ -305,27 +226,6 @@ namespace imtk::w
 	};
 
 	template<>
-	struct bound_widget<edit_session<glm::vec2>> : public widget
-	{
-		edit_session<glm::vec2>& data;
-
-		struct config_impl
-		{
-			std::string label;
-			imp::potential<float> min = imp::nullpotential;
-			imp::potential<float> max = imp::nullpotential;
-			
-			const char* format = "%.3f";
-			ImGuiInputTextFlags flags = 0;
-		} config;
-
-		bound_widget(edit_session<glm::vec2>& data, config_impl config = {}) : data(data), config(std::move(config)) {}
-
-	protected:
-		item_result draw_impl() override;
-	};
-
-	template<>
 	struct bound_widget<glm::vec3> : public widget
 	{
 		glm::vec3& data;
@@ -341,27 +241,6 @@ namespace imtk::w
 		} config;
 
 		bound_widget(glm::vec3& data, config_impl config = {}) : data(data), config(std::move(config)) {}
-
-	protected:
-		item_result draw_impl() override;
-	};
-
-	template<>
-	struct bound_widget<edit_session<glm::vec3>> : public widget
-	{
-		edit_session<glm::vec3>& data;
-
-		struct config_impl
-		{
-			std::string label;
-			imp::potential<float> min = imp::nullpotential;
-			imp::potential<float> max = imp::nullpotential;
-
-			const char* format = "%.3f";
-			ImGuiInputTextFlags flags = 0;
-		} config;
-
-		bound_widget(edit_session<glm::vec3>& data, config_impl config = {}) : data(data), config(std::move(config)) {}
 
 	protected:
 		item_result draw_impl() override;
@@ -389,27 +268,6 @@ namespace imtk::w
 	};
 
 	template<>
-	struct bound_widget<edit_session<glm::vec4>> : public widget
-	{
-		edit_session<glm::vec4>& data;
-
-		struct config_impl
-		{
-			std::string label;
-			imp::potential<float> min = imp::nullpotential;
-			imp::potential<float> max = imp::nullpotential;
-
-			const char* format = "%.3f";
-			ImGuiInputTextFlags flags = 0;
-		} config;
-
-		bound_widget(edit_session<glm::vec4>& data, config_impl config = {}) : data(data), config(std::move(config)) {}
-
-	protected:
-		item_result draw_impl() override;
-	};
-
-	template<>
 	struct bound_widget<std::string> : public widget
 	{
 		std::string& data;
@@ -431,27 +289,6 @@ namespace imtk::w
 	};
 
 	template<>
-	struct bound_widget<edit_session<std::string>> : public widget
-	{
-		edit_session<std::string>& data;
-
-		struct config_impl
-		{
-			std::string label;
-
-			size_t max_size = 256;
-			ImGuiInputTextFlags flags = 0;
-			ImGuiInputTextCallback callback = nullptr;
-			void* user_data = nullptr;
-		} config;
-
-		bound_widget(edit_session<std::string>& data, config_impl config = {}) : data(data), config(std::move(config)) {}
-
-	protected:
-		item_result draw_impl() override;
-	};
-
-	template<>
 	struct bound_widget<color4> : public widget
 	{
 		color4& data;
@@ -464,24 +301,6 @@ namespace imtk::w
 		} config;
 
 		bound_widget(color4& data, config_impl config = {}) : data(data), config(std::move(config)) {}
-
-	protected:
-		item_result draw_impl() override;
-	};
-
-	template<>
-	struct bound_widget<edit_session<color4>> : public widget
-	{
-		edit_session<color4>& data;
-
-		struct config_impl
-		{
-			std::string label;
-
-			ImGuiColorEditFlags flags = 0;
-		} config;
-
-		bound_widget(edit_session<color4>& data, config_impl config = {}) : data(data), config(std::move(config)) {}
 
 	protected:
 		item_result draw_impl() override;

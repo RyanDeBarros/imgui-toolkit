@@ -78,7 +78,7 @@ namespace imtk::prop
 			ImGui::TextUnformatted(label_text.c_str());
 			label_text.clear();
 
-			label_state = item_state::query();
+			label_state = item_state::query(); // TODO this only triggers context menu when text element is clicked - but this should actually query the full cell
 			dirty_grid |= clipboard::context_menu(value::properties);
 		}
 	}
@@ -222,9 +222,9 @@ namespace imtk::prop
 
 	bool grid::check_property(std::unique_ptr<iview> prop)
 	{
-		bool dirty = clipboard::context_menu(*prop);
+		bool pasted = clipboard::context_menu(*prop);
 		add_property(std::move(prop));
-		return dirty;
+		return pasted;
 	}
 
 	void assign_reset_icon(res::icon_id icon)
