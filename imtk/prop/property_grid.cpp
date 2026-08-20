@@ -54,10 +54,12 @@ namespace imtk::prop
 	namespace row
 	{
 		static item_result draw_result;
+		static size_t row_number = 0;
 
 		static void clear()
 		{
 			draw_result = {};
+			row_number = 0;
 		}
 	}
 
@@ -158,6 +160,7 @@ namespace imtk::prop
 		void submit()
 		{
 			ImGui::TableNextRow();
+			id_scope row_id(row_number++);
 			reset::draw_cell();
 			value::draw_cell();
 			key::draw_cell();
@@ -206,19 +209,21 @@ namespace imtk::prop
 		return dirty;
 	}
 
-	void grid::add_property(std::unique_ptr<iview> prop, bool dirty)
+	void grid::add_property(std::unique_ptr<iview> prop)
 	{
 		if (value::drawing)
 		{
-			dirty_grid |= dirty;
-			value::properties.subviews.push_back(std::move(prop));
+			if (subproperty_scope::instance_count() == 0)
+				value::properties.subviews.push_back(std::move(prop));
+			else
+				subproperty_scope::instance().subproperties.push_back(std::move(prop));
 		}
 	}
 
-	bool check_property(std::unique_ptr<iview> prop)
+	bool grid::check_property(std::unique_ptr<iview> prop)
 	{
 		bool dirty = clipboard::context_menu(*prop);
-		grid::add_property(std::move(prop), dirty);
+		add_property(std::move(prop));
 		return dirty;
 	}
 

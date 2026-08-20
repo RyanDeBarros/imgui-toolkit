@@ -33,7 +33,7 @@ namespace imtk::controls
 				return items[idx].c_str();
 			}, const_cast<std::vector<std::string>*>(&items), static_cast<int>(items.size())));
 
-		result.modified |= prop::check_property(std::make_unique<prop::dynamic_combo_view>(current_item, items));
+		result.modified |= prop::grid::check_property(std::make_unique<prop::dynamic_combo_view>(current_item, items));
 
 		return result;
 	}
@@ -54,9 +54,9 @@ namespace imtk::controls
 
 		auto main_prop = std::make_unique<prop::simple_view<std::string>>(string);
 		if (flags & ImGuiInputTextFlags_ReadOnly)
-			result.modified |= prop::check_property(std::make_unique<prop::readonly_view>(std::move(main_prop)));
+			result.modified |= prop::grid::check_property(std::make_unique<prop::readonly_view>(std::move(main_prop)));
 		else
-			result.modified |= prop::check_property(std::move(main_prop));
+			result.modified |= prop::grid::check_property(std::move(main_prop));
 
 		if (string.size() > max_size)
 		{
@@ -70,17 +70,16 @@ namespace imtk::controls
 	item_result readonly_text(const char* label, std::string_view string, ImGuiInputTextFlags flags)
 	{
 		auto result = item_result::query(ImGui::InputText(label, const_cast<char*>(string.data()), string.size() + 1, flags | ImGuiInputTextFlags_ReadOnly));
-		result.modified |= prop::check_property(std::make_unique<prop::readonly_text_view>(std::string(string)));
+		result.modified |= prop::grid::check_property(std::make_unique<prop::readonly_text_view>(std::string(string)));
 		return result;
 	}
 
 	item_result float_popout(const char* label, float& value, float min, float max, const char* format, ImGuiSliderFlags slider_flags, float step, float step_fast)
 	{
-		bool dirty_property = false;
 		auto property = std::make_unique<prop::simple_view<float>>(value);
 
 		auto result = item_result::query(ImGui::SliderFloat(label, &value, min, max, format, slider_flags));
-		dirty_property |= prop::clipboard::context_menu(*property);
+		result.modified |= prop::clipboard::context_menu(*property);
 
 		popup popup("Edit value##" + std::string(label));
 
@@ -90,22 +89,21 @@ namespace imtk::controls
 		if (auto d = popup.draw())
 		{
 			result |= item_result::query(ImGui::InputFloat(label, &value, step, step_fast, format));
-			dirty_property |= prop::clipboard::context_menu(*property);
+			result.modified |= prop::clipboard::context_menu(*property);
 			value = std::max(value, min);
 			value = std::min(value, max);
 		}
 
-		prop::grid::add_property(std::move(property), dirty_property);
+		prop::grid::add_property(std::move(property));
 		return result;
 	}
 
 	item_result int_popout(const char* label, int& value, int min, int max, const char* format, ImGuiSliderFlags slider_flags, int step, int step_fast)
 	{
-		bool dirty_property = false;
 		auto property = std::make_unique<prop::simple_view<int>>(value);
 
 		auto result = item_result::query(ImGui::SliderInt(label, &value, min, max, format, slider_flags));
-		dirty_property |= prop::clipboard::context_menu(*property);
+		result.modified |= prop::clipboard::context_menu(*property);
 
 		popup popup("Edit value##" + std::string(label));
 
@@ -115,12 +113,12 @@ namespace imtk::controls
 		if (auto d = popup.draw())
 		{
 			result |= item_result::query(ImGui::InputInt(label, &value, step, step_fast));
-			dirty_property |= prop::clipboard::context_menu(*property);
+			result.modified |= prop::clipboard::context_menu(*property);
 			value = std::max(value, min);
 			value = std::min(value, max);
 		}
 
-		prop::grid::add_property(std::move(property), dirty_property);
+		prop::grid::add_property(std::move(property));
 		return result;
 	}
 }

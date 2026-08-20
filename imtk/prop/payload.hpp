@@ -12,7 +12,7 @@ namespace imtk::prop
 	struct payload
 	{
 		imp::type_erasure type;
-		std::vector<std::byte> data;
+		std::vector<std::byte> data; // TODO use imp::type_erase_box, which already encodes imp::type_erasure and stores a deleter/copier/mover. That way there could be heap allocated data, and std::string/std::vector doesn't need special handling -> remove POD?
 
 		payload(const void* data, size_t size, imp::type_erasure type);
 		payload(std::vector<std::byte> data, imp::type_erasure type);

@@ -22,6 +22,8 @@ namespace imtk::desc
 		}
 	}
 
+	// TODO use imp::erase_type over std::type_index
+
 #define _IMTK_UNPAREN(...) __VA_ARGS__
 #define _IMTK_FIELD_DECL(type, field) _IMTK_UNPAREN type field;
 #define _IMTK_SUBPATH_ENUM_ENTRY(_, field) _E_##field,

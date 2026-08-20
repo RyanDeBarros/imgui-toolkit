@@ -1,7 +1,9 @@
 #pragma once
 
-#include "imtk/prop/payload.hpp"
+#include "imtk/edit_session.hpp"
 #include "imtk/label_registry.hpp"
+
+#include "imtk/prop/payload.hpp"
 
 namespace imtk::prop
 {
@@ -48,12 +50,58 @@ namespace imtk::prop
 		}
 	};
 
+	template<typename ty>
+	struct simple_view<edit_session<ty>> : public iview
+	{
+		edit_session<ty>& ref;
+
+		simple_view(edit_session<ty>& ref) : ref(ref) {}
+
+		payload dump() const override
+		{
+			return payload::pod(ref.buffer());
+		}
+
+		bool can_load(const payload& pld) const override
+		{
+			return pld.resolve<ty>();
+		}
+
+		bool try_load(const payload& pld) const override
+		{
+			if (auto data = pld.resolve<ty>())
+			{
+				if (ref.buffer() != *data)
+				{
+					ref.publish_reset(*data);
+					return true;
+				}
+				else
+					return false;
+			}
+			else
+				return false;
+		}
+	};
+
 	template<>
 	struct simple_view<std::string> : public iview
 	{
 		std::string& ref;
 
 		simple_view(std::string& ref) : ref(ref) {}
+
+		payload dump() const override;
+		bool can_load(const payload&) const override;
+		bool try_load(const payload&) const override;
+	};
+
+	template<>
+	struct simple_view<edit_session<std::string>> : public iview
+	{
+		edit_session<std::string>& ref;
+
+		simple_view(edit_session<std::string>& ref) : ref(ref) {}
 
 		payload dump() const override;
 		bool can_load(const payload&) const override;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "imtk/instance_guard.hpp"
+#include "imtk/instance_stack.hpp"
 #include "imtk/resource_loader.hpp"
 
 #include "imtk/prop/payload.hpp"
@@ -45,9 +46,19 @@ namespace imtk::prop
 
 		static bool dirty();
 		static bool check_header(const view_generator& generator);
-		static void add_property(std::unique_ptr<iview> prop, bool dirty);
+		static void add_property(std::unique_ptr<iview> prop);
+
+		static bool check_property(std::unique_ptr<iview> prop);
+
+		struct subproperty_scope : public instance_stack<subproperty_scope>
+		{
+			std::vector<std::unique_ptr<iview>> subproperties;
+
+			subproperty_scope() = default;
+			subproperty_scope(const subproperty_scope&) = delete;
+			subproperty_scope(subproperty_scope&&) = delete;
+		};
 	};
 
-	extern bool check_property(std::unique_ptr<iview> prop);
 	extern void assign_reset_icon(res::icon_id icon);
 }

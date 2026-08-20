@@ -30,7 +30,7 @@ namespace imtk::prop
 		void end_table();
 
 	public:
-		// TODO add important library documentation: After pausing a form, make sure to check imtk::prop::in_form() before continuing to draw properties. Likewise for subforms
+		// TODO add important library documentation: After pausing a form, make sure to check imtk::prop::in_form() before continuing to draw properties. Likewise after subforms end. Basically whenever a property will be drawn.
 		class pause
 		{
 			form* _form = nullptr;

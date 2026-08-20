@@ -9,6 +9,7 @@ namespace imtk
 	extern frame_number frame();
 	extern float delta_seconds();
 
+	// TODO v9.3 rename to last_tick_process_phase
 	enum class tick_process_phase
 	{
 		submit_edit,

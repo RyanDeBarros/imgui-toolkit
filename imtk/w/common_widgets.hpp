@@ -23,16 +23,6 @@ namespace imtk::w
 		item_result draw_impl() override;
 	};
 
-	struct subsequent : public widget
-	{
-		std::unique_ptr<widget> item;
-
-		subsequent(std::unique_ptr<widget>&& item) : item(std::move(item)) {}
-
-	protected:
-		item_result draw_impl();
-	};
-
 	struct bound_optional : public widget
 	{
 		bound_widget<bool> enable;

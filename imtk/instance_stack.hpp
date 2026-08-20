@@ -10,7 +10,7 @@ namespace imtk
 	struct instance_stack
 	{
 	private:
-		static inline std::stack<derived*> _instances = nullptr;
+		static inline std::stack<derived*> _instances;
 
 	public:
 		instance_stack()
@@ -32,6 +32,11 @@ namespace imtk
 				return *_instances.top();
 			else
 				throw error(error_code::no_active_instance);
+		}
+
+		static size_t instance_count()
+		{
+			return _instances.size();
 		}
 	};
 }

@@ -5,6 +5,7 @@
 #include <string>
 #include <variant>
 
+// TODO v9.3 serialize to OS clipboard?
 namespace imtk::prop::clipboard
 {
 	struct payload_node

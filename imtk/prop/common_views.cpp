@@ -4,6 +4,7 @@ namespace imtk::prop
 {
 	struct payload_list
 	{
+		// TODO DO NOT USE HEAP ALLOCATION FOR PAYLOADS. Make a note of this in documentations
 		std::vector<payload> payloads;
 	};
 
@@ -73,6 +74,34 @@ namespace imtk::prop
 			if (ref != sv)
 			{
 				ref = sv;
+				return true;
+			}
+			else
+				return false;
+		}
+		else
+			return false;
+	}
+
+	payload simple_view<edit_session<std::string>>::dump() const
+	{
+		return payload(ref.buffer().data(), ref.buffer().size(), imp::erase_type<std::string>());
+	}
+
+	bool simple_view<edit_session<std::string>>::can_load(const payload& pld) const
+	{
+		return pld.type == imp::erase_type<std::string>();
+	}
+
+	bool simple_view<edit_session<std::string>>::try_load(const payload& pld) const
+	{
+		if (pld.type == imp::erase_type<std::string>())
+		{
+			std::string_view sv(reinterpret_cast<const char*>(pld.data.data()), pld.data.size());
+			if (ref.buffer() != sv)
+			{
+				// TODO just set ref.buffer() to value -> then call ref.force_confirm(). In that case, don't even specialize edit_session views - just pass buffer() and if try_load() returns true, call force_confirm() in widgets. Can generically define edit_session widgets in that case instead of specializing for each one.
+				ref.publish_reset(std::string(sv));
 				return true;
 			}
 			else

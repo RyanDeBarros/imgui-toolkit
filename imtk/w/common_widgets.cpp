@@ -14,12 +14,6 @@ namespace imtk::w
 		return draw_fn();
 	}
 
-	item_result subsequent::draw_impl()
-	{
-		controls::vertical_separator();
-		return item->draw();
-	}
-
 	item_result bound_optional::draw_impl()
 	{
 		auto result = enable.draw();
@@ -49,7 +43,7 @@ namespace imtk::w
 
 		result |= item_result::query(ImGui::Combo("", &index, &label_span_registry::combo_getter, &names, label_span_registry::count(names)));
 
-		result.modified |= prop::check_property(std::make_unique<prop::combo_view>(index, names));
+		result.modified |= prop::grid::check_property(std::make_unique<prop::combo_view>(index, names));
 		return result;
 	}
 
