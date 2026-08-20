@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imtk/prop/payload.hpp"
+#include "imtk/prop/view.hpp"
 
 namespace imtk::prop::clipboard
 {

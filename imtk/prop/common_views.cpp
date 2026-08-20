@@ -5,20 +5,20 @@ namespace imtk::prop
 	struct payload_list
 	{
 		// TODO DO NOT USE HEAP ALLOCATION FOR PAYLOADS. Make a note of this in documentations
-		std::vector<payload> payloads;
+		std::vector<imp::box> payloads;
 	};
 
-	payload view_list::dump() const
+	imp::box view_list::dump() const
 	{
-		payload_list list;
+		auto list = new payload_list();
 		for (const auto& view : subviews)
-			list.payloads.push_back(view->dump());
-		return payload::pod(list);
+			list->payloads.push_back(view->dump());
+		return imp::box(list);
 	}
 
-	bool view_list::can_load(const payload& pld) const
+	bool view_list::can_load(const imp::box& pld) const
 	{
-		if (auto list = pld.resolve<payload_list>())
+		if (auto list = pld.as<payload_list>())
 		{
 			if (list->payloads.size() != subviews.size())
 				return false;
@@ -36,9 +36,9 @@ namespace imtk::prop
 			return false;
 	}
 
-	bool view_list::try_load(const payload& pld) const
+	bool view_list::try_load(const imp::box& pld) const
 	{
-		if (auto list = pld.resolve<payload_list>())
+		if (auto list = pld.as<payload_list>())
 		{
 			if (list->payloads.size() != subviews.size())
 				return false;
@@ -56,87 +56,37 @@ namespace imtk::prop
 			return false;
 	}
 
-	payload simple_view<std::string>::dump() const
+	struct readonly_text_payload
 	{
-		return payload(ref.data(), ref.size(), imp::erase_type<std::string>());
+		std::string text;
+	};
+
+	imp::box readonly_text_view::dump() const
+	{
+		return imp::make_box<readonly_text_payload>(text);
 	}
 
-	bool simple_view<std::string>::can_load(const payload& pld) const
-	{
-		return pld.type == imp::erase_type<std::string>();
-	}
-
-	bool simple_view<std::string>::try_load(const payload& pld) const
-	{
-		if (pld.type == imp::erase_type<std::string>())
-		{
-			std::string_view sv(reinterpret_cast<const char*>(pld.data.data()), pld.data.size());
-			if (ref != sv)
-			{
-				ref = sv;
-				return true;
-			}
-			else
-				return false;
-		}
-		else
-			return false;
-	}
-
-	payload simple_view<edit_session<std::string>>::dump() const
-	{
-		return payload(ref.buffer().data(), ref.buffer().size(), imp::erase_type<std::string>());
-	}
-
-	bool simple_view<edit_session<std::string>>::can_load(const payload& pld) const
-	{
-		return pld.type == imp::erase_type<std::string>();
-	}
-
-	bool simple_view<edit_session<std::string>>::try_load(const payload& pld) const
-	{
-		if (pld.type == imp::erase_type<std::string>())
-		{
-			std::string_view sv(reinterpret_cast<const char*>(pld.data.data()), pld.data.size());
-			if (ref.buffer() != sv)
-			{
-				// TODO just set ref.buffer() to value -> then call ref.force_confirm(). In that case, don't even specialize edit_session views - just pass buffer() and if try_load() returns true, call force_confirm() in widgets. Can generically define edit_session widgets in that case instead of specializing for each one.
-				ref.publish_reset(std::string(sv));
-				return true;
-			}
-			else
-				return false;
-		}
-		else
-			return false;
-	}
-
-	payload readonly_text_view::dump() const
-	{
-		return payload(text.data(), text.size(), imp::erase_type<std::string>());
-	}
-
-	bool readonly_text_view::can_load(const payload& pld) const
+	bool readonly_text_view::can_load(const imp::box& pld) const
 	{
 		return false;
 	}
 
-	bool readonly_text_view::try_load(const payload& pld) const
+	bool readonly_text_view::try_load(const imp::box& pld) const
 	{
 		return false;
 	}
 
-	payload readonly_view::dump() const
+	imp::box readonly_view::dump() const
 	{
 		return view->dump();
 	}
 
-	bool readonly_view::can_load(const payload&) const
+	bool readonly_view::can_load(const imp::box&) const
 	{
 		return false;
 	}
 	
-	bool readonly_view::try_load(const payload&) const
+	bool readonly_view::try_load(const imp::box&) const
 	{
 		return false;
 	}
@@ -152,22 +102,22 @@ namespace imtk::prop
 	{
 	}
 
-	payload combo_view::dump() const
+	imp::box combo_view::dump() const
 	{
-		return payload::pod(combo_payload{ .index = index, .names = names });
+		return imp::make_box<combo_payload>(index, names);
 	}
 
-	bool combo_view::can_load(const payload& pld) const
+	bool combo_view::can_load(const imp::box& pld) const
 	{
-		if (auto data = pld.resolve<combo_payload>())
+		if (auto data = pld.as<combo_payload>())
 			return data->names == names;
 		else
 			return false;
 	}
 
-	bool combo_view::try_load(const payload& pld) const
+	bool combo_view::try_load(const imp::box& pld) const
 	{
-		if (auto data = pld.resolve<combo_payload>())
+		if (auto data = pld.as<combo_payload>())
 		{
 			if (data->names == names && index != data->index)
 			{
@@ -186,19 +136,23 @@ namespace imtk::prop
 	{
 	}
 
-	payload dynamic_combo_view::dump() const
+	struct dynamic_combo_payload
 	{
-		return payload(items[index].data(), items[index].size(), imp::erase_type<dynamic_combo_view>());
+		std::string item;
+	};
+
+	imp::box dynamic_combo_view::dump() const
+	{
+		return imp::make_box<dynamic_combo_payload>(items[index]);
 	}
 	
-	bool dynamic_combo_view::can_load(const payload& pld) const
+	bool dynamic_combo_view::can_load(const imp::box& pld) const
 	{
-		if (pld.resolve<dynamic_combo_view>())
+		if (auto data = pld.as<dynamic_combo_payload>())
 		{
-			std::string_view sv(reinterpret_cast<const char*>(pld.data.data()), pld.data.size());
 			for (auto it = items.begin(); it != items.end(); ++it)
 			{
-				if (*it == sv)
+				if (*it == data->item)
 					return true;
 			}
 
@@ -208,18 +162,16 @@ namespace imtk::prop
 			return false;
 	}
 	
-	bool dynamic_combo_view::try_load(const payload& pld) const
+	bool dynamic_combo_view::try_load(const imp::box& pld) const
 	{
-		if (pld.resolve<dynamic_combo_view>())
+		if (auto data = pld.as<dynamic_combo_payload>())
 		{
-			std::string_view sv(reinterpret_cast<const char*>(pld.data.data()), pld.data.size());
-			
-			if (items[index] == sv)
+			if (items[index] == data->item)
 				return false;
 
 			for (auto it = items.begin(); it != items.end(); ++it)
 			{
-				if (*it == sv)
+				if (*it == data->item)
 				{
 					index = it - items.begin();
 					return true;

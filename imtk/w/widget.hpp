@@ -2,7 +2,7 @@
 
 #include "imtk/item_result.hpp"
 
-#include "imtk/prop/payload.hpp"
+#include <string_view>
 
 namespace imtk::w
 {

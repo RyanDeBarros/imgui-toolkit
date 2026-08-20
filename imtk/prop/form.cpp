@@ -105,7 +105,7 @@ namespace imtk::prop
 	}
 
 	// TODO DEBT use generators for as many headers as possible
-	subform::subform(const char* label, const view_generator& property_generator, config cfg)
+	subform::subform(std::string_view label, const view_generator& property_generator, config cfg)
 		: _pause(cfg.resume_after), _section(label, cfg.start_open)
 	{
 		grid::check_header(property_generator);
@@ -114,7 +114,7 @@ namespace imtk::prop
 			_subform.emplace();
 	}
 
-	subform::subform(const char* label, config cfg)
+	subform::subform(std::string_view label, config cfg)
 		: _pause(cfg.resume_after), _section(label, cfg.start_open)
 	{
 		if (_section)

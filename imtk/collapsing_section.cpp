@@ -4,7 +4,7 @@ namespace imtk
 {
 	static int bg_toggle = 0;
 
-	collapsing_section::collapsing_section(const char* label, bool start_open)
+	collapsing_section::collapsing_section(std::string_view label, bool start_open)
 	{
 		style_var sv(ImGuiStyleVar_ChildBorderSize, 2.f);
 
@@ -19,7 +19,7 @@ namespace imtk
 		{
 			if (start_open)
 				ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-			_visible = ImGui::TreeNode(label);
+			_visible = ImGui::TreeNode(label.data());
 		}
 	}
 

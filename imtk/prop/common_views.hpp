@@ -3,7 +3,7 @@
 #include "imtk/edit_session.hpp"
 #include "imtk/label_registry.hpp"
 
-#include "imtk/prop/payload.hpp"
+#include "imtk/prop/view.hpp"
 
 namespace imtk::prop
 {
@@ -11,9 +11,9 @@ namespace imtk::prop
 	{
 		std::vector<std::unique_ptr<iview>> subviews;
 
-		payload dump() const override;
-		bool can_load(const payload&) const override;
-		bool try_load(const payload&) const override;
+		imp::box dump() const override;
+		bool can_load(const imp::box&) const override;
+		bool try_load(const imp::box&) const override;
 	};
 
 	template<typename ty>
@@ -23,19 +23,19 @@ namespace imtk::prop
 
 		simple_view(ty& ref) : ref(ref) {}
 
-		payload dump() const override
+		imp::box dump() const override
 		{
-			return payload::pod(ref);
+			return imp::make_box<ty>(ref);
 		}
 
-		bool can_load(const payload& pld) const override
+		bool can_load(const imp::box& pld) const override
 		{
-			return pld.resolve<ty>();
+			return pld.as<ty>();
 		}
 
-		bool try_load(const payload& pld) const override
+		bool try_load(const imp::box& pld) const override
 		{
-			if (auto data = pld.resolve<ty>())
+			if (auto data = pld.as<ty>())
 			{
 				if (ref != *data)
 				{
@@ -57,22 +57,23 @@ namespace imtk::prop
 
 		simple_view(edit_session<ty>& ref) : ref(ref) {}
 
-		payload dump() const override
+		imp::box dump() const override
 		{
-			return payload::pod(ref.buffer());
+			return imp::make_box<ty>(ref.buffer());
 		}
 
-		bool can_load(const payload& pld) const override
+		bool can_load(const imp::box& pld) const override
 		{
-			return pld.resolve<ty>();
+			return pld.as<ty>();
 		}
 
-		bool try_load(const payload& pld) const override
+		bool try_load(const imp::box& pld) const override
 		{
-			if (auto data = pld.resolve<ty>())
+			if (auto data = pld.as<ty>())
 			{
 				if (ref.buffer() != *data)
 				{
+					// TODO just set ref.buffer() to value -> then call ref.force_confirm(). In that case, don't even specialize edit_session views - just pass buffer() and if try_load() returns true, call force_confirm() in widgets. Can generically define edit_session widgets in that case instead of specializing for each one.
 					ref.publish_reset(*data);
 					return true;
 				}
@@ -84,39 +85,15 @@ namespace imtk::prop
 		}
 	};
 
-	template<>
-	struct simple_view<std::string> : public iview
-	{
-		std::string& ref;
-
-		simple_view(std::string& ref) : ref(ref) {}
-
-		payload dump() const override;
-		bool can_load(const payload&) const override;
-		bool try_load(const payload&) const override;
-	};
-
-	template<>
-	struct simple_view<edit_session<std::string>> : public iview
-	{
-		edit_session<std::string>& ref;
-
-		simple_view(edit_session<std::string>& ref) : ref(ref) {}
-
-		payload dump() const override;
-		bool can_load(const payload&) const override;
-		bool try_load(const payload&) const override;
-	};
-
 	struct readonly_text_view : public iview
 	{
 		std::string text;
 
 		readonly_text_view(std::string text) : text(std::move(text)) {}
 
-		payload dump() const override;
-		bool can_load(const payload&) const override;
-		bool try_load(const payload&) const override;
+		imp::box dump() const override;
+		bool can_load(const imp::box&) const override;
+		bool try_load(const imp::box&) const override;
 	};
 
 	struct readonly_view : public iview
@@ -125,9 +102,9 @@ namespace imtk::prop
 
 		readonly_view(std::unique_ptr<iview> view) : view(std::move(view)) {}
 
-		payload dump() const override;
-		bool can_load(const payload&) const override;
-		bool try_load(const payload&) const override;
+		imp::box dump() const override;
+		bool can_load(const imp::box&) const override;
+		bool try_load(const imp::box&) const override;
 	};
 
 	struct combo_view : public iview
@@ -137,9 +114,9 @@ namespace imtk::prop
 
 		combo_view(int& index, label_span_registry::handle names);
 
-		payload dump() const override;
-		bool can_load(const payload&) const override;
-		bool try_load(const payload&) const override;
+		imp::box dump() const override;
+		bool can_load(const imp::box&) const override;
+		bool try_load(const imp::box&) const override;
 	};
 
 	struct dynamic_combo_view : public iview
@@ -149,8 +126,8 @@ namespace imtk::prop
 
 		dynamic_combo_view(int& index, std::vector<std::string> items);
 
-		payload dump() const override;
-		bool can_load(const payload&) const override;
-		bool try_load(const payload&) const override;
+		imp::box dump() const override;
+		bool can_load(const imp::box&) const override;
+		bool try_load(const imp::box&) const override;
 	};
 }

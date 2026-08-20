@@ -10,7 +10,7 @@ namespace imtk::prop::clipboard
 {
 	struct payload_node
 	{
-		std::variant<std::monostate, payload, std::vector<std::unique_ptr<payload_node>>> sub;
+		std::variant<std::monostate, imp::box, std::vector<std::unique_ptr<payload_node>>> sub;
 	};
 
 	static payload_node instance;
@@ -29,7 +29,7 @@ namespace imtk::prop::clipboard
 
 	bool can_paste(const iview& view)
 	{
-		if (auto pld = std::get_if<payload>(&instance.sub))
+		if (auto pld = std::get_if<imp::box>(&instance.sub))
 			return view.can_load(*pld);
 		else
 			return false;
@@ -37,7 +37,7 @@ namespace imtk::prop::clipboard
 
 	bool try_paste(const iview& view)
 	{
-		if (auto pld = std::get_if<payload>(&instance.sub))
+		if (auto pld = std::get_if<imp::box>(&instance.sub))
 			return view.try_load(*pld);
 		else
 			return false;

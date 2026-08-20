@@ -4,7 +4,7 @@
 #include "imtk/instance_stack.hpp"
 #include "imtk/resource_loader.hpp"
 
-#include "imtk/prop/payload.hpp"
+#include "imtk/prop/view.hpp"
 #include "imtk/w/widget.hpp"
 
 #include <imgui.h>

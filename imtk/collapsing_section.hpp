@@ -13,7 +13,7 @@ namespace imtk
 		std::unique_ptr<child> _child;
 
 	public:
-		collapsing_section(const char* label, bool start_open = false);
+		collapsing_section(std::string_view label, bool start_open = false);
 		collapsing_section(const collapsing_section&) = delete;
 		collapsing_section(collapsing_section&&) noexcept;
 		~collapsing_section();

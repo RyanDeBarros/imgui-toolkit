@@ -3,7 +3,9 @@
 #include "imtk/collapsing_section.hpp"
 #include "imtk/id_scope.hpp"
 
-#include "imtk/prop/payload.hpp"
+#include "imtk/prop/view.hpp"
+
+#include <optional>
 
 namespace imtk::prop
 {
@@ -60,8 +62,8 @@ namespace imtk::prop
 			bool start_open = false;
 		};
 
-		subform(const char* label, const view_generator& property_generator, config cfg = {});
-		subform(const char* label, config cfg = {});
+		subform(std::string_view label, const view_generator& property_generator, config cfg = {});
+		subform(std::string_view label, config cfg = {});
 		subform(const subform&) = delete;
 		subform(subform&&) = delete;
 
