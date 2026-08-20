@@ -2,6 +2,8 @@
 
 #include "imtk/desc/datapath.hpp"
 
+#include <imp/type_erasure.hpp>
+
 #include <unordered_map>
 #include <variant>
 
@@ -116,11 +118,11 @@ namespace imtk::desc
 			return _vector.end();
 		}
 
-		void* resolve(datapath_view path, std::type_index type)
+		void* resolve(datapath_view path, imp::type_erasure type)
 		{
 			if (path.empty())
-				return typeid(decltype(*this)) == type ? static_cast<void*>(this) : nullptr;
-
+				return imp::matches_type(type, this);
+			
 			int index = path.step();
 			if (index >= 0 && index < _vector.size())
 				return _vector[index].resolve(path.next(), type);
@@ -231,7 +233,7 @@ namespace imtk::desc
 			return std::get_if<d>(&_variant);
 		}
 
-		void* resolve(datapath_view path, std::type_index type)
+		void* resolve(datapath_view path, imp::type_erasure type)
 		{
 			return std::visit([path, type](auto& desc) { return desc.resolve(path, type); }, _variant);
 		}
@@ -305,10 +307,10 @@ namespace imtk::desc
 			return _map.end();
 		}
 
-		void* resolve(datapath_view path, std::type_index type)
+		void* resolve(datapath_view path, imp::type_erasure type)
 		{
 			if (path.empty())
-				return typeid(decltype(*this)) == type ? static_cast<void*>(this) : nullptr;
+				return imp::matches_type(type, this);
 
 			auto it = _map.find(static_cast<key>((int)path.step()));
 			if (it != _map.end())

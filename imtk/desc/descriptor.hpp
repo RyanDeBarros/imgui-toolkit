@@ -2,6 +2,8 @@
 
 #include "imtk/desc/datapath.hpp"
 
+#include <imp/type_erasure.hpp>
+
 namespace imtk::desc
 {
 	namespace internal
@@ -22,8 +24,6 @@ namespace imtk::desc
 		}
 	}
 
-	// TODO use imp::erase_type over std::type_index
-
 #define _IMTK_UNPAREN(...) __VA_ARGS__
 #define _IMTK_FIELD_DECL(type, field) _IMTK_UNPAREN type field;
 #define _IMTK_SUBPATH_ENUM_ENTRY(_, field) _E_##field,
@@ -37,10 +37,10 @@ namespace imtk::desc
 		GENERATOR(_IMTK_FIELD_DECL)\
 		private: enum : int { GENERATOR(_IMTK_SUBPATH_ENUM_ENTRY) }; \
 		public: struct { GENERATOR(_IMTK_SUBPATH_STRUCT_ENTRY) } subpaths; \
-		void* resolve(imtk::datapath_view path, std::type_index type) \
+		void* resolve(imtk::datapath_view path, imp::type_erasure type) \
 		{ \
 			if (path.empty()) \
-				return typeid(decltype(*this)) == type ? static_cast<void*>(this) : nullptr; \
+				return imp::matches_type(type, this); \
 			switch (path.step()) \
 			{ \
 				GENERATOR(_IMTK_SUBPATH_PATH_GET); \

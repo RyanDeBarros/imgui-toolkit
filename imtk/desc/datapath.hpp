@@ -2,7 +2,6 @@
 
 #include <ostream>
 #include <optional>
-#include <typeindex>
 #include <vector>
 #include <span>
 
