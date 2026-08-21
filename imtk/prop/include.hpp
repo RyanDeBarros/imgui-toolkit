@@ -4,4 +4,5 @@
 #include "common_views.hpp"
 #include "form.hpp"
 #include "property_grid.hpp"
+#include "row_scope.hpp"
 #include "view.hpp"

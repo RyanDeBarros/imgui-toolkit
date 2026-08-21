@@ -50,7 +50,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			std::string label;
+			std::string label; // TODO use interned name?
 		} config;
 
 		bound_widget(bool& data, config_impl config = {}) : data(data), config(std::move(config)) {}
