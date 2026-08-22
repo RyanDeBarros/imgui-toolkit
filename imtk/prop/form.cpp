@@ -78,6 +78,7 @@ namespace imtk::prop
 		active_form = nullptr;
 	}
 
+	// TODO maybe instead of checking in_form(), do away with scopes and call imtk::prop::form as a function that takes a callback (that executes on _draw_content = true). Then in that callback, can call imtk::prop::form_pause() which has two callbacks - on for 'inside' the pause, and one for after resuming the pause.
 	bool in_form()
 	{
 		return active_form && *active_form;

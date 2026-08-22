@@ -1,6 +1,7 @@
 #pragma once
 
-#include "imtk/desc/datapath.hpp"
+#include "imtk/datapath.hpp"
+#include "imtk/key.hpp"
 
 #include <imp/type_erasure.hpp>
 
@@ -24,9 +25,10 @@ namespace imtk::desc
 
 	public:
 		datapath_link link;
+		key key_;
 
-		vector(datapath_link link)
-			: link(std::move(link))
+		vector(key key, datapath_link link)
+			: link(std::move(link)), key_(key)
 		{
 		}
 
@@ -173,6 +175,17 @@ namespace imtk::desc
 			for (size_t i = 0; i < _vector.size(); ++i)
 				_vector[i].copy_data(o._vector[i]);
 		}
+
+		toml_node subnode(toml_node node) const
+		{
+			return node[encode_key(key_)];
+		}
+
+		template<typename value>
+		void dump_into(toml::table& table, value&& value_) const
+		{
+			table.insert_or_assign(encode_key(key_), std::forward<value>(value_));
+		}
 	};
 
 	template<typename... ds>
@@ -253,7 +266,7 @@ namespace imtk::desc
 					return lhs.query_dirty(rhs);
 				else
 					return true;
-				}, _variant, disk._variant);
+			}, _variant, disk._variant);
 		}
 
 		void copy_data(const variant<ds...>& o)
@@ -266,20 +279,128 @@ namespace imtk::desc
 					lhs.copy_data(rhs);
 				else
 					set<rty>().copy_data(rhs);
-				}, _variant, o._variant);
+			}, _variant, o._variant);
 		}
 	};
 
-	template<typename key, typename d>
+	template<typename... ds>
+	class subvariant
+	{
+	public:
+		datapath_link link;
+		key key_;
+
+	private:
+		std::variant<ds...> _variant;
+
+	public:
+		subvariant(key key, datapath_link link)
+			: link(std::move(link)), key_(key), _variant(std::in_place_index<0>, key, this->link.share())
+		{
+		}
+
+		template<typename d>
+		subvariant(key key_, datapath_link link, d&& val)
+			: link(std::move(link)), key_(key), _variant(std::forward<d>(val))
+		{
+			std::visit([this](auto& v) { v.link = this->link.share(); v.key_ = this->key_; }, _variant);
+		}
+
+		template<typename d>
+		d& set()
+		{
+			_variant = d(key_, link.share());
+			return std::get<d>(_variant);
+		}
+
+		template<typename d>
+		void set(d&& desc)
+		{
+			_variant = std::forward<d>(desc);
+			std::visit([this](auto& v) { v.link = link.share(); v.key_ = key_; }, _variant);
+		}
+
+		auto visit(auto&& visitor)
+		{
+			return std::visit([&visitor](auto& desc) { return visitor(desc); }, _variant);
+		}
+
+		auto visit(auto&& visitor) const
+		{
+			return std::visit([&visitor](const auto& desc) { return visitor(desc); }, _variant);
+		}
+
+		template<typename d>
+		d* try_get()
+		{
+			return std::get_if<d>(&_variant);
+		}
+
+		template<typename d>
+		const d* try_get() const
+		{
+			return std::get_if<d>(&_variant);
+		}
+
+		void* resolve(datapath_view path, imp::type_erasure type)
+		{
+			return std::visit([path, type](auto& desc) { return desc.resolve(path, type); }, _variant);
+		}
+
+		void describe(std::ostream& os, datapath_view path) const
+		{
+			return std::visit([&os, path](auto& desc) { return desc.describe(os, path); }, _variant);
+		}
+
+		bool query_dirty(const subvariant<ds...>& disk) const
+		{
+			return std::visit([](const auto& lhs, const auto& rhs) {
+				using lty = std::decay_t<decltype(lhs)>;
+				using rty = std::decay_t<decltype(rhs)>;
+
+				if constexpr (std::is_same_v<lty, rty>)
+					return lhs.query_dirty(rhs);
+				else
+					return true;
+				}, _variant, disk._variant);
+		}
+
+		void copy_data(const subvariant<ds...>& o)
+		{
+			std::visit([this](auto& lhs, const auto& rhs) {
+				using lty = std::decay_t<decltype(lhs)>;
+				using rty = std::decay_t<decltype(rhs)>;
+
+				if constexpr (std::is_same_v<lty, rty>)
+					lhs.copy_data(rhs);
+				else
+					set<rty>().copy_data(rhs);
+				}, _variant, o._variant);
+		}
+
+		toml_node subnode(toml_node node) const
+		{
+			return node[encode_key(key_)];
+		}
+
+		template<typename value>
+		void dump_into(toml::table& table, value&& value_) const
+		{
+			table.insert_or_assign(encode_key(key_), std::forward<value>(value_));
+		}
+	};
+
+	template<typename key_ty, typename d>
 	class map
 	{
-		std::unordered_map<key, d> _map;
+		std::unordered_map<key_ty, d> _map;
 
 	public:
 		datapath_link link;
+		key key_;
 
-		map(datapath_link link)
-			: link(std::move(link))
+		map(key key, datapath_link link)
+			: link(std::move(link)), key_(key)
 		{
 		}
 
@@ -288,7 +409,7 @@ namespace imtk::desc
 			_map.clear();
 		}
 
-		d& operator[](key key)
+		d& operator[](key_ty key)
 		{
 			auto it = _map.find(key);
 			if (it != _map.end())
@@ -312,7 +433,7 @@ namespace imtk::desc
 			if (path.empty())
 				return imp::matches_type(type, this);
 
-			auto it = _map.find(static_cast<key>((int)path.step()));
+			auto it = _map.find(static_cast<key_ty>((int)path.step()));
 			if (it != _map.end())
 				return it->second.resolve(path.next(), type);
 			else
@@ -325,7 +446,7 @@ namespace imtk::desc
 				os << "<error>";
 			else
 			{
-				auto k = static_cast<key>((int)path.step());
+				auto k = static_cast<key_ty>((int)path.step());
 				auto it = _map.find(k);
 				if (it != _map.end())
 				{
@@ -343,7 +464,7 @@ namespace imtk::desc
 			}
 		}
 
-		bool query_dirty(const map<key, d>& disk) const
+		bool query_dirty(const map<key_ty, d>& disk) const
 		{
 			if (_map.size() != disk._map.size())
 				return true;
@@ -361,7 +482,7 @@ namespace imtk::desc
 			return false;
 		}
 
-		void copy_data(const map<key, d>& o)
+		void copy_data(const map<key_ty, d>& o)
 		{
 			for (auto it = _map.begin(); it != _map.end(); ++it)
 			{
@@ -377,6 +498,17 @@ namespace imtk::desc
 				if (!_map.contains(o_key))
 					(*this)[o_key].copy_data(o_desc);
 			}
+		}
+
+		toml_node subnode(toml_node node) const
+		{
+			return node[encode_key(key_)];
+		}
+
+		template<typename value>
+		void dump_into(toml::table& table, value&& value_) const
+		{
+			table.insert_or_assign(encode_key(key_), std::forward<value>(value_));
 		}
 	};
 }

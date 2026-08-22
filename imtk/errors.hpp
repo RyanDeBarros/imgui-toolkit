@@ -10,6 +10,7 @@ namespace imtk
 		none,
 		init_glfw,
 		init_glew,
+		glfw_error,
 		existing_active_instance,
 		no_active_instance,
 		dead_object,

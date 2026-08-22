@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imtk/desc/datapath.hpp"
+#include "imtk/datapath.hpp"
 
 #include <imp/type_erasure.hpp>
 

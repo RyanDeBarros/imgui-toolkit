@@ -1,11 +1,13 @@
 target_sources(imgui-toolkit PRIVATE
 	controls.cpp
 	collapsing_section.cpp
+	datapath.cpp
 	dock.cpp
 	drag_drop.cpp
 	errors.cpp
 	id_scope.cpp
 	item_result.cpp
+	key.cpp
 	label_registry.cpp
 	nav.cpp
 	os_window.cpp
