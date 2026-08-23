@@ -1,8 +1,8 @@
 #pragma once
 
-#include "imtk/instance_guard.hpp"
-
 #include <imgui.h>
+
+#include <imp/instance_guard.hpp>
 
 #include <string_view>
 #include <vector>
@@ -70,7 +70,7 @@ namespace imtk
 		operator bool() const;
 	};
 
-	class main_menu_bar : public instance_guard<main_menu_bar>
+	class main_menu_bar : public imp::instance_guard<main_menu_bar>
 	{
 		bool _alive;
 
@@ -247,7 +247,7 @@ namespace imtk
 		operator bool() const;
 	};
 
-	class context_menu : public instance_guard<context_menu>
+	class context_menu : public imp::instance_guard<context_menu>
 	{
 		bool _alive;
 

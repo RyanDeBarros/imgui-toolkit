@@ -1,11 +1,11 @@
 #pragma once
 
-#include "imtk/instance_guard.hpp"
 #include "imtk/util.hpp"
 
-#include <imp/type_erasure.hpp>
-
 #include <imgui.h>
+
+#include <imp/instance_guard.hpp>
+#include <imp/type_erasure.hpp>
 
 #include <functional>
 #include <optional>
@@ -86,7 +86,7 @@ namespace imtk
 		}
 	};
 
-	class drag_drop_source : public instance_guard<drag_drop_source>
+	class drag_drop_source : public imp::instance_guard<drag_drop_source>
 	{
 		bool _alive;
 
@@ -100,7 +100,7 @@ namespace imtk
 		operator bool() const;
 	};
 
-	class drag_drop_target : public instance_guard<drag_drop_target>
+	class drag_drop_target : public imp::instance_guard<drag_drop_target>
 	{
 		bool _alive;
 

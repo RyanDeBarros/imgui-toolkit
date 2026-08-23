@@ -124,6 +124,4 @@ namespace imtk
 			_published_from.reset();
 		}
 	};
-
-	// TODO convenience utility to use in Field that stores the value bound to by edit_session
 }

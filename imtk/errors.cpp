@@ -2,11 +2,17 @@
 
 namespace imtk
 {
-	static std::function<void(const char*)> error_logger;
+	static std::function<void(std::string_view)> error_logger;
 
-	void set_error_logger(std::function<void(const char*)> logger)
+	void set_error_logger(std::function<void(std::string_view)> logger)
 	{
 		error_logger = std::move(logger);
+	}
+
+	void log_error(std::string_view message)
+	{
+		if (error_logger)
+			error_logger(message);
 	}
 
 	static std::string repr(error_code ec)
@@ -23,8 +29,6 @@ namespace imtk
 			return "glfw error";
 		case error_code::existing_active_instance:
 			return "existing active instance";
-		case error_code::no_active_instance:
-			return "no active instance";
 		case error_code::dead_object:
 			return "dead object";
 		case error_code::load_texture:
@@ -37,14 +41,10 @@ namespace imtk
 	error::error(error_code ec)
 		: ec(ec), std::runtime_error("Error [" + repr(ec) + "]")
 	{
-		if (error_logger)
-			error_logger(what());
 	}
 
 	error::error(error_code ec, std::string info)
 		: ec(ec), std::runtime_error("Error [" + repr(ec) + "]: " + std::string(info))
 	{
-		if (error_logger)
-			error_logger(what());
 	}
 }

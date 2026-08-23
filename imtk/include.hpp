@@ -13,8 +13,6 @@
 #include "edit_session.hpp"
 #include "errors.hpp"
 #include "id_scope.hpp"
-#include "instance_guard.hpp"
-#include "instance_stack.hpp"
 #include "item_result.hpp"
 #include "key.hpp"
 #include "label_registry.hpp"

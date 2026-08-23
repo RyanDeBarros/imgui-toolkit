@@ -1,13 +1,14 @@
 #pragma once
 
-#include "imtk/instance_guard.hpp"
-#include "imtk/instance_stack.hpp"
 #include "imtk/resource_loader.hpp"
 
 #include "imtk/prop/view.hpp"
 #include "imtk/w/widget.hpp"
 
 #include <imgui.h>
+
+#include <imp/instance_guard.hpp>
+#include <imp/instance_stack.hpp>
 
 namespace imtk::prop
 {
@@ -38,7 +39,7 @@ namespace imtk::prop
 		extern bool dirty();
 	}
 
-	struct grid : public instance_guard<grid>
+	struct grid : public imp::instance_guard<grid>
 	{
 		grid();
 
@@ -50,7 +51,7 @@ namespace imtk::prop
 
 		static bool check_property(std::unique_ptr<iview> prop);
 
-		struct subproperty_scope : public instance_stack<subproperty_scope>
+		struct subproperty_scope : public imp::instance_stack<subproperty_scope>
 		{
 			std::vector<std::unique_ptr<iview>> subproperties;
 

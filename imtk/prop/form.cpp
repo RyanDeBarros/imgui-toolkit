@@ -1,6 +1,7 @@
 #include "form.hpp"
 
 #include "imtk/simple_scopes.hpp"
+#include "imtk/errors.hpp"
 
 #include "imtk/prop/property_grid.hpp"
 
