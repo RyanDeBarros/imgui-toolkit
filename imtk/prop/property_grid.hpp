@@ -58,6 +58,8 @@ namespace imtk::prop
 			subproperty_scope() = default;
 			subproperty_scope(const subproperty_scope&) = delete;
 			subproperty_scope(subproperty_scope&&) = delete;
+
+			operator bool() const;
 		};
 	};
 

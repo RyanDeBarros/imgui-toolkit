@@ -13,5 +13,5 @@ namespace imtk
 		key(*key_decoder)(std::string_view) = nullptr;
 	};
 
-	extern void init(const gui_config& config);
+	extern void post_window_init(const gui_config& config);
 }
