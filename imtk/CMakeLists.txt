@@ -9,7 +9,9 @@ target_sources(imgui-toolkit PRIVATE
 	item_result.cpp
 	key.cpp
 	label_registry.cpp
+	logger.cpp
 	nav.cpp
+	notifier.cpp
 	os_window.cpp
 	outline.cpp
 	overlays.cpp
