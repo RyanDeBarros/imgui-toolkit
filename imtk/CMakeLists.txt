@@ -1,4 +1,5 @@
 target_sources(imgui-toolkit PRIVATE
+	breakout_error.cpp
 	controls.cpp
 	collapsing_section.cpp
 	datapath.cpp

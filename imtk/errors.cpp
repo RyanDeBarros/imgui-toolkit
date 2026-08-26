@@ -2,19 +2,6 @@
 
 namespace imtk
 {
-	static std::function<void(std::string_view)> error_logger;
-
-	void set_error_logger(std::function<void(std::string_view)> logger)
-	{
-		error_logger = std::move(logger);
-	}
-
-	void log_error(std::string_view message)
-	{
-		if (error_logger)
-			error_logger(message);
-	}
-
 	static std::string repr(error_code ec)
 	{
 		switch (ec)
@@ -46,5 +33,10 @@ namespace imtk
 	error::error(error_code ec, std::string info)
 		: ec(ec), std::runtime_error("Error [" + repr(ec) + "]: " + std::string(info))
 	{
+	}
+
+	void error::log() const
+	{
+		breakout_error::log(what());
 	}
 }

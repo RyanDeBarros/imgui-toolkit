@@ -4,6 +4,7 @@
 #include "prop/include.hpp"
 #include "w/include.hpp"
 
+#include "breakout_error.hpp"
 #include "collapsing_section.hpp"
 #include "color.hpp"
 #include "controls.hpp"

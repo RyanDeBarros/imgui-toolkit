@@ -11,7 +11,6 @@ namespace imtk
 
 	void post_window_init(const gui_config& config)
 	{
-		set_error_logger(config.error_logger);
 		prop::assign_reset_icon(config.reset_icon);
 		set_key_encoder(config.key_encoder);
 		set_key_decoder(config.key_decoder);

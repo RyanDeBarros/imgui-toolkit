@@ -1,5 +1,7 @@
 #pragma once
 
+#include "imtk/breakout_error.hpp"
+
 #include <functional>
 #include <stdexcept>
 
@@ -20,20 +22,19 @@ namespace imtk
 		load_texture,
 	};
 
-	extern void set_error_logger(std::function<void(std::string_view)> logger);
-	extern void log_error(std::string_view message);
-
 	struct error : public std::runtime_error
 	{
 		error_code ec;
 
 		error(error_code ec);
 		error(error_code ec, std::string info);
+
+		void log() const;
 	};
 
 	template<typename func>
-	void handle_error(func&& func_)
+	void handle_errors(func&& func_)
 	{
-		imp::handle_error<error>(std::forward<func>(func_), [](const error& e) { log_error(e.what()); });
+		imp::handle_error<error, breakout_error>(std::forward<func>(func_), [](const auto& e) { e.log(); });
 	}
 }
