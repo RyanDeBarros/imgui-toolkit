@@ -4,7 +4,7 @@
 
 namespace imtk
 {
-	static imp::functional_event<notification> receive_notification;
+	static imp::event<notification> receive_notification;
 
 	notification::notification(log_level level, std::string message, float timer)
 		: level(level), message(std::move(message)), timer(timer)
@@ -26,7 +26,7 @@ namespace imtk
 		return age >= timer;
 	}
 
-	imp::functional_event<notification>& on_receive_notification()
+	imp::event<notification>& on_receive_notification()
 	{
 		return receive_notification;
 	}

@@ -2,7 +2,7 @@
 
 #include "imtk/logger.hpp"
 
-#include <imp/functional_event.hpp>
+#include <imp/event.hpp>
 
 namespace imtk
 {
@@ -20,7 +20,7 @@ namespace imtk
 		bool expired() const;
 	};
 
-	extern imp::functional_event<notification>& on_receive_notification();
+	extern imp::event<notification>& on_receive_notification();
 
 	extern void notify(log_level level, std::string message, float timer = 3.f);
 	extern void notify_info(std::string message, float timer = 3.f);

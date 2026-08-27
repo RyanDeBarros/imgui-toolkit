@@ -5,7 +5,7 @@
 #include <string>
 #include <variant>
 
-// TODO v9.3 serialize to OS clipboard?
+// TODO v9.3 serialize to OS clipboard? platform dependent, and only windows seems realistic but it's also the most likely target.
 namespace imtk::prop::clipboard
 {
 	struct payload_node

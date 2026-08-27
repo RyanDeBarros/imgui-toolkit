@@ -78,7 +78,7 @@ namespace imtk::prop
 			ImGui::TextUnformatted(label_text.c_str());
 			label_text.clear();
 
-			label_state = item_state::query(); // TODO this only triggers context menu when text element is clicked - but this should actually query the full cell. Context menu should also trigger when right-clicking the value cell, not just the value items
+			label_state = item_state::query();
 			dirty_grid |= clipboard::context_menu(value::properties);
 		}
 	}
