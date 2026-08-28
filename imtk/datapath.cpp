@@ -1,5 +1,7 @@
 #include "datapath.hpp"
 
+#include <sstream>
+
 namespace imtk
 {
 	datapath::datapath(datapath_view path)
@@ -115,5 +117,32 @@ namespace imtk
 	datapath datapath_link::compute_path() const
 	{
 		return _node->compute_path();
+	}
+
+	std::string data_accessor::description(datapath_view path) const
+	{
+		std::stringstream ss;
+		describe(ss, path);
+		return ss.str();
+	}
+
+	active_data_accessor::active_data_accessor(data_accessor& accessor)
+		: accessor(accessor)
+	{
+	}
+
+	void* active_data_accessor::resolve(datapath_view path, imp::type_erasure type)
+	{
+		return instance().accessor.resolve(path, type);
+	}
+	
+	void active_data_accessor::describe(std::ostream& os, datapath_view path)
+	{
+		instance().accessor.describe(os, path);
+	}
+	
+	std::string active_data_accessor::description(imtk::datapath_view path)
+	{
+		return instance().accessor.description(path);
 	}
 }

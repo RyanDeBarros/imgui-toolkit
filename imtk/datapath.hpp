@@ -5,6 +5,9 @@
 #include <vector>
 #include <span>
 
+#include <imp/instance_guard.hpp>
+#include <imp/type_erasure.hpp>
+
 namespace imtk
 {
 	class datapath_view;
@@ -91,6 +94,26 @@ namespace imtk
 		void set_step(datapath::step step);
 		datapath_link share() const;
 		datapath compute_path() const;
+	};
+
+	class data_accessor
+	{
+	public:
+		virtual void* resolve(datapath_view path, imp::type_erasure type) = 0;
+		virtual void describe(std::ostream& os, datapath_view path) const = 0;
+
+		std::string description(imtk::datapath_view path) const;
+	};
+
+	struct active_data_accessor : public imp::instance_guard<active_data_accessor>
+	{
+		data_accessor& accessor;
+
+		active_data_accessor(data_accessor& accessor);
+
+		static void* resolve(datapath_view path, imp::type_erasure type);
+		static void describe(std::ostream& os, datapath_view path);
+		static std::string description(imtk::datapath_view path);
 	};
 }
 

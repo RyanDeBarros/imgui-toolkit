@@ -2,6 +2,8 @@
 
 #include "imtk/prop/property_grid.hpp"
 
+#include <imp/group.hpp>
+
 namespace imtk::prop
 {
 	template<typename ty, typename def_ty>
