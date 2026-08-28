@@ -24,6 +24,7 @@
 #include "outline.hpp"
 #include "overlays.hpp"
 #include "popup.hpp"
+#include "printer.hpp"
 #include "resource_loader.hpp"
 #include "serializer.hpp"
 #include "simple_scopes.hpp"
