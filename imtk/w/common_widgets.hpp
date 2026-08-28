@@ -88,4 +88,25 @@ namespace imtk::w
 	protected:
 		item_result draw_impl() override;
 	};
+
+	struct disabler : public widget
+	{
+		bool disable = false;
+		std::unique_ptr<widget> subwidget;
+
+		disabler(std::unique_ptr<widget> subwidget, bool disable) : subwidget(std::move(subwidget)), disable(disable) {}
+
+	protected:
+		item_result draw_impl() override;
+	};
+
+	struct vertical_list : public widget
+	{
+		std::vector<std::unique_ptr<widget>> subwidgets;
+
+		vertical_list(std::vector<std::unique_ptr<widget>> subwidgets) : subwidgets(std::move(subwidgets)) {}
+
+	protected:
+		item_result draw_impl() override;
+	};
 }

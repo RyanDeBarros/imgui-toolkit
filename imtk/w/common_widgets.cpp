@@ -57,4 +57,20 @@ namespace imtk::w
 	{
 		return view.draw();
 	}
+
+	item_result disabler::draw_impl()
+	{
+		if (auto _ = disabled(disable))
+			return subwidget->draw();
+		else
+			return {};
+	}
+
+	item_result vertical_list::draw_impl()
+	{
+		item_result result;
+		for (auto& subwidget : subwidgets)
+			result |= subwidget->draw();
+		return result;
+	}
 }

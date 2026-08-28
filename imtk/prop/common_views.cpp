@@ -1,5 +1,7 @@
 #include "common_views.hpp"
 
+// TODO DEBT support more complex property views. For example, a dynamic list of strings should be able to paste into another, even though they might have different sizes. Another example is dynamic descriptors, such as checkboxes or combos enabling/disabling sections.
+
 namespace imtk::prop
 {
 	struct payload_list

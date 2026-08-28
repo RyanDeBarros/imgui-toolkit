@@ -4,15 +4,15 @@
 
 namespace imtk::prop
 {
-	template<typename ty>
+	template<typename ty, typename def_ty>
 	class row_scope
 	{
 		bool _valid;
 		ty& _data;
-		const ty& _def;
+		const def_ty& _def;
 
 	public:
-		row_scope(std::string_view label, ty& data, const ty& def)
+		row_scope(std::string_view label, ty& data, const def_ty& def)
 			: _valid(true), _data(data), _def(def)
 		{
 			key::set_label(label);
@@ -47,21 +47,21 @@ namespace imtk::prop
 		}
 	};
 
-	template<typename ty>
-	row_scope<ty> make_row_scope(std::string_view label, ty& data, const ty& def)
+	template<typename ty, typename def_ty>
+	row_scope<ty, def_ty> make_row_scope(std::string_view label, ty& data, const def_ty& def)
 	{
-		return row_scope<ty>(label, data, def);
+		return row_scope<ty, def_ty>(label, data, def);
 	}
 
-	template<typename ty>
-	class row_scope<edit_session<ty>>
+	template<typename ty, typename def_ty>
+	class row_scope<edit_session<ty>, def_ty>
 	{
 		bool _valid;
 		edit_session<ty>& _data;
-		const ty& _def;
+		const def_ty& _def;
 
 	public:
-		row_scope(std::string_view label, edit_session<ty>& data, const ty& def)
+		row_scope(std::string_view label, edit_session<ty>& data, const def_ty& def)
 			: _valid(true), _data(data), _def(def)
 		{
 			key::set_label(label);
@@ -96,9 +96,9 @@ namespace imtk::prop
 		}
 	};
 
-	template<typename ty>
-	row_scope<edit_session<ty>> make_row_scope(std::string_view label, edit_session<ty>& data, const ty& def)
+	template<typename ty, typename def_ty>
+	row_scope<edit_session<ty>, def_ty> make_row_scope(std::string_view label, edit_session<ty>& data, const def_ty& def)
 	{
-		return row_scope<edit_session<ty>>(label, data, def);
+		return row_scope<edit_session<ty>, def_ty>(label, data, def);
 	}
 }

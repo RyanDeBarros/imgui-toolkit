@@ -32,7 +32,7 @@ namespace imtk::w
 			bool separators = false;
 		} config;
 
-		widget_row(config_impl config = {}) : config(std::move(config)) {}
+		widget_row(std::vector<std::unique_ptr<widget>> subwidgets = {}, config_impl config = {}) : subwidgets(std::move(subwidgets)), config(std::move(config)) {}
 
 	protected:
 		item_result draw_impl();

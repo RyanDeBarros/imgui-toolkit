@@ -43,6 +43,18 @@ namespace imtk::w
 		}
 	};
 
+	template<typename ty>
+	std::unique_ptr<bound_widget<ty>> unique_bound_widget(ty& data, typename bound_widget<ty>::config_impl config = {})
+	{
+		return std::make_unique<bound_widget<ty>>(data, std::move(config));
+	}
+
+	template<typename ty>
+	std::unique_ptr<simple_widget<ty>> unique_simple_widget(ty value = {}, typename simple_widget<ty>::config_impl config = {})
+	{
+		return std::make_unique<simple_widget<ty>>(std::move(value), std::move(config));
+	}
+
 	template<>
 	struct bound_widget<bool> : public widget
 	{
