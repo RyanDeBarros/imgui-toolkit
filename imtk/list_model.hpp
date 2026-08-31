@@ -9,6 +9,8 @@
 #include <imp/bitmask.hpp>
 #include <imp/modifiable.hpp>
 
+#include <unordered_set>
+
 namespace imtk
 {
 	enum class list_policy
@@ -103,5 +105,60 @@ namespace imtk
 				break;
 			}
 		}
+	};
+
+	struct list_adapter
+	{
+		virtual ~list_adapter() = default;
+
+		virtual size_t size() const = 0;
+		virtual void apply(const list_op& op) = 0;
+	};
+
+	class list_model
+	{
+		size_t _list_size = 0;
+		imp::modifiable<size_t> _index = 0;
+		std::vector<list_op> _ops;
+		std::unordered_set<size_t> _simul_selected;
+		std::vector<size_t> _simul_selected_ordered;
+
+	public:
+		list_policy policy = list_policy::none;
+
+		size_t size() const;
+
+		void init(size_t size);
+		void sync(size_t size);
+		
+		void init(list_adapter& adapter);
+		void sync(list_adapter& adapter);
+
+	private:
+		void enforce_policy(list_adapter& adapter);
+
+	public:
+		size_t index() const;
+		bool consume_index_modified();
+		bool index_selected(size_t index) const;
+		void on_select(size_t index, bool ctrl, bool shift);
+
+		void clamp();
+		void set_last();
+
+		void defer_append();
+		void defer_delete();
+		void defer_resize(size_t size);
+		void defer_clear();
+		void defer_move(size_t src_index, size_t dst_index);
+
+		bool visit_deferred_ops(const std::function<void(const list_op&)>& fn);
+
+	private:
+		void apply(const list_op& op, list_adapter& adapter);
+
+	public:
+		bool consume_ops(list_adapter& adapter);
+		void invoke(const list_op& op, list_adapter& adapter);
 	};
 }
