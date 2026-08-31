@@ -18,6 +18,7 @@
 #include "item_result.hpp"
 #include "key.hpp"
 #include "label_registry.hpp"
+#include "list_model.hpp"
 #include "logger.hpp"
 #include "nav.hpp"
 #include "notifier.hpp"
