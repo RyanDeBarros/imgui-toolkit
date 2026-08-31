@@ -3,6 +3,8 @@
 #include "imtk/datapath.hpp"
 #include "imtk/key.hpp"
 
+#include "external/toml.hpp"
+
 #include <imp/type_erasure.hpp>
 
 #include <unordered_map>
@@ -43,7 +45,7 @@ namespace imtk::desc
 			for (auto it = _vector.begin() + i; it != _vector.end(); ++it)
 				it->link.set_step(*it->link.step() + 1);
 
-			element.link = datapath_link(link, datapath::step(i));
+			element.link.parent_to(link, datapath::step(i));
 			_vector.insert(_vector.begin() + i, std::move(element));
 		}
 

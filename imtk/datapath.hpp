@@ -92,6 +92,7 @@ namespace imtk
 
 		std::optional<datapath::step> step() const;
 		void set_step(datapath::step step);
+		void parent_to(const datapath_link& parent, datapath::step step);
 		datapath_link share() const;
 		datapath compute_path() const;
 	};

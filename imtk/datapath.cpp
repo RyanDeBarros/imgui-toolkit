@@ -107,6 +107,12 @@ namespace imtk
 		_node->step = step;
 	}
 
+	void datapath_link::parent_to(const datapath_link& parent, datapath::step step)
+	{
+		_node->parent = parent._node;
+		_node->step = step;
+	}
+
 	datapath_link datapath_link::share() const
 	{
 		datapath_link clone;

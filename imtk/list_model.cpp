@@ -2,10 +2,12 @@
 
 namespace imtk
 {
-	list_op list_op::make_append_op()
+	list_op list_op::make_append_op(size_t old_size)
 	{
 		list_op op;
 		op._type = list_op_type::append_;
+		op._index1 = old_size;
+		op._index2 = old_size + 1;
 		return op;
 	}
 
