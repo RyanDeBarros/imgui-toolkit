@@ -322,12 +322,12 @@ namespace imtk::desc
 			std::visit([this](auto& v) { v.link = link.share(); v.key_ = key_; }, _variant);
 		}
 
-		auto visit(auto&& visitor)
+		auto visit(const auto& visitor)
 		{
 			return std::visit([&visitor](auto& desc) { return visitor(desc); }, _variant);
 		}
 
-		auto visit(auto&& visitor) const
+		auto visit(const auto& visitor) const
 		{
 			return std::visit([&visitor](const auto& desc) { return visitor(desc); }, _variant);
 		}
