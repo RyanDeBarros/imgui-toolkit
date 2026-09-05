@@ -66,7 +66,7 @@ namespace imtk::w
 			return {};
 	}
 
-	item_result vertical_list::draw_impl()
+	item_result sequence::draw_impl()
 	{
 		item_result result;
 		for (auto& subwidget : subwidgets)

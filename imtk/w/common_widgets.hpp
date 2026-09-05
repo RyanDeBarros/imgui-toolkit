@@ -100,11 +100,11 @@ namespace imtk::w
 		item_result draw_impl() override;
 	};
 
-	struct vertical_list : public widget
+	struct sequence : public widget
 	{
 		std::vector<std::unique_ptr<widget>> subwidgets;
 
-		vertical_list(std::vector<std::unique_ptr<widget>> subwidgets) : subwidgets(std::move(subwidgets)) {}
+		sequence(std::vector<std::unique_ptr<widget>> subwidgets) : subwidgets(std::move(subwidgets)) {}
 
 	protected:
 		item_result draw_impl() override;

@@ -27,7 +27,7 @@ namespace imtk::w
 		icon_image icon;
 		const char* str_id = "";
 		bool selected = false;
-		const char* tooltip = "";
+		std::string tooltip = "";
 		std::optional<icon_image> selected_icon;
 	};
 

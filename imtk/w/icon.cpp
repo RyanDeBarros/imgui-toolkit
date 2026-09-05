@@ -34,8 +34,8 @@ namespace imtk::w
 		{
 			ImGui::GetWindowDrawList()->AddRectFilled(pos, pos + size, ImGui::GetColorU32(ImGuiCol_HeaderHovered, 0.9f), 6.0f);
 
-			if (config.tooltip)
-				ImGui::SetTooltip(config.tooltip);
+			if (!config.tooltip.empty())
+				ImGui::SetTooltip(config.tooltip.c_str());
 		}
 
 		if (config.selected && config.selected_icon)
