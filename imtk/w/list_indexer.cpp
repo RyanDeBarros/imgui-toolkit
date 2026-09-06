@@ -13,6 +13,46 @@ namespace imtk::w
 		clear_button.config.str_id = "##x";
 	}
 
+	list_indexer::list_indexer(list_model& model, const list_indexer& o)
+		: model(model), create_button(o.create_button), delete_button(o.delete_button), clear_button(o.clear_button)
+		, prompt(o.prompt), combo_name(o.combo_name)
+	{
+	}
+
+	list_indexer::list_indexer(list_model& model, list_indexer&& o) noexcept
+		: model(model), create_button(std::move(o.create_button)), delete_button(std::move(o.delete_button)), clear_button(std::move(o.clear_button))
+		, prompt(std::move(o.prompt)), combo_name(std::move(o.combo_name))
+	{
+	}
+
+	list_indexer& list_indexer::operator=(const list_indexer& o)
+	{
+		if (this != &o)
+		{
+			create_button = o.create_button;
+			delete_button = o.delete_button;
+			clear_button = o.clear_button;
+			prompt = o.prompt;
+			combo_name = o.combo_name;
+		}
+
+		return *this;
+	}
+
+	list_indexer& list_indexer::operator=(list_indexer&& o) noexcept
+	{
+		if (this != &o)
+		{
+			create_button = std::move(o.create_button);
+			delete_button = std::move(o.delete_button);
+			clear_button = std::move(o.clear_button);
+			prompt = std::move(o.prompt);
+			combo_name = std::move(o.combo_name);
+		}
+
+		return *this;
+	}
+
 	item_result list_indexer::draw_impl()
 	{
 		item_result result;
@@ -57,17 +97,6 @@ namespace imtk::w
 		return result;
 	}
 
-	void list_indexer::configure_buttons(icon_image create_icon, std::string create_tooltip,
-		icon_image delete_icon, std::string delete_tooltip, icon_image clear_icon, std::string clear_tooltip)
-	{
-		create_button.config.icon = create_icon;
-		create_button.config.tooltip = std::move(create_tooltip);
-		delete_button.config.icon = delete_icon;
-		delete_button.config.tooltip = std::move(delete_tooltip);
-		clear_button.config.icon = clear_icon;
-		clear_button.config.tooltip = std::move(clear_tooltip);
-	}
-
 	std::function<std::string(size_t)> make_combo_name_from_prefix(std::string slot_prefix)
 	{
 		return [slot_prefix = std::move(slot_prefix)](size_t i) { return slot_prefix + " " + std::to_string(i); };
@@ -75,6 +104,16 @@ namespace imtk::w
 
 	owned_list_indexer::owned_list_indexer()
 		: widget(model)
+	{
+	}
+
+	owned_list_indexer::owned_list_indexer(const owned_list_indexer& o)
+		: model(o.model), widget(model, o.widget)
+	{
+	}
+
+	owned_list_indexer::owned_list_indexer(owned_list_indexer&& o) noexcept
+		: model(std::move(o.model)), widget(model, std::move(o.widget))
 	{
 	}
 

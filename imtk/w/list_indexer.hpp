@@ -17,13 +17,13 @@ namespace imtk::w
 		std::function<std::string(size_t)> combo_name;
 
 		list_indexer(list_model& model);
+		list_indexer(list_model& model, const list_indexer& o);
+		list_indexer(list_model& model, list_indexer&& o) noexcept;
+		list_indexer& operator=(const list_indexer& o);
+		list_indexer& operator=(list_indexer&& o) noexcept;
 
 	protected:
 		item_result draw_impl() override;
-
-	public:
-		void configure_buttons(icon_image create_icon, std::string create_tooltip,
-			icon_image delete_icon, std::string delete_tooltip, icon_image clear_icon, std::string clear_tooltip);
 	};
 
 	extern std::function<std::string(size_t)> make_combo_name_from_prefix(std::string slot_prefix);
@@ -34,6 +34,8 @@ namespace imtk::w
 		list_model model;
 
 		owned_list_indexer();
+		owned_list_indexer(const owned_list_indexer&);
+		owned_list_indexer(owned_list_indexer&&) noexcept;
 
 	protected:
 		item_result draw_impl() override;

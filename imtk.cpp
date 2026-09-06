@@ -12,6 +12,7 @@ namespace imtk
 	void post_window_init(const gui_config& config)
 	{
 		prop::assign_reset_icon(config.reset_icon);
+		w::assign_drag_icon(config.drag_icon);
 		set_key_encoder(config.key_encoder);
 		set_key_decoder(config.key_decoder);
 		glfwSetErrorCallback(glfw_error_callback);

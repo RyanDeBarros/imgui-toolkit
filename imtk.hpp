@@ -8,6 +8,7 @@ namespace imtk
 	struct gui_config
 	{
 		res::icon_id reset_icon;
+		res::icon_id drag_icon;
 		std::string(*key_encoder)(key) = nullptr;
 		key(*key_decoder)(std::string_view) = nullptr;
 	};
