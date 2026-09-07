@@ -3,4 +3,5 @@ target_sources(imgui-toolkit PRIVATE
 	common_views.cpp
 	form.cpp
 	property_grid.cpp
+	row_scope.cpp
 )

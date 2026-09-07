@@ -46,6 +46,7 @@ namespace imtk::prop
 		operator bool() const;
 
 		static bool dirty();
+		static void mark_dirty();
 		static bool check_header(const view_generator& generator);
 		static void add_property(std::unique_ptr<iview> prop);
 

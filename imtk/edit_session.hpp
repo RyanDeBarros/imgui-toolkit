@@ -31,7 +31,6 @@ namespace imtk
 			if (this != &o)
 			{
 				_editing = o._editing;
-				_truth = o._truth;
 				_buffer = o._buffer;
 				_published_from = o._published_from;
 			}
@@ -44,7 +43,6 @@ namespace imtk
 			if (this != &o)
 			{
 				_editing = o._editing;
-				_truth = o._truth;
 				_buffer = std::move(o._buffer);
 				_published_from = std::move(o._published_from);
 			}

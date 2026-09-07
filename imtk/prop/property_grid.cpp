@@ -100,10 +100,9 @@ namespace imtk::prop
 		static void draw_cell()
 		{
 			ImGui::TableSetColumnIndex(1);
-			draw_result = {};
 
 			drawing = true;
-			draw_result |= components.draw();
+			draw_result = components.draw();
 			drawing = false;
 		}
 	}
@@ -200,6 +199,11 @@ namespace imtk::prop
 	bool grid::dirty()
 	{
 		return dirty_grid;
+	}
+
+	void grid::mark_dirty()
+	{
+		dirty_grid = true;
 	}
 
 	bool grid::check_header(const view_generator& generator)

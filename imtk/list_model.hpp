@@ -107,6 +107,8 @@ namespace imtk
 		}
 	};
 
+	// TODO separate list_adapter into class that has size() and class that has apply(). That way, only apply() is required to pass to consume_ops() - replace visit_deferred_ops() with consume_ops()
+
 	struct list_adapter
 	{
 		virtual ~list_adapter() = default;
