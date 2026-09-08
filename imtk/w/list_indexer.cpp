@@ -5,12 +5,48 @@
 
 namespace imtk::w
 {
+	static res::icon_id create_icon;
+	static res::icon_id delete_icon;
+	static res::icon_id clear_icon;
+
+	static void configure_buttons(list_indexer& li)
+	{
+		li.create_button.config.str_id = "##+";
+		li.create_button.config.icon = create_icon;
+		li.delete_button.config.str_id = "##-";
+		li.delete_button.config.icon = delete_icon;
+		li.clear_button.config.str_id = "##x";
+		li.clear_button.config.icon = clear_icon;
+	}
+
 	list_indexer::list_indexer(list_model& model)
 		: model(model)
 	{
-		create_button.config.str_id = "##+";
-		delete_button.config.str_id = "##-";
-		clear_button.config.str_id = "##x";
+		configure_buttons(*this);
+	}
+
+	list_indexer::list_indexer(list_model& model, config cfg, std::function<std::string(size_t)> combo_name)
+		: model(model), combo_name(std::move(combo_name))
+	{
+		configure_buttons(*this);
+
+		create_button.config.tooltip = std::move(cfg.create_tooltip);
+		delete_button.config.tooltip = std::move(cfg.delete_tooltip);
+		clear_button.config.tooltip = std::move(cfg.clear_tooltip);
+
+		prompt = std::move(cfg.prompt);
+	}
+
+	list_indexer::list_indexer(list_model& model, config cfg, std::string combo_slot_prefix)
+		: model(model), combo_name(make_combo_name_from_prefix(combo_slot_prefix))
+	{
+		configure_buttons(*this);
+
+		create_button.config.tooltip = std::move(cfg.create_tooltip);
+		delete_button.config.tooltip = std::move(cfg.delete_tooltip);
+		clear_button.config.tooltip = std::move(cfg.clear_tooltip);
+
+		prompt = std::move(cfg.prompt);
 	}
 
 	list_indexer::list_indexer(list_model& model, const list_indexer& o)
@@ -107,6 +143,16 @@ namespace imtk::w
 	{
 	}
 
+	owned_list_indexer::owned_list_indexer(list_indexer::config cfg, std::function<std::string(size_t)> combo_name)
+		: widget(model, std::move(cfg), std::move(combo_name))
+	{
+	}
+
+	owned_list_indexer::owned_list_indexer(list_indexer::config cfg, std::string combo_slot_prefix)
+		: widget(model, std::move(cfg), std::move(combo_slot_prefix))
+	{
+	}
+
 	owned_list_indexer::owned_list_indexer(const owned_list_indexer& o)
 		: model(o.model), widget(model, o.widget)
 	{
@@ -120,5 +166,12 @@ namespace imtk::w
 	item_result owned_list_indexer::draw_impl()
 	{
 		return widget.draw();
+	}
+
+	void assign_list_indexer_icons(res::icon_id create_icon_, res::icon_id delete_icon_, res::icon_id clear_icon_)
+	{
+		create_icon = create_icon_;
+		delete_icon = delete_icon_;
+		clear_icon = clear_icon_;
 	}
 }
