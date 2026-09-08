@@ -52,6 +52,18 @@ namespace imtk::prop
 		}
 	};
 
+	template<typename ty, typename def_ty>
+	auto make_resettable_value(ty& data, const def_ty& def)
+	{
+		return std::make_unique<resettable_value<ty, def_ty>>(data, def);
+	}
+
+	template<typename ty, typename def_ty>
+	auto make_resettable_value(edit_session<ty>& data, const def_ty& def)
+	{
+		return std::make_unique<resettable_value<edit_session<ty>, def_ty>>(data, def);
+	}
+
 	class resettable_row : public iresettable
 	{
 		std::vector<std::unique_ptr<iresettable>> _resetters;
@@ -76,6 +88,15 @@ namespace imtk::prop
 				r->reset();
 		}
 	};
+	
+	template<typename... ty>
+	std::unique_ptr<resettable_row> make_resettable_value_row(ty&&... resetters)
+	{
+		std::vector<std::unique_ptr<iresettable>> values;
+		values.reserve(sizeof...(resetters));
+		(values.push_back(std::forward<ty>(resetters)), ...);
+		return std::make_unique<resettable_row>(std::move(values));
+	}
 
 	template<typename ty>
 	class resettable_vector_size : public iresettable
@@ -85,8 +106,8 @@ namespace imtk::prop
 		size_t _def_size;
 
 	public:
-		resettable_vector_size(list_model& model, desc::vector<ty>& data, const std::vector<ty>& def)
-			: _model(model), _data(data), _def_size(def.size())
+		resettable_vector_size(list_model& model, desc::vector<ty>& data, size_t def_size)
+			: _model(model), _data(data), _def_size(def_size)
 		{
 		}
 
@@ -104,12 +125,12 @@ namespace imtk::prop
 	template<typename ty, typename def_ty>
 	row_scope make_row_scope(std::string_view label, ty& data, const def_ty& def)
 	{
-		return row_scope(label, std::make_unique<resettable_value<ty, def_ty>>(data, def));
+		return row_scope(label, make_resettable_value(data, def));
 	}
 
 	template<typename ty, typename def_ty>
 	row_scope make_row_scope(std::string_view label, edit_session<ty>& data, const def_ty& def)
 	{
-		return row_scope(label, std::make_unique<resettable_value<edit_session<ty>, def_ty>>(data, def));
+		return row_scope(label, make_resettable_value(data, def));
 	}
 }

@@ -24,4 +24,12 @@ namespace imtk
 	{
 		return key_decoder(key);
 	}
+
+	toml_node toml_get(toml_node node, key key)
+	{
+		if (key != key::null())
+			return node[encode_key(key)];
+		else
+			return node;
+	}
 }

@@ -65,5 +65,21 @@ namespace imtk::w
 		item_result draw_impl() override;
 	};
 
-	extern void assign_drag_icon(res::icon_id);
+	struct dynamic_list
+	{
+		list_model model;
+		dynamic_list_header header;
+		dynamic_list_body body;
+
+		dynamic_list();
+		dynamic_list(const dynamic_list& o);
+		dynamic_list(dynamic_list&& o) noexcept;
+
+		dynamic_list& operator=(const dynamic_list&) = default;
+		dynamic_list& operator=(dynamic_list&&) noexcept = default;
+
+		item_result draw(size_t list_size);
+	};
+
+	extern void assign_dynamic_list_icons(res::icon_id drag_icon, res::icon_id create_icon, res::icon_id delete_icon, res::icon_id clear_icon);
 }

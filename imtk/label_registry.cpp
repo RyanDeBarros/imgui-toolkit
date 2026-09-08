@@ -106,4 +106,9 @@ namespace imtk
 	{
 		return string(*static_cast<handle*>(user_data), idx);
 	}
+
+	label_registry::handle label(const std::string_view label)
+	{
+		return label_registry::intern(label);
+	}
 }

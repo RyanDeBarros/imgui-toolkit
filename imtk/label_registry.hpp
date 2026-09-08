@@ -29,4 +29,6 @@ namespace imtk
 
 		static const char* combo_getter(void* user_data, int idx);
 	};
+
+	extern label_registry::handle label(const std::string_view label);
 }

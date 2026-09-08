@@ -4,6 +4,8 @@
 #include IMTK_KEY_DECL_PATH
 #endif
 
+#include "external/toml.hpp"
+
 #include <string>
 #include <string_view>
 
@@ -33,4 +35,6 @@ namespace imtk
 
 	extern std::string encode_key(key key);
 	extern key decode_key(std::string_view key);
+
+	extern toml_node toml_get(toml_node node, key key);
 }

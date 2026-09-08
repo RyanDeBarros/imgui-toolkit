@@ -6,13 +6,22 @@
 namespace imtk::w
 {
 	static res::icon_id drag_icon;
+	static res::icon_id create_icon;
+	static res::icon_id delete_icon;
+	static res::icon_id clear_icon;
 
 	dynamic_list_header::dynamic_list_header(list_model& model)
 		: model(model)
 	{
 		create_button.config.str_id = "##+";
+		create_button.config.tooltip = "New item";
+		create_button.config.icon = create_icon;
 		delete_button.config.str_id = "##-";
+		delete_button.config.tooltip = "Remove item";
+		delete_button.config.icon = delete_icon;
 		clear_button.config.str_id = "##x";
+		clear_button.config.tooltip = "Clear items";
+		clear_button.config.icon = clear_icon;
 	}
 
 	dynamic_list_header::dynamic_list_header(list_model& model, const dynamic_list_header& o)
@@ -214,8 +223,35 @@ namespace imtk::w
 		return result;
 	}
 
-	void assign_drag_icon(res::icon_id icon)
+	dynamic_list::dynamic_list()
+		: header(model), body(model)
 	{
-		drag_icon = icon;
+	}
+
+	dynamic_list::dynamic_list(const dynamic_list& o)
+		: model(o.model), header(model, o.header), body(model, o.body)
+	{
+	}
+
+	dynamic_list::dynamic_list(dynamic_list&& o) noexcept
+		: model(std::move(o.model)), header(model, std::move(o.header)), body(model, std::move(o.body))
+	{
+	}
+
+	item_result dynamic_list::draw(size_t list_size)
+	{
+		item_result result;
+		model.sync(list_size);
+		result |= header.draw();
+		result |= body.draw();
+		return result;
+	}
+
+	void assign_dynamic_list_icons(res::icon_id drag_icon_, res::icon_id create_icon_, res::icon_id delete_icon_, res::icon_id clear_icon_)
+	{
+		drag_icon = drag_icon_;
+		create_icon = create_icon_;
+		delete_icon = delete_icon_;
+		clear_icon = clear_icon_;
 	}
 }
