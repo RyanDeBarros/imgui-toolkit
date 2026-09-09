@@ -23,6 +23,7 @@ target_sources(imgui-toolkit PRIVATE
 	simple_scopes.cpp
 	texture.cpp
 	tick.cpp
+	unsaved_changes_modal.cpp
 	color.cpp
 )
 

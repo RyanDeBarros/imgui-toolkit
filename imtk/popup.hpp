@@ -3,6 +3,7 @@
 #include <imgui.h>
 
 #include <string>
+#include <string_view>
 #include <optional>
 
 namespace imtk
@@ -34,7 +35,7 @@ namespace imtk
 			bool _open;
 
 			friend popup;
-			draw_impl(const char* name, popup_config config);
+			draw_impl(const std::string_view name, popup_config config);
 
 		public:
 			draw_impl(const draw_impl&) = delete;
@@ -51,6 +52,7 @@ namespace imtk
 		popup(std::string name, popup_config default_config = {});
 
 		void open();
+		void close();
 		bool is_opening() const;
 		draw_impl draw(std::optional<popup_config> config_override = std::nullopt);
 	};

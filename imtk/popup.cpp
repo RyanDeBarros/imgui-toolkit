@@ -6,7 +6,7 @@
 
 namespace imtk
 {
-	popup::draw_impl::draw_impl(const char* name, popup_config config)
+	popup::draw_impl::draw_impl(const std::string_view name, popup_config config)
 	{
 		if (config.center_window == center_window::always)
 			ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
@@ -14,9 +14,9 @@ namespace imtk
 			ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
 		if (config.modal)
-			_alive = ImGui::BeginPopupModal(name, 0, config.window_flags);
+			_alive = ImGui::BeginPopupModal(name.data(), 0, config.window_flags);
 		else
-			_alive = ImGui::BeginPopup(name, config.window_flags);
+			_alive = ImGui::BeginPopup(name.data(), config.window_flags);
 
 		_open = _alive;
 	}
@@ -59,6 +59,11 @@ namespace imtk
 		_trigger_open = true;
 	}
 
+	void popup::close()
+	{
+		_trigger_open = false;
+	}
+
 	bool popup::is_opening() const
 	{
 		return _trigger_open;
@@ -72,6 +77,6 @@ namespace imtk
 			_trigger_open = false;
 		}
 
-		return draw_impl(_name.c_str(), config_override ? *config_override : _default_config);
+		return draw_impl(_name, config_override ? *config_override : _default_config);
 	}
 }

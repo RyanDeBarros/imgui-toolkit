@@ -34,4 +34,5 @@
 #include "simple_scopes.hpp"
 #include "texture.hpp"
 #include "tick.hpp"
+#include "unsaved_changes_modal.hpp"
 #include "util.hpp"
