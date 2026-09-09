@@ -14,6 +14,7 @@
 #include "drag_drop.hpp"
 #include "edit_session.hpp"
 #include "errors.hpp"
+#include "font_instance.hpp"
 #include "id_scope.hpp"
 #include "item_result.hpp"
 #include "key.hpp"

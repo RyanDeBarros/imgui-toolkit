@@ -6,6 +6,7 @@ target_sources(imgui-toolkit PRIVATE
 	dock.cpp
 	drag_drop.cpp
 	errors.cpp
+	font_instance.cpp
 	id_scope.cpp
 	item_result.cpp
 	key.cpp

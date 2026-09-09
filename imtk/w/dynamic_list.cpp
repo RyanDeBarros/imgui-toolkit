@@ -108,7 +108,7 @@ namespace imtk::w
 		{
 			_visible = true;
 
-			if (_drag_button.draw()) // TODO add result to dynamic_row.result to use in dynamic_list_body
+			if (_drag_button.draw())
 				on_select();
 
 			if (auto _ = drag_drop_source())
