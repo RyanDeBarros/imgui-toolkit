@@ -18,6 +18,14 @@ namespace imtk
 			res::icon_id delete_icon;
 			res::icon_id clear_icon;
 		} dynamic_lists;
+
+		struct
+		{
+			res::icon_id drag_icon;
+			res::icon_id create_icon;
+			res::icon_id delete_icon;
+			res::icon_id clear_icon;
+		} list_indexers;
 	};
 
 	extern void post_window_init(const gui_config& config);

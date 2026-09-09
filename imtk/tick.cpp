@@ -22,11 +22,11 @@ namespace imtk
 
 	void end_frame()
 	{
-		++frame_counter;
-
 		tick_processor::process_last_frames(tick_process_phase::submit_edit);
 		tick_processor::process_last_frames(tick_process_phase::check_undo);
 		tick_processor::process_last_frames(tick_process_phase::query_dirty);
+
+		++frame_counter;
 	}
 
 	frame_number frame()

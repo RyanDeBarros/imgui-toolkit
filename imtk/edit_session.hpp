@@ -3,15 +3,33 @@
 #include "imtk/item_result.hpp"
 #include "imtk/tick.hpp"
 
+#include <imp/instance_tracker.hpp>
+
 #include <optional>
 
 namespace imtk
 {
+	namespace internal
+	{
+		class iedit_session : public imp::instance_tracker<iedit_session>
+		{
+		protected:
+			virtual void signal_publish_editing() = 0;
+
+		public:
+			static void signal_publish_editing_all()
+			{
+				for (auto it = instances().begin(); it != instances().end(); ++it)
+					(*it)->signal_publish_editing();
+			}
+		};
+	}
+
 	template<typename ty>
-	class edit_session : public tick_processor
+	class edit_session : public tick_processor, public internal::iedit_session
 	{
 		bool _editing = false;
-
+		
 		ty& _truth;
 		ty _buffer = ty();
 		std::optional<ty> _published_from;
@@ -25,7 +43,7 @@ namespace imtk
 
 		edit_session(const edit_session&) = delete;
 		edit_session(edit_session&&) = delete;
-		
+
 		edit_session& operator=(const edit_session& o)
 		{
 			if (this != &o)
@@ -71,7 +89,6 @@ namespace imtk
 				_buffer = _truth;
 
 			processed_this_frame();
-			_published_from.reset();
 		}
 
 		void post_edit(item_state state)
@@ -104,15 +121,13 @@ namespace imtk
 		void publish_reset(ty to)
 		{
 			_buffer = std::move(to);
-			_published_from = std::move(_truth);
-			_truth = _buffer;
+			publish_impl();
 		}
 
 		void publish_confirm()
 		{
 			_editing = false;
-			_published_from = std::move(_truth);
-			_truth = _buffer;
+			publish_impl();
 		}
 
 		void cancel_editing()
@@ -121,5 +136,27 @@ namespace imtk
 			_buffer = _truth;
 			_published_from.reset();
 		}
+
+	protected:
+		void signal_publish_editing() override
+		{
+			if (_editing)
+				publish_impl();
+		}
+
+	private:
+		void publish_impl()
+		{
+			if (_truth != _buffer)
+			{
+				_published_from = std::move(_truth);
+				_truth = _buffer;
+			}
+		}
 	};
+
+	inline void signal_publish_editing_sessions()
+	{
+		internal::iedit_session::signal_publish_editing_all();
+	}
 }

@@ -88,10 +88,8 @@ namespace imtk::w
 		{
 			data.pre_edit();
 			item_result result;
-			{
-				prop::grid::subproperty_scope s;
+			if (auto s = prop::grid::subproperty_scope())
 				result = subwidget.draw();
-			}
 			data.post_edit(result.state);
 			prop::grid::add_property(std::make_unique<prop::simple_view<edit_session<ty>>>(data));
 			return result;
