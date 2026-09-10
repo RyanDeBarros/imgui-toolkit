@@ -40,7 +40,7 @@ namespace imtk::desc
 		void* resolve(imtk::datapath_view path, imp::type_erasure type) \
 		{ \
 			if (path.empty()) \
-				return imp::matches_type(type, this); \
+				return imp::resolve_type(type, this); \
 			switch (path.step()) \
 			{ \
 				GENERATOR(_IMTK_SUBPATH_PATH_GET); \

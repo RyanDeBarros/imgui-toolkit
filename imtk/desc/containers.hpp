@@ -125,7 +125,7 @@ namespace imtk::desc
 		void* resolve(datapath_view path, imp::type_erasure type)
 		{
 			if (path.empty())
-				return imp::matches_type(type, this);
+				return imp::resolve_type(type, this);
 			
 			int index = path.step();
 			if (index >= 0 && index < _vector.size())
@@ -252,7 +252,7 @@ namespace imtk::desc
 		void* resolve(datapath_view path, imp::type_erasure type)
 		{
 			if (path.empty())
-				return imp::matches_type(type, this);
+				return imp::resolve_type(type, this);
 
 			int index = path.step();
 			if (index >= 0 && index < n)
@@ -558,7 +558,7 @@ namespace imtk::desc
 		void* resolve(datapath_view path, imp::type_erasure type)
 		{
 			if (path.empty())
-				return imp::matches_type(type, this);
+				return imp::resolve_type(type, this);
 
 			auto it = _map.find(static_cast<key_ty>((int)path.step()));
 			if (it != _map.end())
