@@ -5,4 +5,5 @@
 #include "doubler.hpp"
 #include "subdesc.hpp"
 #include "set_action.hpp"
+#include "simple.hpp"
 #include "vector_actions.hpp"
