@@ -158,7 +158,7 @@ FetchContent_Declare(
     imperious
     GIT_REPOSITORY https://github.com/RyanDeBarros/Imperious.git
     GIT_TAG        main
-    # TODO v9.3 use specific tag
+    # TODO LATER use specific tag
 )
 
 FetchContent_MakeAvailable(imperious)
@@ -168,7 +168,7 @@ FetchContent_MakeAvailable(imperious)
 #    Build Toolkit
 # ====================
 
-# TODO licensing may require library to be dynamically linked?
+# TODO LATER licensing may require library to be dynamically linked?
 add_library(imgui-toolkit STATIC)
 
 # Engine compile options (MSVC specific)

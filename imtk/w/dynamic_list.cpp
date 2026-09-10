@@ -3,87 +3,90 @@
 #include "imtk/drag_drop.hpp"
 #include "imtk/id_scope.hpp"
 
-namespace imtk::w
+namespace imtk
 {
 	static res::icon_id drag_icon;
 	static res::icon_id create_icon;
 	static res::icon_id delete_icon;
 	static res::icon_id clear_icon;
 
-	dynamic_list_header::dynamic_list_header(list_model& model)
-		: model(model)
+	namespace w
 	{
-		create_button.config.str_id = "##+";
-		create_button.config.tooltip = "New item";
-		create_button.config.icon = create_icon;
-		delete_button.config.str_id = "##-";
-		delete_button.config.tooltip = "Remove item";
-		delete_button.config.icon = delete_icon;
-		clear_button.config.str_id = "##x";
-		clear_button.config.tooltip = "Clear items";
-		clear_button.config.icon = clear_icon;
-	}
-
-	dynamic_list_header::dynamic_list_header(list_model& model, const dynamic_list_header& o)
-		: model(model), create_button(o.create_button), delete_button(o.delete_button), clear_button(o.clear_button)
-	{
-	}
-
-	dynamic_list_header::dynamic_list_header(list_model& model, dynamic_list_header&& o) noexcept
-		: model(model), create_button(std::move(o.create_button)), delete_button(std::move(o.delete_button)), clear_button(std::move(o.clear_button))
-	{
-	}
-
-	dynamic_list_header& dynamic_list_header::operator=(const dynamic_list_header& o)
-	{
-		if (this != &o)
+		dynamic_list_header::dynamic_list_header(list_model& model)
+			: model(model)
 		{
-			create_button = o.create_button;
-			delete_button = o.delete_button;
-			clear_button = o.clear_button;
+			create_button.config.str_id = "##+";
+			create_button.config.tooltip = "New item";
+			create_button.config.icon = create_icon;
+			delete_button.config.str_id = "##-";
+			delete_button.config.tooltip = "Remove item";
+			delete_button.config.icon = delete_icon;
+			clear_button.config.str_id = "##x";
+			clear_button.config.tooltip = "Clear items";
+			clear_button.config.icon = clear_icon;
 		}
 
-		return *this;
-	}
-	
-	dynamic_list_header& dynamic_list_header::operator=(dynamic_list_header&& o) noexcept
-	{
-		if (this != &o)
+		dynamic_list_header::dynamic_list_header(list_model& model, const dynamic_list_header& o)
+			: model(model), create_button(o.create_button), delete_button(o.delete_button), clear_button(o.clear_button)
 		{
-			create_button = std::move(o.create_button);
-			delete_button = std::move(o.delete_button);
-			clear_button = std::move(o.clear_button);
 		}
 
-		return *this;
-	}
-
-	item_result dynamic_list_header::draw_impl()
-	{
-		item_result result;
-		item_result subresult;
-		
-		subresult = create_button.draw();
-		result |= subresult;
-		if (subresult)
-			model.defer_append();
-
-		if (auto d = disabled(model.size() == 0))
+		dynamic_list_header::dynamic_list_header(list_model& model, dynamic_list_header&& o) noexcept
+			: model(model), create_button(std::move(o.create_button)), delete_button(std::move(o.delete_button)), clear_button(std::move(o.clear_button))
 		{
-			ImGui::SameLine();
-			subresult = delete_button.draw();
+		}
+
+		dynamic_list_header& dynamic_list_header::operator=(const dynamic_list_header& o)
+		{
+			if (this != &o)
+			{
+				create_button = o.create_button;
+				delete_button = o.delete_button;
+				clear_button = o.clear_button;
+			}
+
+			return *this;
+		}
+
+		dynamic_list_header& dynamic_list_header::operator=(dynamic_list_header&& o) noexcept
+		{
+			if (this != &o)
+			{
+				create_button = std::move(o.create_button);
+				delete_button = std::move(o.delete_button);
+				clear_button = std::move(o.clear_button);
+			}
+
+			return *this;
+		}
+
+		item_result dynamic_list_header::draw_impl()
+		{
+			item_result result;
+			item_result subresult;
+
+			subresult = create_button.draw();
 			result |= subresult;
 			if (subresult)
-				model.defer_delete();
+				model.defer_append();
 
-			ImGui::SameLine();
-			subresult = clear_button.draw();
-			result |= subresult;
-			if (subresult)
-				model.defer_resize(0);
+			if (auto d = disabled(model.size() == 0))
+			{
+				ImGui::SameLine();
+				subresult = delete_button.draw();
+				result |= subresult;
+				if (subresult)
+					model.defer_delete();
+
+				ImGui::SameLine();
+				subresult = clear_button.draw();
+				result |= subresult;
+				if (subresult)
+					model.defer_resize(0);
+			}
+
+			return result;
 		}
-
-		return result;
 	}
 
 	struct dynamic_row_payload : public drag_droppable_pod<dynamic_row_payload>
@@ -97,7 +100,7 @@ namespace imtk::w
 		}
 	};
 
-	dynamic_row::dynamic_row(list_model& model, icon_button& drag_button, size_t index, const char* str_id)
+	dynamic_row::dynamic_row(list_model& model, w::icon_button& drag_button, size_t index, const char* str_id)
 		: _model(model), _drag_button(drag_button), _index(index)
 	{
 		_cursor = ImGui::GetCursorScreenPos();
@@ -159,68 +162,71 @@ namespace imtk::w
 		return _index;
 	}
 
-	dynamic_list_body::dynamic_list_body(list_model& model)
-		: model(model)
+	namespace w
 	{
-		drag_button.config.str_id = "##Drag";
-		drag_button.config.tooltip = "Drag item";
-		if (drag_icon)
-			drag_button.config.icon = drag_icon;
-	}
-
-	dynamic_list_body::dynamic_list_body(list_model& model, const dynamic_list_body& o)
-		: model(model), row_draw(o.row_draw), drag_button(o.drag_button)
-	{
-	}
-
-	dynamic_list_body::dynamic_list_body(list_model& model, dynamic_list_body&& o) noexcept
-		: model(model), row_draw(std::move(o.row_draw)), drag_button(std::move(o.drag_button))
-	{
-	}
-
-	dynamic_list_body& dynamic_list_body::operator=(const dynamic_list_body& o)
-	{
-		if (this != &o)
+		dynamic_list_body::dynamic_list_body(list_model& model)
+			: model(model)
 		{
-			row_draw = o.row_draw;
-			drag_button = o.drag_button;
+			drag_button.config.str_id = "##Drag";
+			drag_button.config.tooltip = "Drag item";
+			if (drag_icon)
+				drag_button.config.icon = drag_icon;
 		}
 
-		return *this;
-	}
-
-	dynamic_list_body& dynamic_list_body::operator=(dynamic_list_body&& o) noexcept
-	{
-		if (this != &o)
+		dynamic_list_body::dynamic_list_body(list_model& model, const dynamic_list_body& o)
+			: model(model), row_draw(o.row_draw), drag_button(o.drag_button)
 		{
-			row_draw = std::move(o.row_draw);
-			drag_button = std::move(o.drag_button);
 		}
 
-		return *this;
-	}
-
-	item_result dynamic_list_body::draw_impl()
-	{
-		item_result result;
-
-		for (size_t i = 0; i < model.size(); ++i)
+		dynamic_list_body::dynamic_list_body(list_model& model, dynamic_list_body&& o) noexcept
+			: model(model), row_draw(std::move(o.row_draw)), drag_button(std::move(o.drag_button))
 		{
-			id_scope scope(i);
+		}
 
-			if (auto row = dynamic_row(model, drag_button, i, "Row"))
+		dynamic_list_body& dynamic_list_body::operator=(const dynamic_list_body& o)
+		{
+			if (this != &o)
 			{
-				auto row_result = row_draw(row);
-				if (row_result.state.left_clicked() || row_result.state.focused())
-					row.on_select();
-				result |= row_result;
+				row_draw = o.row_draw;
+				drag_button = o.drag_button;
 			}
+
+			return *this;
 		}
 
-		if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows) && !ImGui::GetIO().WantTextInput && ImGui::Shortcut(ImGuiKey_Delete))
-			model.defer_delete();
+		dynamic_list_body& dynamic_list_body::operator=(dynamic_list_body&& o) noexcept
+		{
+			if (this != &o)
+			{
+				row_draw = std::move(o.row_draw);
+				drag_button = std::move(o.drag_button);
+			}
 
-		return result;
+			return *this;
+		}
+
+		item_result dynamic_list_body::draw_impl()
+		{
+			item_result result;
+
+			for (size_t i = 0; i < model.size(); ++i)
+			{
+				id_scope scope(i);
+
+				if (auto row = dynamic_row(model, drag_button, i, "Row"))
+				{
+					auto row_result = row_draw(row);
+					if (row_result.state.left_clicked() || row_result.state.focused())
+						row.on_select();
+					result |= row_result;
+				}
+			}
+
+			if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows) && !ImGui::GetIO().WantTextInput && ImGui::Shortcut(ImGuiKey_Delete))
+				model.defer_delete();
+
+			return result;
+		}
 	}
 
 	dynamic_list::dynamic_list()
@@ -253,5 +259,18 @@ namespace imtk::w
 		create_icon = create_icon_;
 		delete_icon = delete_icon_;
 		clear_icon = clear_icon_;
+	}
+
+	namespace w
+	{
+		bound_dynamic_list::bound_dynamic_list(dynamic_list& list, size_t list_size)
+			: list(list), list_size(list_size)
+		{
+		}
+
+		item_result bound_dynamic_list::draw_impl()
+		{
+			return list.draw(list_size);
+		}
 	}
 }
