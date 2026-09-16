@@ -1,7 +1,7 @@
 #pragma once
 
 #include "imtk/prop/row_scope.hpp"
-#include "imtk/desc/containers.hpp"
+#include "imtk/desc/vector.hpp"
 
 namespace imtk::prop
 {

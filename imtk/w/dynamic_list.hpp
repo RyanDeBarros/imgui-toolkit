@@ -6,6 +6,8 @@
 #include "imtk/list_model.hpp"
 #include "imtk/simple_scopes.hpp"
 
+#include <functional>
+
 namespace imtk
 {
 	namespace w

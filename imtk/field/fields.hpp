@@ -3,6 +3,7 @@
 #include "imtk/datapath.hpp"
 #include "imtk/edit_session.hpp"
 #include "imtk/key.hpp"
+#include "imtk/list_adapters.hpp"
 
 #include "imtk/field/set_action.hpp"
 
@@ -472,6 +473,28 @@ namespace imtk::field
 		dynamic_list widget;
 
 		using primitive_fld<std::vector<ty>>::primitive_fld;
+
+		struct list_op_adapter : public ilist_op_adapter
+		{
+			vector_fld<ty>& field;
+
+			list_op_adapter(vector_fld<ty>& field)
+				: field(field)
+			{
+			}
+
+			void apply(const list_op& op) const override
+			{
+				field.edit.cancel_editing();
+				op.execute_field_action<ty>(field.link.compute_path());
+			}
+		};
+
+		void consume_ops()
+		{
+			if (widget.model.consume_ops(list_op_adapter(*this)))
+				prop::grid::mark_dirty();
+		}
 	};
 
 	using string_vector_fld = vector_fld<std::string>;

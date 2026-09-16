@@ -3,9 +3,6 @@
 #include "imtk/datapath.hpp"
 #include "imtk/printer.hpp"
 
-#include "desc/vector_actions.hpp"
-#include "field/list_actions.hpp"
-
 #include <imp/bitmask.hpp>
 #include <imp/modifiable.hpp>
 
@@ -57,64 +54,28 @@ namespace imtk
 		void update_op(list_policy policy, list_op& op) const;
 
 		template<typename ty, typename printer = standard_printer<ty>>
-		void execute_desc_action(datapath path) const
-		{
-			switch (type())
-			{
-			case list_op_type::append_:
-				desc::execute_vector_insert_action<ty, printer>(std::move(path), get_old_size());
-				break;
-
-			case list_op_type::delete_:
-				desc::execute_vector_delete_action<ty, printer>(std::move(path), get_index());
-				break;
-
-			case list_op_type::resize_:
-				if (get_old_size() != get_new_size())
-					desc::execute_vector_resize_action<ty>(std::move(path), get_old_size(), get_new_size());
-				break;
-
-			case list_op_type::move_:
-				if (get_src_index() != get_dst_index())
-					desc::execute_vector_move_action<ty>(std::move(path), get_src_index(), get_dst_index());
-				break;
-			}
-		}
+		void execute_desc_action(datapath path) const;
 
 		template<typename ty, typename printer = standard_printer<ty>>
-		void execute_field_action(datapath path) const
-		{
-			switch (type())
-			{
-			case list_op_type::append_:
-				field::execute_list_insert_action<ty, printer>(std::move(path), get_old_size());
-				break;
-
-			case list_op_type::delete_:
-				field::execute_list_delete_action<ty, printer>(std::move(path), get_index());
-				break;
-
-			case list_op_type::resize_:
-				if (get_old_size() != get_new_size())
-					field::execute_list_resize_action<ty>(std::move(path), get_old_size(), get_new_size());
-				break;
-
-			case list_op_type::move_:
-				if (get_src_index() != get_dst_index())
-					field::execute_list_move_action<ty>(std::move(path), get_src_index(), get_dst_index());
-				break;
-			}
-		}
+		void execute_field_action(datapath path) const;
 	};
 
-	// TODO separate list_adapter into class that has size() and class that has apply(). That way, only apply() is required to pass to consume_ops() - replace visit_deferred_ops() with consume_ops()
+	struct isized
+	{
+		virtual size_t size() const = 0;
+	};
+
+	struct ilist_op_adapter
+	{
+		virtual ~ilist_op_adapter() = default;
+
+		virtual void apply(const list_op& op) const = 0;
+	};
 
 	struct list_adapter
 	{
-		virtual ~list_adapter() = default;
-
-		virtual size_t size() const = 0;
-		virtual void apply(const list_op& op) = 0;
+		std::unique_ptr<isized> sized;
+		std::unique_ptr<ilist_op_adapter> ops;
 	};
 
 	class list_model
@@ -133,11 +94,11 @@ namespace imtk
 		void init(size_t size);
 		void sync(size_t size);
 		
-		void init(list_adapter& adapter);
-		void sync(list_adapter& adapter);
+		void init(const list_adapter& adapter);
+		void sync(const list_adapter& adapter);
 
 	private:
-		void enforce_policy(list_adapter& adapter);
+		void enforce_policy(const ilist_op_adapter& adapter);
 
 	public:
 		size_t index() const;
@@ -154,13 +115,11 @@ namespace imtk
 		void defer_clear();
 		void defer_move(size_t src_index, size_t dst_index);
 
-		bool visit_deferred_ops(const std::function<void(const list_op&)>& fn);
-
 	private:
-		void apply(const list_op& op, list_adapter& adapter);
+		void apply(const list_op& op, const ilist_op_adapter& adapter);
 
 	public:
-		bool consume_ops(list_adapter& adapter);
-		void invoke(const list_op& op, list_adapter& adapter);
+		bool consume_ops(const ilist_op_adapter& adapter);
+		void invoke(const list_op& op, const ilist_op_adapter& adapter);
 	};
 }

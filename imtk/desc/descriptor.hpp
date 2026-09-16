@@ -74,5 +74,12 @@ namespace imtk::desc
 #define _IMTK_DUMP_FIELD(_, field) desc.field.dump(table);
 #define IMTK_DUMP_FIELDS(GENERATOR) GENERATOR(_IMTK_DUMP_FIELD)
 
+	template<typename d>
+	d clone_data(const d& desc)
+	{
+		d copy{};
+		copy.copy_data(desc);
+		return copy;
+	}
 	// TODO documentation for how to use fields/descriptors, and how to use generators/macros
 }

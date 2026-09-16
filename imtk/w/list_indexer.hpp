@@ -4,6 +4,8 @@
 #include "imtk/w/icon.hpp"
 #include "imtk/list_model.hpp"
 
+#include <functional>
+
 namespace imtk
 {
 	namespace w

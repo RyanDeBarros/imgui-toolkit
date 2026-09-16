@@ -149,19 +149,19 @@ namespace imtk
 		clamp();
 	}
 
-	void list_model::init(list_adapter& adapter)
+	void list_model::init(const list_adapter& adapter)
 	{
-		init(adapter.size());
-		enforce_policy(adapter);
+		init(adapter.sized->size());
+		enforce_policy(*adapter.ops);
 	}
 
-	void list_model::sync(list_adapter& adapter)
+	void list_model::sync(const list_adapter& adapter)
 	{
-		sync(adapter.size());
-		enforce_policy(adapter);
+		sync(adapter.sized->size());
+		enforce_policy(*adapter.ops);
 	}
 	
-	void list_model::enforce_policy(list_adapter& adapter)
+	void list_model::enforce_policy(const ilist_op_adapter& adapter)
 	{
 		if (_list_size == 0 && imp::has_flag(policy, list_policy::minimum_one))
 			apply(list_op::make_append_op(_list_size), adapter);
@@ -285,57 +285,7 @@ namespace imtk
 		_ops.push_back(list_op::make_move_op(src_index, dst_index));
 	}
 
-	bool list_model::visit_deferred_ops(const std::function<void(const list_op&)>& fn)
-	{
-		bool any = false;
-
-		for (auto it = _ops.begin(); it != _ops.end(); ++it)
-		{
-			if (!it->valid())
-				continue;
-
-			any = true;
-
-			fn(*it);
-
-			switch (it->type())
-			{
-			case list_op_type::append_:
-				++_list_size;
-				set_last();
-				break;
-
-			case list_op_type::delete_:
-				--_list_size;
-				break;
-
-			case list_op_type::resize_:
-				_list_size = it->get_new_size();
-				break;
-			}
-
-			if (!it->update_index(policy, _index))
-				clamp();
-
-			std::unordered_set<size_t> keep_selected;
-			for (auto ut = _simul_selected_ordered.begin(); ut != _simul_selected_ordered.end(); )
-			{
-				if (it->update_index(policy, *ut))
-					keep_selected.insert(*ut++);
-				else
-					ut = _simul_selected_ordered.erase(ut);
-			}
-			_simul_selected = std::move(keep_selected);
-
-			for (auto ut = std::next(it); ut != _ops.end(); ++ut)
-				it->update_op(policy, *ut);
-		}
-
-		_ops.clear();
-		return any;
-	}
-
-	void list_model::apply(const list_op& op, list_adapter& adapter)
+	void list_model::apply(const list_op& op, const ilist_op_adapter& adapter)
 	{
 		switch (op.type())
 		{
@@ -363,7 +313,7 @@ namespace imtk
 	}
 
 	// TODO merge common logic of consume_ops and visit_deferred_ops
-	bool list_model::consume_ops(list_adapter& adapter)
+	bool list_model::consume_ops(const ilist_op_adapter& adapter)
 	{
 		bool any = false;
 
@@ -374,6 +324,15 @@ namespace imtk
 
 			any = true;
 			apply(*it, adapter);
+
+			_simul_selected.clear();
+			for (auto index = _simul_selected_ordered.begin(); index != _simul_selected_ordered.end(); )
+			{
+				if (it->update_index(policy, *index))
+					_simul_selected.insert(*index++);
+				else
+					index = _simul_selected_ordered.erase(index);
+			}
 
 			for (auto ut = std::next(it); ut != _ops.end(); )
 			{
@@ -389,7 +348,7 @@ namespace imtk
 		return any;
 	}
 
-	void list_model::invoke(const imtk::list_op& op, list_adapter& adapter)
+	void list_model::invoke(const imtk::list_op& op, const ilist_op_adapter& adapter)
 	{
 		if (!_ops.empty())
 			consume_ops(adapter);

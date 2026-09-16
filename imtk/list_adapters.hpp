@@ -2,7 +2,8 @@
 
 #include "imtk/list_model.hpp"
 #include "imtk/printer.hpp"
-#include "imtk/desc/containers.hpp"
+
+#include "imtk/desc/vector.hpp"
 
 #include <imp/counter.hpp>
 
@@ -10,49 +11,83 @@
 
 namespace imtk
 {
-	template<typename ty, typename Printer = standard_printer<ty>>
-	struct vector_adapter : public list_adapter
+	template<typename ty>
+	struct vector_sized : public isized
 	{
 		const desc::vector<ty>& v;
 
-		vector_adapter(const desc::vector<ty>& vec) : v(vec) {}
+		vector_sized(const desc::vector<ty>& vec) : v(vec) {}
 
 		size_t size() const override
 		{
 			return v.size();
 		}
+	};
 
-		void apply(const list_op& op) override
+	template<typename ty, typename printer = standard_printer<ty>>
+	struct vector_op_adapter : public ilist_op_adapter
+	{
+		const desc::vector<ty>& v;
+
+		vector_op_adapter(const desc::vector<ty>& vec) : v(vec) {}
+
+		void apply(const list_op& op) const override
 		{
-			op.execute_desc_action<ty, Printer>(v.link.compute_path());
+			op.execute_desc_action<ty, printer>(v.link.compute_path());
 		}
 	};
 
 	template<typename ty>
-	std::unique_ptr<vector_adapter<ty, standard_printer<ty>>> make_vector_adapter(const desc::vector<ty>& vector)
+	vector_op_adapter<ty, standard_printer<ty>> make_vector_op_adapter(const desc::vector<ty>& vector)
 	{
-		return std::make_unique<vector_adapter<ty, standard_printer<ty>>>(vector);
+		return vector_op_adapter<ty, standard_printer<ty>>(vector);
 	}
 
 	template<typename printer, typename ty>
-	std::unique_ptr<vector_adapter<ty, printer>> make_vector_adapter(const desc::vector<ty>& vector)
+	vector_op_adapter<ty, printer> make_vector_op_adapter(const desc::vector<ty>& vector)
 	{
-		return std::make_unique<vector_adapter<ty, printer>>(vector);
+		return vector_op_adapter<ty, printer>(vector);
 	}
 
-	struct list_callback_adapter : public list_adapter
+	template<typename ty>
+	std::unique_ptr<vector_op_adapter<ty, standard_printer<ty>>> make_unique_vector_op_adapter(const desc::vector<ty>& vector)
 	{
-		std::unique_ptr<list_adapter> primary;
+		return std::make_unique<vector_op_adapter<ty, standard_printer<ty>>>(vector);
+	}
+
+	template<typename printer, typename ty>
+	std::unique_ptr<vector_op_adapter<ty, printer>> make_unique_vector_op_adapter(const desc::vector<ty>& vector)
+	{
+		return std::make_unique<vector_op_adapter<ty, printer>>(vector);
+	}
+
+	template<typename ty>
+	list_adapter make_vector_adapter(const desc::vector<ty>& vector)
+	{
+		return {
+			.sized = std::make_unique<vector_sized<ty>>(vector),
+			.ops = make_unique_vector_op_adapter<ty>(vector)
+		};
+	}
+
+	template<typename printer, typename ty>
+	list_adapter make_vector_adapter(const desc::vector<ty>& vector)
+	{
+		return {
+			.sized = std::make_unique<vector_sized<ty>>(vector),
+			.ops = make_unique_vector_op_adapter<printer, ty>(vector)
+		};
+	}
+
+	struct list_callback_adapter : public ilist_op_adapter
+	{
+		std::unique_ptr<ilist_op_adapter> primary;
 		std::function<void(const list_op&)> callback;
 
-		list_callback_adapter(std::unique_ptr<list_adapter>&& primary, std::function<void(const list_op&)> callback) : primary(std::move(primary)), callback(std::move(callback)) {}
+		list_callback_adapter(std::unique_ptr<ilist_op_adapter>&& primary, std::function<void(const list_op&)> callback)
+			: primary(std::move(primary)), callback(std::move(callback)) {}
 
-		size_t size() const override
-		{
-			return primary->size();
-		}
-
-		void apply(const list_op& op) override
+		void apply(const list_op& op) const override
 		{
 			callback(op);
 			primary->apply(op);

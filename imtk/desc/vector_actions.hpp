@@ -4,7 +4,7 @@
 #include "imtk/logger.hpp"
 #include "imtk/printer.hpp"
 
-#include "imtk/desc/containers.hpp"
+#include "imtk/desc/vector.hpp"
 
 #include <imp/undo_history.hpp>
 #include <imp/fixed_array.hpp>
@@ -328,5 +328,33 @@ namespace imtk::desc
 	void execute_vector_resize_action(datapath_view list_path, size_t initial_size, size_t final_size)
 	{
 		imp::undo_history::active_instance().execute(std::make_unique<vector_resize_action<element_ty>>(list_path, initial_size, final_size));
+	}
+}
+
+namespace imtk
+{
+	template<typename ty, typename printer>
+	void list_op::execute_desc_action(datapath path) const
+	{
+		switch (type())
+		{
+		case list_op_type::append_:
+			desc::execute_vector_insert_action<ty, printer>(std::move(path), get_old_size());
+			break;
+
+		case list_op_type::delete_:
+			desc::execute_vector_delete_action<ty, printer>(std::move(path), get_index());
+			break;
+
+		case list_op_type::resize_:
+			if (get_old_size() != get_new_size())
+				desc::execute_vector_resize_action<ty>(std::move(path), get_old_size(), get_new_size());
+			break;
+
+		case list_op_type::move_:
+			if (get_src_index() != get_dst_index())
+				desc::execute_vector_move_action<ty>(std::move(path), get_src_index(), get_dst_index());
+			break;
+		}
 	}
 }
