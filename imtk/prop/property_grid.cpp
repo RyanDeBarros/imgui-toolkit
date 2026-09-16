@@ -86,6 +86,8 @@ namespace imtk::prop
 	namespace value
 	{
 		static bool drawing = false;
+		imp::event<> value_begin;
+		imp::event<> value_end;
 
 		item_result get_draw_result()
 		{
@@ -97,13 +99,25 @@ namespace imtk::prop
 			components.subwidgets.push_back(std::move(component));
 		}
 
+		imp::event<>& on_value_begin()
+		{
+			return value_begin;
+		}
+
+		imp::event<>& on_value_end()
+		{
+			return value_end;
+		}
+
 		static void draw_cell()
 		{
 			ImGui::TableSetColumnIndex(1);
 
 			drawing = true;
+			value_begin.invoke();
 			draw_result = components.draw();
 			drawing = false;
+			value_end.invoke();
 		}
 	}
 

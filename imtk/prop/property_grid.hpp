@@ -9,6 +9,7 @@
 
 #include <imp/instance_guard.hpp>
 #include <imp/instance_stack.hpp>
+#include <imp/event.hpp>
 
 namespace imtk::prop
 {
@@ -22,6 +23,8 @@ namespace imtk::prop
 		extern item_result get_draw_result();
 
 		extern void add_component(std::unique_ptr<w::widget> component);
+		extern imp::event<>& on_value_begin();
+		extern imp::event<>& on_value_end();
 	}
 
 	namespace reset

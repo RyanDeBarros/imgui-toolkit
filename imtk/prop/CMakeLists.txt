@@ -4,4 +4,5 @@ target_sources(imgui-toolkit PRIVATE
 	form.cpp
 	property_grid.cpp
 	row_scope.cpp
+	value_outline.cpp
 )

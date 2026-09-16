@@ -6,4 +6,5 @@
 #include "form.hpp"
 #include "property_grid.hpp"
 #include "row_scope.hpp"
+#include "value_outline.hpp"
 #include "view.hpp"
