@@ -2,9 +2,9 @@
 
 namespace imtk
 {
-	font_instance::font_instance(const char* filename, float size_pixels)
+	font_instance::font_instance(const std::string_view filename, float size_pixels)
 	{
-		_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename, size_pixels);
+		_font = ImGui::GetIO().Fonts->AddFontFromFileTTF(filename.data(), size_pixels);
 	}
 
 	font_instance::font_instance(font_instance&& o) noexcept

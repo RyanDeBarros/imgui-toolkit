@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string_view>
+
 namespace imtk
 {
 	class id_scope
@@ -11,6 +13,7 @@ namespace imtk
 		id_scope(const void* ptr_id);
 		id_scope(int int_id);
 		id_scope(const char* str_id);
+		id_scope(const std::string_view str_id);
 
 		id_scope(const id_scope&) = delete;
 		id_scope(id_scope&& o) noexcept;
@@ -22,6 +25,7 @@ namespace imtk
 		id_scope& push(const void* ptr_id);
 		id_scope& push(int int_id);
 		id_scope& push(const char* str_id);
+		id_scope& push(const std::string_view str_id);
 
 		void pop();
 		void pop_all();

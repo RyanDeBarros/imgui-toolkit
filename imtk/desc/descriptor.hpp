@@ -9,7 +9,7 @@ namespace imtk::desc
 	namespace internal
 	{
 		template<typename ty>
-		void describe(std::ostream& os, datapath_view path, const char* name, const ty& field)
+		void describe(std::ostream& os, datapath_view path, const std::string_view name, const ty& field)
 		{
 			if constexpr (requires(ty t, std::ostream os, datapath_view path) { t.describe(os, path); })
 			{

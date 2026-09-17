@@ -17,15 +17,15 @@ namespace imtk
 			icon_button delete_button;
 			icon_button clear_button;
 
-			std::string prompt;
+			label_registry::handle prompt;
 			std::function<std::string(size_t)> combo_name;
 
 			struct config
 			{
-				std::string prompt;
-				std::string create_tooltip = "New";
-				std::string delete_tooltip = "Delete";
-				std::string clear_tooltip = "Clear";
+				label_registry::handle prompt;
+				label_registry::handle create_tooltip = label("New");
+				label_registry::handle delete_tooltip = label("Delete");
+				label_registry::handle clear_tooltip = label("Clear");
 			};
 
 			list_indexer(list_model& model);

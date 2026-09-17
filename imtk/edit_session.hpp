@@ -118,6 +118,12 @@ namespace imtk
 			return pf;
 		}
 
+		void cancel_to(ty to)
+		{
+			_truth = std::move(to);
+			cancel_editing();
+		}
+
 		void publish_reset(ty to)
 		{
 			_buffer = std::move(to);

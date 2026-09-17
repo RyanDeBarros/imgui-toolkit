@@ -18,6 +18,7 @@ namespace imtk
 			ImDrawFlags flags = 0;
 		};
 
+		void restart();
 		void draw(ImU32 color, config cfg = {}) const;
 	};
 }

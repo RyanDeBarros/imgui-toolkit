@@ -312,7 +312,6 @@ namespace imtk
 		enforce_policy(adapter);
 	}
 
-	// TODO merge common logic of consume_ops and visit_deferred_ops
 	bool list_model::consume_ops(const ilist_op_adapter& adapter)
 	{
 		bool any = false;

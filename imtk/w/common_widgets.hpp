@@ -52,7 +52,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			std::string label;
+			label_registry::handle label;
 		} config;
 
 		combo_widget(int& index, imtk::label_span_registry::handle names, config_impl config = {}) : index(index), names(names), config(std::move(config)) {}
@@ -67,7 +67,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			std::string label;
+			label_registry::handle label;
 
 			ImGuiInputTextFlags flags = 0;
 		} config;

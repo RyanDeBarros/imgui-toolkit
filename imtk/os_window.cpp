@@ -11,7 +11,7 @@
 
 namespace imtk
 {
-	os_window::os_window(int width, int height, const char* title)
+	os_window::os_window(int width, int height, const std::string_view title)
 	{
         if (!glfwInit())
             throw error(error_code::init_glfw);
@@ -21,7 +21,7 @@ namespace imtk
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-        _w = glfwCreateWindow(width, height, title, nullptr, nullptr);
+        _w = glfwCreateWindow(width, height, title.data(), nullptr, nullptr);
         glfwMakeContextCurrent(_w);
 
         if (glewInit() != GLEW_OK)

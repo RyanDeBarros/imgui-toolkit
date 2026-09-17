@@ -7,6 +7,7 @@
 
 #include "imtk/color.hpp"
 #include "imtk/edit_session.hpp"
+#include "imtk/label_registry.hpp"
 #include "imtk/simple_scopes.hpp"
 
 #include "external/glm.hpp"
@@ -62,7 +63,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			std::string label; // TODO use interned name?
+			label_registry::handle label;
 		} config;
 
 		bound_widget(bool& data, config_impl config = {}) : data(data), config(std::move(config)) {}
@@ -103,7 +104,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			std::string label;
+			label_registry::handle label;
 		} config;
 
 		bound_widget(edit_session<bool>& data, config_impl config = {}) : data(data), config(std::move(config)) {}
@@ -153,7 +154,7 @@ namespace imtk::w
 		
 		struct config_impl
 		{
-			std::string label;
+			label_registry::handle label;
 			imp::potential<int> min = imp::nullpotential;
 			imp::potential<int> max = imp::nullpotential;
 
@@ -175,13 +176,13 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			std::string label;
+			label_registry::handle label;
 			imp::potential<float> min = imp::nullpotential;
 			imp::potential<float> max = imp::nullpotential;
 
 			float step = 0.f;
 			float step_fast = 0.f;
-			const char* format = "%.3f";
+			unsigned char precision = 3;
 			ImGuiInputTextFlags flags = 0;
 		} config;
 
@@ -198,13 +199,13 @@ namespace imtk::w
 		
 		struct config_impl
 		{
-			std::string label;
+			label_registry::handle label;
 			imp::potential<double> min = imp::nullpotential;
 			imp::potential<double> max = imp::nullpotential;
 
 			double step = 0.;
 			double step_fast = 0.;
-			const char* format = "%.6f";
+			unsigned char precision = 6;
 			ImGuiInputTextFlags flags = 0;
 		} config;
 
@@ -221,11 +222,11 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			std::string label;
+			label_registry::handle label;
 			imp::potential<float> min = imp::nullpotential;
 			imp::potential<float> max = imp::nullpotential;
-			
-			const char* format = "%.3f";
+
+			unsigned char precision = 3;
 			ImGuiInputTextFlags flags = 0;
 		} config;
 
@@ -242,11 +243,11 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			std::string label;
+			label_registry::handle label;
 			imp::potential<float> min = imp::nullpotential;
 			imp::potential<float> max = imp::nullpotential;
 
-			const char* format = "%.3f";
+			unsigned char precision = 3;
 			ImGuiInputTextFlags flags = 0;
 		} config;
 
@@ -263,11 +264,11 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			std::string label;
+			label_registry::handle label;
 			imp::potential<float> min = imp::nullpotential;
 			imp::potential<float> max = imp::nullpotential;
 
-			const char* format = "%.3f";
+			unsigned char precision = 3;
 			ImGuiInputTextFlags flags = 0;
 		} config;
 
@@ -284,7 +285,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			std::string label;
+			label_registry::handle label;
 
 			size_t max_size = 256;
 			ImGuiInputTextFlags flags = 0;
@@ -305,7 +306,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			std::string label;
+			label_registry::handle label;
 
 			ImGuiColorEditFlags flags = 0;
 		} config;

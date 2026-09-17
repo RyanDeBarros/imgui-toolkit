@@ -3,8 +3,13 @@
 namespace imtk
 {
 	outline::outline()
-		: _start_pos(ImGui::GetCursorScreenPos())
 	{
+		restart();
+	}
+
+	void outline::restart()
+	{
+		_start_pos = ImGui::GetCursorScreenPos();
 	}
 
 	void outline::draw(ImU32 color, config cfg) const

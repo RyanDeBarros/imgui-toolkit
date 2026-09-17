@@ -1,7 +1,9 @@
 #pragma once
 
 #include "imtk/w/widget.hpp"
+
 #include "imtk/resource_loader.hpp"
+#include "imtk/label_registry.hpp"
 
 #include <imgui.h>
 
@@ -27,7 +29,7 @@ namespace imtk::w
 		icon_image icon;
 		const char* str_id = "";
 		bool selected = false;
-		std::string tooltip = "";
+		label_registry::handle tooltip;
 		std::optional<icon_image> selected_icon;
 	};
 
@@ -46,7 +48,7 @@ namespace imtk::w
 	struct icon_menu_item_config
 	{
 		icon_image icon;
-		std::string label;
+		label_registry::handle label;
 	};
 
 	struct icon_menu_item : public widget

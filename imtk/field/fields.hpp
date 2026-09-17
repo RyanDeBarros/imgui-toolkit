@@ -3,6 +3,7 @@
 #include "imtk/datapath.hpp"
 #include "imtk/edit_session.hpp"
 #include "imtk/key.hpp"
+#include "imtk/label_registry.hpp"
 #include "imtk/list_adapters.hpp"
 
 #include "imtk/field/set_action.hpp"
@@ -31,10 +32,15 @@ namespace imtk::field
 		ty value;
 		edit_session<ty> edit;
 		key key_;
-		const char* label; // TODO v9.3 use label_registry for all const char* labels -> use in widgets as well over std::string?
+		label_registry::handle label;
+
+		primitive_fld(datapath_link link, ty def, key key, label_registry::handle label)
+			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), key_(key), label(label)
+		{
+		}
 
 		primitive_fld(datapath_link link, ty def, key key, const char* label)
-			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), key_(key), label(label)
+			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), key_(key), label(imtk::label(label))
 		{
 		}
 
@@ -49,7 +55,7 @@ namespace imtk::field
 
 		void copy_data(const primitive_fld& o)
 		{
-			edit.publish_reset(o.value);
+			edit.cancel_to(o.value);
 		}
 
 		bool query_dirty(const primitive_fld& disk) const
@@ -61,7 +67,7 @@ namespace imtk::field
 		{
 			ty val = def;
 			serializer<ty>{}.load(val, toml_get(node, key_));
-			edit.publish_reset(std::move(val));
+			edit.cancel_to(std::move(val));
 		}
 
 		void dump(toml::table& table) const
@@ -95,7 +101,7 @@ namespace imtk::field
 
 		void draw()
 		{
-			if (auto row = prop::make_row_scope(label, edit, def))
+			if (auto row = prop::make_row_scope(label_registry::string(label), edit, def))
 				prop::value::add_component(std::make_unique<w::bound_widget<edit_session<ty>>>(edit));
 
 			check_undo_action();
@@ -108,10 +114,16 @@ namespace imtk::field
 		bool def;
 		bool value;
 		key key_;
-		const char* label;
+		label_registry::handle label;
 
-		bool_fld(datapath_link link, bool def, key key, const char* label)
+		bool_fld(datapath_link link, bool def, key key, label_registry::handle label)
 			: link(std::move(link)), def(def), value(def), key_(key), label(label)
+		{
+		}
+
+		// TODO replace label_registry::handle with class label_handle that can implicitly take in a const char*. This will simplify a LOT, especially with setting prompts/tooltips. No need for const char* duplicate ctors, as well as const char** for sublabels.
+		bool_fld(datapath_link link, bool def, key key, const char* label)
+			: link(std::move(link)), def(def), value(def), key_(key), label(imtk::label(label))
 		{
 		}
 
@@ -151,7 +163,7 @@ namespace imtk::field
 		{
 			const bool og = value;
 
-			if (auto row = prop::make_row_scope(label, value, def))
+			if (auto row = prop::make_row_scope(label_registry::string(label), value, def))
 				prop::value::add_component(std::make_unique<w::bound_widget<bool>>(value));
 
 			if (og != value)
@@ -171,7 +183,7 @@ namespace imtk::field
 
 		void draw()
 		{
-			if (auto row = prop::make_row_scope(this->label, this->edit, this->def))
+			if (auto row = prop::make_row_scope(label_registry::string(this->label), this->edit, this->def))
 			{
 				auto widget = std::make_unique<w::bound_widget<edit_session<ty>>>(this->edit);
 				widget->subwidget.config.min = min;
@@ -199,10 +211,15 @@ namespace imtk::field
 		e def;
 		e value;
 		key key_;
-		const char* label;
+		label_registry::handle label;
+
+		enum_fld(datapath_link link, e def, key key, label_registry::handle label)
+			: link(std::move(link)), def(def), value(def), key_(key), label(label)
+		{
+		}
 
 		enum_fld(datapath_link link, e def, key key, const char* label)
-			: link(std::move(link)), def(def), value(def), key_(key), label(label)
+			: link(std::move(link)), def(def), value(def), key_(key), label(imtk::label(label))
 		{
 		}
 
@@ -244,7 +261,7 @@ namespace imtk::field
 			int int_value = static_cast<int>(value);
 			const int int_default = static_cast<int>(def);
 
-			if (auto row = prop::make_row_scope(label, int_value, int_default))
+			if (auto row = prop::make_row_scope(label_registry::string(label), int_value, int_default))
 				prop::value::add_component(std::make_unique<w::combo_widget>(int_value, combo_names()));
 
 			value = static_cast<e>(int_value);
@@ -264,10 +281,10 @@ namespace imtk::field
 		datapath_link link;
 		std::array<field, n> fields;
 		key key_;
-		const char* label;
+		label_registry::handle label;
 
 		template<typename ty>
-		array_fld(datapath_link link, std::array<ty, n> def, key key, const char* label)
+		array_fld(datapath_link link, std::array<ty, n> def, key key, label_registry::handle label)
 			: link(std::move(link))
 			, fields(init_fields(std::make_index_sequence<n>{}, this->link, std::move(def), nullptr))
 			, key_(key)
@@ -276,7 +293,16 @@ namespace imtk::field
 		}
 
 		template<typename ty>
-		array_fld(datapath_link link, std::array<ty, n> def, key key, const char* label, const char* (&sublabels)[n])
+		array_fld(datapath_link link, std::array<ty, n> def, key key, const char* label)
+			: link(std::move(link))
+			, fields(init_fields(std::make_index_sequence<n>{}, this->link, std::move(def), nullptr))
+			, key_(key)
+			, label(imtk::label(label))
+		{
+		}
+
+		template<typename ty>
+		array_fld(datapath_link link, std::array<ty, n> def, key key, label_registry::handle label, label_registry::handle(&sublabels)[n])
 			: link(std::move(link))
 			, fields(init_fields(std::make_index_sequence<n>{}, this->link, std::move(def), sublabels))
 			, key_(key)
@@ -284,11 +310,20 @@ namespace imtk::field
 		{
 		}
 
+		template<typename ty>
+		array_fld(datapath_link link, std::array<ty, n> def, key key, const char* label, label_registry::handle(&sublabels)[n])
+			: link(std::move(link))
+			, fields(init_fields(std::make_index_sequence<n>{}, this->link, std::move(def), sublabels))
+			, key_(key)
+			, label(imtk::label(label))
+		{
+		}
+
 	private:
 		template<typename ty, size_t... i>
-		static auto init_fields(std::index_sequence<i...>, datapath_link& link, std::array<ty, n> def, const char** sublabels)
+		static auto init_fields(std::index_sequence<i...>, datapath_link& link, std::array<ty, n> def, label_registry::handle* sublabels)
 		{
-			return std::array<field, n>{ field(datapath_link(link, datapath::step(i)), std::move(def[i]), key::null(), sublabels ? sublabels[i] : "")... };
+			return std::array<field, n>{ field(datapath_link(link, datapath::step(i)), std::move(def[i]), key::null(), sublabels ? sublabels[i] : label_registry::handle())... };
 		}
 
 	public:
@@ -371,7 +406,7 @@ namespace imtk::field
 			//};
 			//if (auto subform = prop::subform(label, generator))
 
-			if (auto subform = prop::subform(label))
+			if (auto subform = prop::subform(imtk::label_registry::string(label)))
 			{
 				for (auto& field : fields)
 					field.draw();
@@ -386,16 +421,27 @@ namespace imtk::field
 		std::array<bool, n> def;
 		std::array<bool, n> value;
 		key key_;
-		const char* label;
+		label_registry::handle label;
 		label_span_registry::handle sublabels = {};
 		bool inline_checkboxes;
+
+		bool_array_fld(datapath_link link, std::array<bool, n> def, key key, label_registry::handle label, const char* (&sublabels)[n], bool inline_checkboxes)
+			: link(std::move(link))
+			, def(def)
+			, value(def)
+			, key_(key)
+			, label(label)
+			, sublabels(label_span_registry::intern(std::span<const char* const>(sublabels, n)))
+			, inline_checkboxes(inline_checkboxes)
+		{
+		}
 
 		bool_array_fld(datapath_link link, std::array<bool, n> def, key key, const char* label, const char* (&sublabels)[n], bool inline_checkboxes)
 			: link(std::move(link))
 			, def(def)
 			, value(def)
 			, key_(key)
-			, label(label)
+			, label(imtk::label(label))
 			, sublabels(label_span_registry::intern(std::span<const char* const>(sublabels, n)))
 			, inline_checkboxes(inline_checkboxes)
 		{
@@ -449,12 +495,12 @@ namespace imtk::field
 			imp::group<bool> data_group(value);
 			imp::group<const bool> def_group(def);
 
-			if (auto row = prop::make_row_scope(label, data_group, def_group))
+			if (auto row = prop::make_row_scope(label_registry::string(label), data_group, def_group))
 			{
 				std::vector<std::unique_ptr<w::widget>> widgets;
 
 				for (size_t i = 0; i < n; ++i)
-					widgets.push_back(w::unique_bound_widget(value[i], { .label = label_span_registry::string(sublabels, i) }));
+					widgets.push_back(w::unique_bound_widget(value[i], { .label = label_span_registry::singular_handle(sublabels, i) }));
 
 				if (inline_checkboxes)
 					prop::value::add_component(std::make_unique<w::widget_row>(std::move(widgets)));
@@ -507,14 +553,22 @@ namespace imtk::field
 		int index_;
 		int def_index;
 		key key_;
-		const char* label;
+		label_registry::handle label;
 		const e* values;
 		label_span_registry::handle names = {};
 		size_t count;
 
 		template<size_t n>
-		disjoint_enum_fld(datapath_link link, e def, key key, const char* label, const e(&values)[n], const char* (&names)[n])
+		disjoint_enum_fld(datapath_link link, e def, key key, label_registry::handle label, const e(&values)[n], const char* (&names)[n])
 			: link(std::move(link)), def(def), key_(key), label(label), values(values), names(label_span_registry::intern(std::span<const char*>(names, n))), count(n)
+		{
+			set_value(def);
+			def_index = index(def);
+		}
+
+		template<size_t n>
+		disjoint_enum_fld(datapath_link link, e def, key key, const char* label, const e(&values)[n], const char* (&names)[n])
+			: link(std::move(link)), def(def), key_(key), label(imtk::label(label)), values(values), names(label_span_registry::intern(std::span<const char*>(names, n))), count(n)
 		{
 			set_value(def);
 			def_index = index(def);
@@ -534,7 +588,7 @@ namespace imtk::field
 		{
 			const auto initial = index_;
 
-			if (auto row = prop::make_row_scope(label, index_, def_index))
+			if (auto row = prop::make_row_scope(label_registry::string(label), index_, def_index))
 				prop::value::add_component(std::make_unique<w::combo_widget>(index_, names));
 
 			if (initial != index_)
@@ -596,10 +650,15 @@ namespace imtk::field
 		edit_session<imp::potential<ty>> edit;
 		key value_key;
 		key enable_key;
-		const char* label;
+		label_registry::handle label;
+
+		optional_range_fld(datapath_link link, imp::potential<ty> def, key value_key, key enable_key, label_registry::handle label)
+			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), value_key(value_key), enable_key(enable_key), label(label)
+		{
+		}
 
 		optional_range_fld(datapath_link link, imp::potential<ty> def, key value_key, key enable_key, const char* label)
-			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), value_key(value_key), enable_key(enable_key), label(label)
+			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), value_key(value_key), enable_key(enable_key), label(imtk::label(label))
 		{
 		}
 
@@ -613,7 +672,7 @@ namespace imtk::field
 
 		void copy_data(const optional_range_fld& o)
 		{
-			edit.publish_reset(o.value);
+			edit.cancel_to(o.value);
 		}
 
 		bool query_dirty(const optional_range_fld& disk) const
@@ -631,7 +690,7 @@ namespace imtk::field
 				serializer<bool>{}.load(val.has_value, node[encode_key(enable_key)]);
 			}
 
-			edit.publish_reset(std::move(val));
+			edit.cancel_to(std::move(val));
 		}
 
 		void dump(toml::table& table) const
@@ -645,7 +704,7 @@ namespace imtk::field
 
 		void draw()
 		{
-			if (auto row = prop::make_row_scope(label, edit, def))
+			if (auto row = prop::make_row_scope(label_registry::string(label), edit, def))
 			{
 				auto widget = std::make_unique<w::bound_widget<edit_session<imp::potential<ty>>>>(edit);
 				widget->subwidget.value.config.min = min;
@@ -695,10 +754,15 @@ namespace imtk::field
 		edit_session<imp::potential<ty>> edit;
 		ty nullopt;
 		key key_;
-		const char* label;
+		label_registry::handle label;
+
+		compact_optional_range_fld(datapath_link link, imp::potential<ty> def, ty nullopt, key key, label_registry::handle label)
+			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), nullopt(nullopt), key_(key), label(label)
+		{
+		}
 
 		compact_optional_range_fld(datapath_link link, imp::potential<ty> def, ty nullopt, key key, const char* label)
-			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), nullopt(nullopt), key_(key), label(label)
+			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), nullopt(nullopt), key_(key), label(imtk::label(label))
 		{
 		}
 
@@ -712,7 +776,7 @@ namespace imtk::field
 
 		void copy_data(const compact_optional_range_fld& o)
 		{
-			edit.publish_reset(o.value);
+			edit.cancel_to(o.value);
 		}
 
 		bool query_dirty(const compact_optional_range_fld& disk) const
@@ -722,7 +786,7 @@ namespace imtk::field
 
 		void draw()
 		{
-			if (auto row = prop::make_row_scope(label, edit, def))
+			if (auto row = prop::make_row_scope(label_registry::string(label), edit, def))
 			{
 				auto widget = std::make_unique<w::bound_widget<edit_session<imp::potential<ty>>>>(edit);
 				widget->subwidget.value.config.min = min;
@@ -756,7 +820,7 @@ namespace imtk::field
 					val.has_value = false;
 			}
 
-			edit.publish_reset(std::move(val));
+			edit.cancel_to(std::move(val));
 		}
 
 		void dump(toml::table& table) const
@@ -808,19 +872,32 @@ namespace imtk::field
 		e def;
 		e value;
 		key key_;
-		const char* label;
+		label_registry::handle label;
 		const e* values;
 		label_span_registry::handle names = {};
 		bool inline_checkboxes;
 
 		static const inline size_t count = count_;
 
-		bitset_fld(datapath_link link, e def, key key, const char* label, const e(&values)[count_], const char* (&names)[count_], bool inline_checkboxes)
+		bitset_fld(datapath_link link, e def, key key, label_registry::handle label, const e(&values)[count_], const char* (&names)[count_], bool inline_checkboxes)
 			: link(std::move(link))
 			, def(def)
 			, value(def)
 			, key_(key)
 			, label(label)
+			, values(values)
+			, names(label_span_registry::intern(std::span<const char* const>(names, count)))
+			, inline_checkboxes(inline_checkboxes)
+		{
+			set_flags();
+		}
+
+		bitset_fld(datapath_link link, e def, key key, const char* label, const e(&values)[count_], const char* (&names)[count_], bool inline_checkboxes)
+			: link(std::move(link))
+			, def(def)
+			, value(def)
+			, key_(key)
+			, label(imtk::label(label))
 			, values(values)
 			, names(label_span_registry::intern(std::span<const char* const>(names, count)))
 			, inline_checkboxes(inline_checkboxes)
@@ -852,14 +929,14 @@ namespace imtk::field
 			imp::group<bool> data_group(value_flags, count);
 			imp::group<const bool> def_group(def_flags, count);
 
-			if (auto row = prop::make_row_scope(label, data_group, def_group))
+			if (auto row = prop::make_row_scope(label_registry::string(label), data_group, def_group))
 			{
 				std::vector<std::unique_ptr<w::widget>> widgets;
 
 				for (size_t i = 0; i < count; ++i)
 				{
 					widgets.push_back(std::make_unique<w::disabler>(
-						w::unique_bound_widget(value_flags[i], { .label = label_span_registry::string(names, i) }),
+						w::unique_bound_widget(value_flags[i], { .label = label_span_registry::singular_handle(names, i) }),
 						disabled && disabled[i]
 					));
 				}

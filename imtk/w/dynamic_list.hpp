@@ -41,7 +41,7 @@ namespace imtk
 		std::unique_ptr<child> _child;
 
 	public:
-		dynamic_row(list_model& model, w::icon_button& _drag_button, size_t index, const char* str_id);
+		dynamic_row(list_model& model, w::icon_button& _drag_button, size_t index, const std::string_view str_id);
 		dynamic_row(const dynamic_row&) = delete;
 		dynamic_row(dynamic_row&&) = delete;
 		~dynamic_row();

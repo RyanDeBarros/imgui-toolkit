@@ -34,8 +34,8 @@ namespace imtk::w
 		{
 			ImGui::GetWindowDrawList()->AddRectFilled(pos, pos + size, ImGui::GetColorU32(ImGuiCol_HeaderHovered, 0.9f), 6.0f);
 
-			if (!config.tooltip.empty())
-				ImGui::SetTooltip(config.tooltip.c_str());
+			if (config.tooltip.valid())
+				ImGui::SetTooltip(label_registry::string(config.tooltip));
 		}
 
 		if (config.selected && config.selected_icon)
@@ -58,7 +58,7 @@ namespace imtk::w
 
 	item_result icon_menu_item::draw_impl()
 	{
-		auto result = imtk::item_result::query(ImGui::MenuItem(("   " + config.label).c_str()));
+		auto result = imtk::item_result::query(ImGui::MenuItem((std::string("   ") + label_registry::string(config.label)).c_str()));
 		config.icon.draw(ImGui::GetItemRectMin() + ImVec2(2.f, 0.f));
 		return result;
 	}

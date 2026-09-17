@@ -19,6 +19,11 @@ namespace imtk
 		push(str_id);
 	}
 
+	id_scope::id_scope(const std::string_view str_id)
+	{
+		push(str_id);
+	}
+
 	id_scope::id_scope(id_scope&& o) noexcept
 		: _depth(o._depth)
 	{
@@ -65,6 +70,11 @@ namespace imtk
 		ImGui::PushID(str_id);
 		++_depth;
 		return *this;
+	}
+
+	id_scope& id_scope::push(const std::string_view str_id)
+	{
+		return push(str_id.data());
 	}
 
 	void id_scope::pop()

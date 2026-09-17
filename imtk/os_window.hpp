@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string_view>
 
 struct GLFWwindow;
 
@@ -20,7 +21,7 @@ namespace imtk
 		mutable state _state;
 
 	public:
-		os_window(int width, int height, const char* title);
+		os_window(int width, int height, const std::string_view title);
 		os_window(const os_window&) = delete;
 		os_window(os_window&&) = delete;
 		~os_window();

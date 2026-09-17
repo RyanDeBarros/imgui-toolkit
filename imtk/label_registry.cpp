@@ -11,12 +11,15 @@ namespace imtk
 
 	label_registry::handle label_registry::intern(const std::string_view label)
 	{
-		return label_registry_instance.intern(label);
+		return !label.empty() ? label_registry_instance.intern(label) : label_registry::handle();
 	}
 
 	const char* label_registry::string(const handle handle)
 	{
-		return label_registry_instance.get(handle).c_str();
+		if (auto ptr = label_registry_instance.try_get(handle))
+			return ptr->c_str();
+		else
+			return "";
 	}
 
 	struct label_span_helper
@@ -79,27 +82,44 @@ namespace imtk
 
 	label_span_registry::handle label_span_registry::intern(const std::vector<std::string>& labels)
 	{
-		return label_span_registry_instance.intern<decltype(labels), label_span_helper>(labels);
+		return !labels.empty()
+			? label_span_registry_instance.intern<decltype(labels), label_span_helper>(labels)
+			: label_span_registry::handle();
 	}
 
 	label_span_registry::handle label_span_registry::intern(const std::span<std::string_view> labels)
 	{
-		return label_span_registry_instance.intern<decltype(labels), label_span_helper, label_span_helper, label_span_conversion>(labels);
+		return !labels.empty()
+			? label_span_registry_instance.intern<decltype(labels), label_span_helper, label_span_helper, label_span_conversion>(labels)
+			: label_span_registry::handle();
 	}
 
 	label_span_registry::handle label_span_registry::intern(const std::span<const char* const> labels)
 	{
-		return label_span_registry_instance.intern<decltype(labels), label_span_helper, label_span_helper, label_span_conversion>(labels);
+		return !labels.empty()
+			? label_span_registry_instance.intern<decltype(labels), label_span_helper, label_span_helper, label_span_conversion>(labels)
+			: label_span_registry::handle();
 	}
 
 	const char* label_span_registry::string(const handle handle, size_t i)
 	{
-		return label_span_registry_instance.get(handle)[i].c_str();
+		if (auto ptr = label_span_registry_instance.try_get(handle))
+			return (*ptr)[i].c_str();
+		else
+			return "";
 	}
+
+    label_registry::handle label_span_registry::singular_handle(const handle handle, size_t i)
+    {
+        return label(string(handle, i));
+    }
 
 	size_t label_span_registry::count(const handle handle)
 	{
-		return label_span_registry_instance.get(handle).size();
+		if (auto ptr = label_span_registry_instance.try_get(handle))
+			return ptr->size();
+		else
+			return 0;
 	}
 
 	const char* label_span_registry::combo_getter(void* user_data, int idx)

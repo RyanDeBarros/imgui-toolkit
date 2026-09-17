@@ -2,6 +2,8 @@
 
 #include <imgui.h>
 
+#include <string_view>
+
 namespace imtk
 {
 	class font_instance
@@ -10,7 +12,7 @@ namespace imtk
 
 	public:
 		font_instance() = default;
-		font_instance(const char* filename, float size_pixels = 0.f);
+		font_instance(const std::string_view filename, float size_pixels = 0.f);
 		font_instance(const font_instance&) = delete;
 		font_instance(font_instance&&) noexcept;
 		~font_instance();

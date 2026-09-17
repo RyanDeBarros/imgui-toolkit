@@ -31,7 +31,7 @@ namespace imtk::controls
 				return nullptr;
 			else
 				return items[idx].c_str();
-			}, const_cast<std::vector<std::string>*>(&items), static_cast<int>(items.size())));
+		}, const_cast<std::vector<std::string>*>(&items), static_cast<int>(items.size())));
 
 		result.modified |= prop::grid::check_property(std::make_unique<prop::dynamic_combo_view>(current_item, items));
 
