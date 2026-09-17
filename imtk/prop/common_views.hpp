@@ -109,9 +109,9 @@ namespace imtk::prop
 	struct combo_view : public iview
 	{
 		int& index;
-		label_span_registry::handle names;
+		label_span_handle names;
 
-		combo_view(int& index, label_span_registry::handle names);
+		combo_view(int& index, label_span_handle names);
 
 		imp::box dump() const override;
 		bool can_load(const imp::box&) const override;

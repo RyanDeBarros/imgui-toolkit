@@ -16,13 +16,13 @@ namespace imtk
 			: model(model)
 		{
 			create_button.config.str_id = "##+";
-			create_button.config.tooltip = label("New item");
+			create_button.config.tooltip = "New item";
 			create_button.config.icon = create_icon;
 			delete_button.config.str_id = "##-";
-			delete_button.config.tooltip = label("Remove item");
+			delete_button.config.tooltip = "Remove item";
 			delete_button.config.icon = delete_icon;
 			clear_button.config.str_id = "##x";
-			clear_button.config.tooltip = label("Clear items");
+			clear_button.config.tooltip = "Clear items";
 			clear_button.config.icon = clear_icon;
 		}
 
@@ -168,7 +168,7 @@ namespace imtk
 			: model(model)
 		{
 			drag_button.config.str_id = "##Drag";
-			drag_button.config.tooltip = label("Drag item");
+			drag_button.config.tooltip = "Drag item";
 			if (drag_icon)
 				drag_button.config.icon = drag_icon;
 		}

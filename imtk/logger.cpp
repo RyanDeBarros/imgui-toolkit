@@ -11,13 +11,13 @@ namespace imtk
         switch (level)
         {
         case log_level::success:
-            return imtk::col::success;
+            return col::success;
         case log_level::warning:
-            return imtk::col::warning;
+            return col::warning;
         case log_level::error:
-            return imtk::col::error;
+            return col::error;
         default:
-            return imtk::col::white;
+            return col::white;
         }
     }
 

@@ -39,9 +39,9 @@ namespace imtk::w
 	item_result combo_widget::draw_impl()
 	{
 		id_scope scope(&index);
-		auto result = prefix_label(label_registry::string(config.label));
+		auto result = prefix_label(config.label.c_str());
 
-		result |= item_result::query(ImGui::Combo("", &index, &label_span_registry::combo_getter, &names, label_span_registry::count(names)));
+		result |= item_result::query(ImGui::Combo("", &index, &label_span_registry::combo_getter, &names, names.count()));
 
 		result.modified |= prop::grid::check_property(std::make_unique<prop::combo_view>(index, names));
 		return result;
@@ -50,7 +50,7 @@ namespace imtk::w
 	item_result readonly_text::draw_impl()
 	{
 		id_scope scope(text.data());
-		return prefix_label(label_registry::string(config.label)) | controls::readonly_text("", text, config.flags);
+		return prefix_label(config.label.c_str()) | controls::readonly_text("", text, config.flags);
 	}
 
 	item_result readonly_text_owned::draw_impl()

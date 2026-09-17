@@ -19,7 +19,7 @@ namespace imtk::w
 	item_result bound_widget<bool>::draw_impl()
 	{
 		id_scope scope(&data);
-		auto result = prefix_label(label_registry::string(config.label));
+		auto result = prefix_label(config.label.c_str());
 
 		result |= item_result::query(ImGui::Checkbox("", &data));
 		
@@ -30,7 +30,7 @@ namespace imtk::w
 	item_result bound_widget<int>::draw_impl()
 	{
 		id_scope scope(&data);
-		auto result = prefix_label(label_registry::string(config.label));
+		auto result = prefix_label(config.label.c_str());
 
 		const int og = data;
 		result |= item_result::query(ImGui::InputInt("", &data, config.step, config.step_fast, config.flags));
@@ -44,7 +44,7 @@ namespace imtk::w
 	item_result bound_widget<float>::draw_impl()
 	{
 		id_scope scope(&data);
-		auto result = prefix_label(label_registry::string(config.label));
+		auto result = prefix_label(config.label.c_str());
 
 		const float og = data;
 		result |= item_result::query(ImGui::InputFloat("", &data, config.step, config.step_fast, precision_format(config.precision), config.flags));
@@ -58,7 +58,7 @@ namespace imtk::w
 	item_result bound_widget<double>::draw_impl()
 	{
 		id_scope scope(&data);
-		auto result = prefix_label(label_registry::string(config.label));
+		auto result = prefix_label(config.label.c_str());
 
 		const double og = data;
 		result |= item_result::query(ImGui::InputDouble("", &data, config.step, config.step_fast, precision_format(config.precision), config.flags));
@@ -72,7 +72,7 @@ namespace imtk::w
 	item_result bound_widget<glm::vec2>::draw_impl()
 	{
 		id_scope scope(&data);
-		auto result = prefix_label(label_registry::string(config.label));
+		auto result = prefix_label(config.label.c_str());
 
 		const glm::vec2 og = data;
 		result |= item_result::query(ImGui::InputFloat2("", glm::value_ptr(data), precision_format(config.precision), config.flags));
@@ -86,7 +86,7 @@ namespace imtk::w
 	item_result bound_widget<glm::vec3>::draw_impl()
 	{
 		id_scope scope(&data);
-		auto result = prefix_label(label_registry::string(config.label));
+		auto result = prefix_label(config.label.c_str());
 
 		const glm::vec3 og = data;
 		result |= item_result::query(ImGui::InputFloat3("", glm::value_ptr(data), precision_format(config.precision), config.flags));
@@ -100,7 +100,7 @@ namespace imtk::w
 	item_result bound_widget<glm::vec4>::draw_impl()
 	{
 		id_scope scope(&data);
-		auto result = prefix_label(label_registry::string(config.label));
+		auto result = prefix_label(config.label.c_str());
 
 		const glm::vec4 og = data;
 		result |= item_result::query(ImGui::InputFloat4("", glm::value_ptr(data), precision_format(config.precision), config.flags));
@@ -114,7 +114,7 @@ namespace imtk::w
 	item_result bound_widget<std::string>::draw_impl()
 	{
 		id_scope scope(&data);
-		auto result = prefix_label(label_registry::string(config.label));
+		auto result = prefix_label(config.label.c_str());
 
 		result |= item_result::query(controls::input_text("", data, config.max_size, config.flags, config.callback, config.user_data));
 
@@ -125,7 +125,7 @@ namespace imtk::w
 	item_result bound_widget<color4>::draw_impl()
 	{
 		id_scope scope(&data);
-		auto result = prefix_label(label_registry::string(config.label));
+		auto result = prefix_label(config.label.c_str());
 
 		result |= item_result::query(ImGui::ColorEdit4("", data.ptr(), config.flags));
 

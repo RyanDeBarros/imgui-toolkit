@@ -147,7 +147,7 @@ namespace imtk
 		instance().accessor.describe(os, path);
 	}
 	
-	std::string active_data_accessor::description(imtk::datapath_view path)
+	std::string active_data_accessor::description(datapath_view path)
 	{
 		return instance().accessor.description(path);
 	}

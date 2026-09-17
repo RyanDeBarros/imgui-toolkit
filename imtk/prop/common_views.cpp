@@ -95,10 +95,10 @@ namespace imtk::prop
 	struct combo_payload
 	{
 		int index;
-		label_span_registry::handle names;
+		label_span_handle names;
 	};
 
-	combo_view::combo_view(int& index, label_span_registry::handle names)
+	combo_view::combo_view(int& index, label_span_handle names)
 		: index(index), names(names)
 	{
 	}

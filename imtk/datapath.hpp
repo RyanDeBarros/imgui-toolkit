@@ -103,7 +103,7 @@ namespace imtk
 		virtual void* resolve(datapath_view path, imp::type_erasure type) = 0;
 		virtual void describe(std::ostream& os, datapath_view path) const = 0;
 
-		std::string description(imtk::datapath_view path) const;
+		std::string description(datapath_view path) const;
 	};
 
 	struct active_data_accessor : public imp::instance_guard<active_data_accessor>
@@ -114,7 +114,7 @@ namespace imtk
 
 		static void* resolve(datapath_view path, imp::type_erasure type);
 		static void describe(std::ostream& os, datapath_view path);
-		static std::string description(imtk::datapath_view path);
+		static std::string description(datapath_view path);
 	};
 }
 

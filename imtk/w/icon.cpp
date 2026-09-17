@@ -25,7 +25,7 @@ namespace imtk::w
 	{
 		const ImVec2 pos = ImGui::GetCursorScreenPos();
 		const ImVec2 size = ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight());
-		auto result = imtk::item_result::query(ImGui::InvisibleButton(config.str_id, size));
+		auto result = item_result::query(ImGui::InvisibleButton(config.str_id, size));
 
 		if (result)
 			config.selected = !config.selected;
@@ -34,8 +34,8 @@ namespace imtk::w
 		{
 			ImGui::GetWindowDrawList()->AddRectFilled(pos, pos + size, ImGui::GetColorU32(ImGuiCol_HeaderHovered, 0.9f), 6.0f);
 
-			if (config.tooltip.valid())
-				ImGui::SetTooltip(label_registry::string(config.tooltip));
+			if (config.tooltip)
+				ImGui::SetTooltip(config.tooltip.c_str());
 		}
 
 		if (config.selected && config.selected_icon)
@@ -58,7 +58,7 @@ namespace imtk::w
 
 	item_result icon_menu_item::draw_impl()
 	{
-		auto result = imtk::item_result::query(ImGui::MenuItem((std::string("   ") + label_registry::string(config.label)).c_str()));
+		auto result = item_result::query(ImGui::MenuItem((std::string("   ") + config.label.c_str()).c_str()));
 		config.icon.draw(ImGui::GetItemRectMin() + ImVec2(2.f, 0.f));
 		return result;
 	}

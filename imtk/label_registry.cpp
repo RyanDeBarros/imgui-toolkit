@@ -21,97 +21,102 @@ namespace imtk
 		else
 			return "";
 	}
+	
+	label_handle::label_handle(const std::string_view label)
+		: _h(label_registry::intern(label))
+	{
+	}
+
+	label_handle::label_handle(const char* label)
+		: _h(label_registry::intern(label))
+	{
+	}
+
+	label_handle& label_handle::operator=(const std::string_view label)
+	{
+		_h = label_registry::intern(label);
+		return *this;
+	}
+
+	label_handle& label_handle::operator=(const char* label)
+	{
+		_h = label_registry::intern(label);
+		return *this;
+	}
+
+	const char* label_handle::c_str() const
+	{
+		return label_registry::string(_h);
+	}
+
+	label_handle::operator bool() const
+	{
+		return _h.valid();
+	}
+
+	size_t label_handle::hash() const
+	{
+		return std::hash<label_registry::handle>{}(_h);
+	}
 
 	struct label_span_helper
 	{
-		size_t operator()(const std::vector<std::string>& span) const
+		struct hash
 		{
-			imp::hasher h;
-			for (const auto& s : span)
-				h.with(s);
-			return h;
-		}
+			size_t operator()(const std::vector<label_handle>& vec) const
+			{
+				imp::hasher h;
+				for (const auto& s : vec)
+					h.with(s);
+				return h;
+			}
 
-		size_t operator()(const std::span<std::string_view> span) const
-		{
-			imp::hasher h;
-			for (const auto& s : span)
-				h.with(s);
-			return h;
-		}
+			size_t operator()(const std::span<label_handle> span) const
+			{
+				imp::hasher h;
+				for (const auto& s : span)
+					h.with(s);
+				return h;
+			}
+		};
 
-		size_t operator()(const std::span<const char* const> span) const
+		struct equal
 		{
-			imp::hasher h;
-			for (const auto& s : span)
-				h.with(std::string_view(s));
-			return h;
-		}
+			bool operator()(const std::vector<label_handle> a, const std::span<label_handle>& b) const
+			{
+				return std::ranges::equal(a, b);
+			}
+		};
 
-		bool operator()(const std::vector<std::string>& a, const std::span<std::string_view>& b) const
+		struct converter
 		{
-			return std::ranges::equal(a, b);
-		}
-
-		bool operator()(const std::vector<std::string>& a, const std::span<const char* const>& b) const
-		{
-			return std::ranges::equal(a, b);
-		}
+			std::vector<label_handle> operator()(const std::span<label_handle> span) const
+			{
+				return std::vector(span.begin(), span.end());
+			}
+		};
 	};
 
-	struct label_span_conversion
-	{
-		std::vector<std::string> operator()(const std::span<std::string_view>& span) const
-		{
-			std::vector<std::string> v;
-			v.reserve(span.size());
-			for (const auto& s : span)
-				v.push_back(std::string(s));
-			return v;
-		}
-
-		std::vector<std::string> operator()(const std::span<const char* const>& span) const
-		{
-			std::vector<std::string> v;
-			v.reserve(span.size());
-			for (const auto& s : span)
-				v.push_back(std::string(s));
-			return v;
-		}
-	};
-
-	label_span_registry::handle label_span_registry::intern(const std::vector<std::string>& labels)
-	{
-		return !labels.empty()
-			? label_span_registry_instance.intern<decltype(labels), label_span_helper>(labels)
-			: label_span_registry::handle();
-	}
-
-	label_span_registry::handle label_span_registry::intern(const std::span<std::string_view> labels)
-	{
-		return !labels.empty()
-			? label_span_registry_instance.intern<decltype(labels), label_span_helper, label_span_helper, label_span_conversion>(labels)
-			: label_span_registry::handle();
-	}
-
-	label_span_registry::handle label_span_registry::intern(const std::span<const char* const> labels)
-	{
-		return !labels.empty()
-			? label_span_registry_instance.intern<decltype(labels), label_span_helper, label_span_helper, label_span_conversion>(labels)
-			: label_span_registry::handle();
-	}
-
-	const char* label_span_registry::string(const handle handle, size_t i)
-	{
-		if (auto ptr = label_span_registry_instance.try_get(handle))
-			return (*ptr)[i].c_str();
-		else
-			return "";
-	}
-
-    label_registry::handle label_span_registry::singular_handle(const handle handle, size_t i)
+    label_span_registry::handle label_span_registry::intern(const std::vector<label_handle>& labels)
     {
-        return label(string(handle, i));
+        return !labels.empty()
+            ? label_span_registry_instance.intern<decltype(labels), label_span_helper::hash>(labels)
+            : label_span_registry::handle();
+    }
+
+	label_span_registry::handle label_span_registry::intern(const std::span<label_handle> labels)
+	{
+		return !labels.empty()
+			? label_span_registry_instance.intern<decltype(labels), label_span_helper::hash, label_span_helper::equal, label_span_helper::converter>(labels)
+			: label_span_registry::handle();
+	}
+
+	label_handle label_span_registry::sublabel(const handle handle, size_t i)
+    {
+		if (auto ptr = label_span_registry_instance.try_get(handle))
+			return (*ptr)[i];
+		else
+			return {};
     }
 
 	size_t label_span_registry::count(const handle handle)
@@ -124,11 +129,35 @@ namespace imtk
 
 	const char* label_span_registry::combo_getter(void* user_data, int idx)
 	{
-		return string(*static_cast<handle*>(user_data), idx);
+		return sublabel(*static_cast<handle*>(user_data), idx).c_str();
 	}
 
-	label_registry::handle label(const std::string_view label)
+	label_span_handle::label_span_handle(const std::vector<label_handle>& labels)
+		: _h(label_span_registry::intern(labels))
 	{
-		return label_registry::intern(label);
+	}
+
+	label_span_handle::label_span_handle(const std::span<label_handle> labels)
+		: _h(label_span_registry::intern(labels))
+	{
+	}
+
+	label_span_handle::label_span_handle(const char** labels, size_t count)
+	{
+		std::vector<label_handle> handles;
+		handles.reserve(count);
+		for (size_t i = 0; i < count; ++i)
+			handles.emplace_back(labels[i]);
+		_h = label_span_registry::intern(handles);
+	}
+
+	label_handle label_span_handle::sublabel(size_t i) const
+	{
+		return label_span_registry::sublabel(_h, i);
+	}
+
+	size_t label_span_handle::count() const
+	{
+		return label_span_registry::count(_h);
 	}
 }

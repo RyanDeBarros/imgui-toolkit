@@ -152,7 +152,7 @@ namespace imtk::prop
 					subrows_to_reset.erase(it);
 
 					id_scope scope(subrow);
-					if (w::icon_button({ .icon = icon, .str_id = "##Reset", .tooltip = label("Reset to default") }).draw())
+					if (w::icon_button({ .icon = icon, .str_id = "##Reset", .tooltip = "Reset to default" }).draw())
 						subrows_activated.insert(subrow);
 				}
 				else

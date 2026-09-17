@@ -97,9 +97,9 @@ namespace imtk
 
 			style_color sc(ImGuiCol_ChildBg, ImGui::GetColorU32(ImGuiCol_FrameBg, 0.75f));
 
-			if (auto _ = child(label_registry::string(prompt), ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_Borders))
+			if (auto _ = child(prompt.c_str(), ImVec2(0, 0), ImGuiChildFlags_AutoResizeY | ImGuiChildFlags_Borders))
 			{
-				ImGui::TextUnformatted(label_registry::string(prompt));
+				ImGui::TextUnformatted(prompt.c_str());
 				ImGui::SameLine();
 
 				item_result subresult;

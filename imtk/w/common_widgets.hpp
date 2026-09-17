@@ -48,14 +48,14 @@ namespace imtk::w
 	struct combo_widget : public widget
 	{
 		int& index;
-		imtk::label_span_registry::handle names;
+		label_span_handle names;
 
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 		} config;
 
-		combo_widget(int& index, imtk::label_span_registry::handle names, config_impl config = {}) : index(index), names(names), config(std::move(config)) {}
+		combo_widget(int& index, label_span_handle names, config_impl config = {}) : index(index), names(names), config(std::move(config)) {}
 
 	protected:
 		item_result draw_impl() override;
@@ -67,7 +67,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 
 			ImGuiInputTextFlags flags = 0;
 		} config;

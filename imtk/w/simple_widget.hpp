@@ -63,7 +63,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 		} config;
 
 		bound_widget(bool& data, config_impl config = {}) : data(data), config(std::move(config)) {}
@@ -104,7 +104,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 		} config;
 
 		bound_widget(edit_session<bool>& data, config_impl config = {}) : data(data), config(std::move(config)) {}
@@ -154,7 +154,7 @@ namespace imtk::w
 		
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 			imp::potential<int> min = imp::nullpotential;
 			imp::potential<int> max = imp::nullpotential;
 
@@ -176,7 +176,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 			imp::potential<float> min = imp::nullpotential;
 			imp::potential<float> max = imp::nullpotential;
 
@@ -199,7 +199,7 @@ namespace imtk::w
 		
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 			imp::potential<double> min = imp::nullpotential;
 			imp::potential<double> max = imp::nullpotential;
 
@@ -222,7 +222,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 			imp::potential<float> min = imp::nullpotential;
 			imp::potential<float> max = imp::nullpotential;
 
@@ -243,7 +243,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 			imp::potential<float> min = imp::nullpotential;
 			imp::potential<float> max = imp::nullpotential;
 
@@ -264,7 +264,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 			imp::potential<float> min = imp::nullpotential;
 			imp::potential<float> max = imp::nullpotential;
 
@@ -285,7 +285,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 
 			size_t max_size = 256;
 			ImGuiInputTextFlags flags = 0;
@@ -306,7 +306,7 @@ namespace imtk::w
 
 		struct config_impl
 		{
-			label_registry::handle label;
+			label_handle label;
 
 			ImGuiColorEditFlags flags = 0;
 		} config;

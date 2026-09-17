@@ -29,7 +29,7 @@ namespace imtk::w
 		icon_image icon;
 		const char* str_id = "";
 		bool selected = false;
-		label_registry::handle tooltip;
+		label_handle tooltip;
 		std::optional<icon_image> selected_icon;
 	};
 
@@ -48,7 +48,7 @@ namespace imtk::w
 	struct icon_menu_item_config
 	{
 		icon_image icon;
-		label_registry::handle label;
+		label_handle label;
 	};
 
 	struct icon_menu_item : public widget

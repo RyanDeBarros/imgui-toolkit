@@ -3,7 +3,7 @@
 namespace imtk
 {
 	unsaved_changes_modal::unsaved_changes_modal(std::string str_id, std::vector<std::string> description)
-		: pop("Unsaved Changes##" + str_id, imtk::popup_config{.center_window = imtk::center_window::always, .window_flags = ImGuiWindowFlags_AlwaysAutoResize})
+		: pop("Unsaved Changes##" + str_id, popup_config{.center_window = center_window::always, .window_flags = ImGuiWindowFlags_AlwaysAutoResize })
 		, description(std::move(description))
 	{
 	}
