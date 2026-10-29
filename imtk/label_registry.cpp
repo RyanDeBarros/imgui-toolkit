@@ -142,7 +142,7 @@ namespace imtk
 	{
 	}
 
-	label_span_handle::label_span_handle(const char** labels, size_t count)
+	label_span_handle::label_span_handle(const char* const* labels, size_t count)
 	{
 		std::vector<label_handle> handles;
 		handles.reserve(count);

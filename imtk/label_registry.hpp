@@ -57,7 +57,7 @@ namespace imtk
 		label_span_handle() = default;
 		label_span_handle(const std::vector<label_handle>& labels);
 		label_span_handle(const std::span<label_handle> labels);
-		label_span_handle(const char** labels, size_t count);
+		label_span_handle(const char* const* labels, size_t count);
 
 		label_handle sublabel(size_t i) const;
 		size_t count() const;

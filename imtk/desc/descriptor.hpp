@@ -87,12 +87,12 @@ namespace imtk::desc
 #define _IMTK_DUMP_FIELD(_, field) desc.field.dump(table);
 #define IMTK_DUMP_FIELDS(GENERATOR) GENERATOR(_IMTK_DUMP_FIELD)
 
-#define _IMTK_DESC_TUPLE_MAKE_RESETTER(field) resetters.push_back(imtk::prop::make_resettable_value(field));
+#define _IMTK_DESC_TUPLE_MAKE_RESETTER(field) resetters.push_back(imtk::prop::make_resettable_value(field.value, field.def));
 #define _IMTK_DESC_TUPLE_CONSUME_PUBLISHED_FROM(field) \
         if (auto _og = field.edit.consume_published_from()) \
         { \
             _consumed = true; \
-            _original.value = _og.value_or(field.value); \
+            _original.field.value = _og.value_or(field.value); \
         }
 #define IMTK_DESC_TUPLE_METHODS(Klass, GENERATOR) \
         public: \

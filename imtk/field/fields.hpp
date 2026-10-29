@@ -514,7 +514,7 @@ namespace imtk::field
 		size_t count;
 
 		template<size_t n>
-		disjoint_enum_fld(datapath_link link, e def, key key, label_handle label, const e(&values)[n], const char*(&names)[n])
+		disjoint_enum_fld(datapath_link link, e def, key key, label_handle label, const e(&values)[n], const char* const(&names)[n])
 			: link(std::move(link)), def(def), key_(key), label(label), values(values), names(names, n), count(n)
 		{
 			set_value(def);
@@ -816,7 +816,7 @@ namespace imtk::field
 
 		static const inline size_t count = count_;
 
-		bitset_fld(datapath_link link, e def, key key, label_handle label, const e(&values)[count_], const char* (&names)[count_], bool inline_checkboxes)
+		bitset_fld(datapath_link link, e def, key key, label_handle label, const e(&values)[count_], const char* const(&names)[count_], bool inline_checkboxes)
 			: link(std::move(link))
 			, def(def)
 			, value(def)
