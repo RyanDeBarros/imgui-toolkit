@@ -155,8 +155,8 @@ namespace imtk::w
 		struct config_impl
 		{
 			label_handle label;
-			imp::potential<int> min = imp::nullpotential;
-			imp::potential<int> max = imp::nullpotential;
+			imp::potential<int> min = imp::kNullPotential;
+			imp::potential<int> max = imp::kNullPotential;
 
 			int step = 1;
 			int step_fast = 100;
@@ -177,8 +177,8 @@ namespace imtk::w
 		struct config_impl
 		{
 			label_handle label;
-			imp::potential<float> min = imp::nullpotential;
-			imp::potential<float> max = imp::nullpotential;
+			imp::potential<float> min = imp::kNullPotential;
+			imp::potential<float> max = imp::kNullPotential;
 
 			float step = 0.f;
 			float step_fast = 0.f;
@@ -200,8 +200,8 @@ namespace imtk::w
 		struct config_impl
 		{
 			label_handle label;
-			imp::potential<double> min = imp::nullpotential;
-			imp::potential<double> max = imp::nullpotential;
+			imp::potential<double> min = imp::kNullPotential;
+			imp::potential<double> max = imp::kNullPotential;
 
 			double step = 0.;
 			double step_fast = 0.;
@@ -223,8 +223,8 @@ namespace imtk::w
 		struct config_impl
 		{
 			label_handle label;
-			imp::potential<float> min = imp::nullpotential;
-			imp::potential<float> max = imp::nullpotential;
+			imp::potential<float> min = imp::kNullPotential;
+			imp::potential<float> max = imp::kNullPotential;
 
 			unsigned char precision = 3;
 			ImGuiInputTextFlags flags = 0;
@@ -244,8 +244,8 @@ namespace imtk::w
 		struct config_impl
 		{
 			label_handle label;
-			imp::potential<float> min = imp::nullpotential;
-			imp::potential<float> max = imp::nullpotential;
+			imp::potential<float> min = imp::kNullPotential;
+			imp::potential<float> max = imp::kNullPotential;
 
 			unsigned char precision = 3;
 			ImGuiInputTextFlags flags = 0;
@@ -265,8 +265,8 @@ namespace imtk::w
 		struct config_impl
 		{
 			label_handle label;
-			imp::potential<float> min = imp::nullpotential;
-			imp::potential<float> max = imp::nullpotential;
+			imp::potential<float> min = imp::kNullPotential;
+			imp::potential<float> max = imp::kNullPotential;
 
 			unsigned char precision = 3;
 			ImGuiInputTextFlags flags = 0;

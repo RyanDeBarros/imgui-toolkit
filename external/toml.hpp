@@ -12,5 +12,5 @@
 
 namespace imtk
 {
-	typedef toml::node_view<const toml::node> toml_node;
+	using toml_node = toml::node_view<const toml::node>;
 }
