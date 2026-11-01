@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imtk/key.hpp"
+#include "imtk/pkey.hpp"
 #include "imtk/serializer.hpp"
 
 namespace imtk::desc
@@ -9,23 +9,23 @@ namespace imtk::desc
 	struct simple
 	{
 		d desc;
-		imtk::key key;
+		pkey key;
 
-		simple(imtk::key key)
+		simple(pkey key)
 			: key(key)
 		{
 		}
 
 		void load(imtk::toml_node node)
 		{
-			desc.load(node[imtk::encode_key(key)]);
+			desc.load(node[imtk::encode_pkey(key)]);
 		}
 
 		void dump(toml::table& table)
 		{
 			toml::table subtable;
 			desc.dump(subtable);
-			table.insert_or_assign(imtk::encode_key(key), std::move(subtable));
+			table.insert_or_assign(imtk::encode_pkey(key), std::move(subtable));
 		}
 
 		const d& operator*() const
@@ -63,9 +63,9 @@ namespace imtk::desc
 	struct simple_array
 	{
 		std::vector<d> descs;
-		imtk::key key;
+		pkey key;
 
-		simple_array(imtk::key key)
+		simple_array(pkey key)
 			: key(key)
 		{
 		}
@@ -73,7 +73,7 @@ namespace imtk::desc
 		void load(imtk::toml_node node)
 		{
 			descs.clear();
-			if (auto array = node[imtk::encode_key(key)].as_array())
+			if (auto array = node[imtk::encode_pkey(key)].as_array())
 			{
 				descs.resize(array->size());
 				for (size_t i = 0; i < descs.size(); ++i)
@@ -90,7 +90,7 @@ namespace imtk::desc
 				descs[i].dump(subtable);
 				array.push_back(std::move(subtable));
 			}
-			table.insert_or_assign(imtk::encode_key(key), std::move(array));
+			table.insert_or_assign(imtk::encode_pkey(key), std::move(array));
 		}
 
 		const d& operator[](size_t i) const

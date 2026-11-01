@@ -2,9 +2,9 @@
 
 #include "imtk/datapath.hpp"
 #include "imtk/edit_session.hpp"
-#include "imtk/key.hpp"
 #include "imtk/label_registry.hpp"
 #include "imtk/list_adapters.hpp"
+#include "imtk/pkey.hpp"
 
 #include "imtk/field/set_action.hpp"
 
@@ -31,16 +31,16 @@ namespace imtk::field
 		ty def;
 		ty value;
 		edit_session<ty> edit;
-		key key_;
+        pkey key;
 		label_handle label;
 
-		primitive_fld(datapath_link link, ty def, key key, label_handle label)
-			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), key_(key), label(label)
+		primitive_fld(datapath_link link, ty def, pkey key, label_handle label)
+			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), key(key), label(label)
 		{
 		}
 
 		primitive_fld(primitive_fld&& o) noexcept
-			: tick_processor(std::move(o)), link(std::move(o.link)), def(std::move(o.def)), value(std::move(o.value)), edit(value), key_(o.key_), label(o.label)
+			: tick_processor(std::move(o)), link(std::move(o.link)), def(std::move(o.def)), value(std::move(o.value)), edit(value), key(o.key), label(o.label)
 		{
 		}
 
@@ -61,14 +61,14 @@ namespace imtk::field
 		void load(toml_node node)
 		{
 			ty val = def;
-			serializer<ty>{}.load(val, toml_get(node, key_));
+			serializer<ty>{}.load(val, toml_get(node, key));
 			edit.cancel_to(std::move(val));
 		}
 
 		void dump(toml::table& table) const
 		{
-			if (key_ != key::null())
-				table.insert_or_assign(encode_key(key_), serializer<ty>{}.dump(edit.truth()));
+			if (key != pkey::null())
+				table.insert_or_assign(encode_pkey(key), serializer<ty>{}.dump(edit.truth()));
 		}
 
 		void dump(toml::array& array) const
@@ -108,11 +108,11 @@ namespace imtk::field
 		datapath_link link;
 		bool def;
 		bool value;
-		key key_;
+		pkey key;
 		label_handle label;
 
-		bool_fld(datapath_link link, bool def, key key, label_handle label)
-			: link(std::move(link)), def(def), value(def), key_(key), label(label)
+		bool_fld(datapath_link link, bool def, pkey key, label_handle label)
+			: link(std::move(link)), def(def), value(def), key(key), label(label)
 		{
 		}
 
@@ -129,13 +129,13 @@ namespace imtk::field
 		void load(toml_node node)
 		{
 			value = def;
-			serializer<bool>{}.load(value, toml_get(node, key_));
+			serializer<bool>{}.load(value, toml_get(node, key));
 		}
 
 		void dump(toml::table& table) const
 		{
-			if (key_ != key::null())
-				table.insert_or_assign(encode_key(key_), serializer<bool>{}.dump(value));
+			if (key != pkey::null())
+				table.insert_or_assign(encode_pkey(key), serializer<bool>{}.dump(value));
 		}
 
 		void dump(toml::array& array) const
@@ -199,11 +199,11 @@ namespace imtk::field
 		datapath_link link;
 		e def;
 		e value;
-		key key_;
+		pkey key;
 		label_handle label;
 
-		enum_fld(datapath_link link, e def, key key, label_handle label)
-			: link(std::move(link)), def(def), value(def), key_(key), label(label)
+		enum_fld(datapath_link link, e def, pkey key, label_handle label)
+			: link(std::move(link)), def(def), value(def), key(key), label(label)
 		{
 		}
 
@@ -220,13 +220,13 @@ namespace imtk::field
 		void load(toml_node node)
 		{
 			value = def;
-			serializer<e>{}.load(value, toml_get(node, key_));
+			serializer<e>{}.load(value, toml_get(node, key));
 		}
 
 		void dump(toml::table& table) const
 		{
-			if (key_ != key::null())
-				table.insert_or_assign(encode_key(key_), serializer<e>{}.dump(value));
+			if (key != pkey::null())
+				table.insert_or_assign(encode_pkey(key), serializer<e>{}.dump(value));
 		}
 
 		void dump(toml::array& array) const
@@ -264,23 +264,23 @@ namespace imtk::field
 	{
 		datapath_link link;
 		std::array<field, n> fields;
-		key key_;
+		pkey key;
 		label_handle label;
 
 		template<typename ty>
-		array_fld(datapath_link link, std::array<ty, n> def, key key, label_handle label)
+		array_fld(datapath_link link, std::array<ty, n> def, pkey key, label_handle label)
 			: link(std::move(link))
 			, fields(init_fields(std::make_index_sequence<n>{}, this->link, std::move(def), nullptr))
-			, key_(key)
+			, key(key)
 			, label(label)
 		{
 		}
 
 		template<typename ty>
-		array_fld(datapath_link link, std::array<ty, n> def, key key, label_handle label, const char*(&sublabels)[n])
+		array_fld(datapath_link link, std::array<ty, n> def, pkey key, label_handle label, const char*(&sublabels)[n])
 			: link(std::move(link))
 			, fields(init_fields(std::make_index_sequence<n>{}, this->link, std::move(def), sublabels))
-			, key_(key)
+			, key(key)
 			, label(label)
 		{
 		}
@@ -289,7 +289,7 @@ namespace imtk::field
 		template<typename ty, size_t... i>
 		static auto init_fields(std::index_sequence<i...>, datapath_link& link, std::array<ty, n> def, const char** sublabels)
 		{
-			return std::array<field, n>{ field(datapath_link(link, datapath::step(i)), std::move(def[i]), key::null(), label_handle(sublabels ? sublabels[i] : ""))... };
+			return std::array<field, n>{ field(datapath_link(link, datapath::step(i)), std::move(def[i]), pkey::null(), label_handle(sublabels ? sublabels[i] : ""))... };
 		}
 
 	public:
@@ -312,7 +312,7 @@ namespace imtk::field
 
 		void load(toml_node node)
 		{
-			if (auto arr = toml_get(node, key_).as_array())
+			if (auto arr = toml_get(node, key).as_array())
 			{
 				for (size_t i = 0; i < n; ++i)
 				{
@@ -326,19 +326,19 @@ namespace imtk::field
 
 		void dump(toml::table& table) const
 		{
-			if (key_ != key::null())
+			if (key != pkey::null())
 			{
 				toml::array arr;
 				arr.reserve(n);
 				for (size_t i = 0; i < n; ++i)
 					fields[i].dump(arr);
-				table.insert_or_assign(encode_key(key_), std::move(arr));
+				table.insert_or_assign(encode_pkey(key), std::move(arr));
 			}
 		}
 
 		void dump(toml::array& array) const
 		{
-			if (key_ != key::null())
+			if (key != pkey::null())
 			{
 				toml::array arr;
 				arr.reserve(n);
@@ -386,16 +386,16 @@ namespace imtk::field
 		datapath_link link;
 		std::array<bool, n> def;
 		std::array<bool, n> value;
-		key key_;
+		pkey key;
 		label_handle label;
 		label_span_handle sublabels = {};
 		bool inline_checkboxes;
 
-		bool_array_fld(datapath_link link, std::array<bool, n> def, key key, label_handle label, const char*(&sublabels)[n], bool inline_checkboxes)
+		bool_array_fld(datapath_link link, std::array<bool, n> def, pkey key, label_handle label, const char*(&sublabels)[n], bool inline_checkboxes)
 			: link(std::move(link))
 			, def(def)
 			, value(def)
-			, key_(key)
+			, key(key)
 			, label(label)
 			, sublabels(sublabels, n)
 			, inline_checkboxes(inline_checkboxes)
@@ -414,13 +414,13 @@ namespace imtk::field
 
 		void load(toml_node node)
 		{
-			serializer<std::array<bool, n>>{}.load(value, toml_get(node, key_));
+			serializer<std::array<bool, n>>{}.load(value, toml_get(node, key));
 		}
 
 		void dump(toml::table& table) const
 		{
-			if (key_ != key::null())
-				table.insert_or_assign(encode_key(key_), serializer<std::array<bool, n>>{}.dump(value));
+			if (key != pkey::null())
+				table.insert_or_assign(encode_pkey(key), serializer<std::array<bool, n>>{}.dump(value));
 		}
 
 		void dump(toml::array& array) const
@@ -507,15 +507,15 @@ namespace imtk::field
 		e def;
 		int index_;
 		int def_index;
-		key key_;
+		pkey key;
 		label_handle label;
 		const e* values;
 		label_span_handle names = {};
 		size_t count;
 
 		template<size_t n>
-		disjoint_enum_fld(datapath_link link, e def, key key, label_handle label, const e(&values)[n], const char* const(&names)[n])
-			: link(std::move(link)), def(def), key_(key), label(label), values(values), names(names, n), count(n)
+		disjoint_enum_fld(datapath_link link, e def, pkey key, label_handle label, const e(&values)[n], const char* const(&names)[n])
+			: link(std::move(link)), def(def), key(key), label(label), values(values), names(names, n), count(n)
 		{
 			set_value(def);
 			def_index = index(def);
@@ -544,12 +544,12 @@ namespace imtk::field
 
 		void load(toml_node node)
 		{
-			index_ = index(static_cast<e>(toml_get(node, key_).value_or(def)));
+			index_ = index(static_cast<e>(toml_get(node, key).value_or(def)));
 		}
 
 		void dump(toml::table& table) const
 		{
-			table.insert_or_assign(encode_key(key_), value());
+			table.insert_or_assign(encode_pkey(key), value());
 		}
 
 		void dump(toml::array& array) const
@@ -595,11 +595,11 @@ namespace imtk::field
 		imp::potential<ty> def;
 		imp::potential<ty> value;
 		edit_session<imp::potential<ty>> edit;
-		key value_key;
-		key enable_key;
+		pkey value_key;
+		pkey enable_key;
 		label_handle label;
 
-		optional_range_fld(datapath_link link, imp::potential<ty> def, key value_key, key enable_key, label_handle label)
+		optional_range_fld(datapath_link link, imp::potential<ty> def, pkey value_key, pkey enable_key, label_handle label)
 			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), value_key(value_key), enable_key(enable_key), label(label)
 		{
 		}
@@ -626,10 +626,10 @@ namespace imtk::field
 		{
 			imp::potential<ty> val = def;
 
-			if (enable_key != key::null() && value_key != key::null())
+			if (enable_key != pkey::null() && value_key != pkey::null())
 			{
-				serializer<ty>{}.load(val.value, node[encode_key(value_key)]);
-				serializer<bool>{}.load(val.has_value, node[encode_key(enable_key)]);
+				serializer<ty>{}.load(val.value, node[encode_pkey(value_key)]);
+				serializer<bool>{}.load(val.has_value, node[encode_pkey(enable_key)]);
 			}
 
 			edit.cancel_to(std::move(val));
@@ -637,10 +637,10 @@ namespace imtk::field
 
 		void dump(toml::table& table) const
 		{
-			if (enable_key != key::null() && value_key != key::null())
+			if (enable_key != pkey::null() && value_key != pkey::null())
 			{
-				table.insert_or_assign(encode_key(enable_key), serializer<bool>{}.dump(edit.truth().has_value));
-				table.insert_or_assign(encode_key(value_key), serializer<ty>{}.dump(edit.truth().value));
+				table.insert_or_assign(encode_pkey(enable_key), serializer<bool>{}.dump(edit.truth().has_value));
+				table.insert_or_assign(encode_pkey(value_key), serializer<ty>{}.dump(edit.truth().value));
 			}
 		}
 
@@ -695,16 +695,16 @@ namespace imtk::field
 		imp::potential<ty> value;
 		edit_session<imp::potential<ty>> edit;
 		ty nullopt;
-		key key_;
+		pkey key;
 		label_handle label;
 
-		compact_optional_range_fld(datapath_link link, imp::potential<ty> def, ty nullopt, key key, label_handle label)
-			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), nullopt(nullopt), key_(key), label(label)
+		compact_optional_range_fld(datapath_link link, imp::potential<ty> def, ty nullopt, pkey key, label_handle label)
+			: tick_processor(tick_process_phase::check_undo), link(std::move(link)), def(def), value(def), edit(value), nullopt(nullopt), key(key), label(label)
 		{
 		}
 
 		compact_optional_range_fld(compact_optional_range_fld&& o) noexcept
-			: tick_processor(std::move(o)), link(std::move(o.link)), def(std::move(o.def)), value(std::move(o.value)), edit(value), nullopt(o.nullopt), key_(o.key_), label(o.label)
+			: tick_processor(std::move(o)), link(std::move(o.link)), def(std::move(o.def)), value(std::move(o.value)), edit(value), nullopt(o.nullopt), key(o.key), label(o.label)
 		{
 		}
 
@@ -744,10 +744,10 @@ namespace imtk::field
 		{
 			imp::potential<ty> val = def;
 
-			if (key_ != key::null())
+			if (key != pkey::null())
 			{
 				ty temp = def.value;
-				if (serializer<ty>{}.load(temp, node[encode_key(key_)]))
+				if (serializer<ty>{}.load(temp, node[encode_pkey(key)]))
 				{
 					val.has_value = temp != nullopt;
 					if (val.has_value)
@@ -762,8 +762,8 @@ namespace imtk::field
 
 		void dump(toml::table& table) const
 		{
-			if (key_ != key::null())
-				table.insert_or_assign(encode_key(key_), serializer<ty>{}.dump(edit.truth().has_value ? edit.truth().value : nullopt));
+			if (key != pkey::null())
+				table.insert_or_assign(encode_pkey(key), serializer<ty>{}.dump(edit.truth().has_value ? edit.truth().value : nullopt));
 		}
 
 		void dump(toml::array& array) const
@@ -808,7 +808,7 @@ namespace imtk::field
 		bool value_flags[count_];
 		e def;
 		e value;
-		key key_;
+		pkey key;
 		label_handle label;
 		const e* values;
 		label_span_handle names = {};
@@ -816,11 +816,11 @@ namespace imtk::field
 
 		static const inline size_t count = count_;
 
-		bitset_fld(datapath_link link, e def, key key, label_handle label, const e(&values)[count_], const char* const(&names)[count_], bool inline_checkboxes)
+		bitset_fld(datapath_link link, e def, pkey key, label_handle label, const e(&values)[count_], const char* const(&names)[count_], bool inline_checkboxes)
 			: link(std::move(link))
 			, def(def)
 			, value(def)
-			, key_(key)
+			, key(key)
 			, label(label)
 			, values(values)
 			, names(names, count)
@@ -900,13 +900,13 @@ namespace imtk::field
 		void load(toml_node node)
 		{
 			value = def;
-			serializer<e>{}.load(value, toml_get(node, key_));
+			serializer<e>{}.load(value, toml_get(node, key));
 		}
 
 		void dump(toml::table& table) const
 		{
-			if (key_ != key::null())
-				table.insert_or_assign(encode_key(key_), serializer<e>{}.dump(value));
+			if (key != pkey::null())
+				table.insert_or_assign(encode_pkey(key), serializer<e>{}.dump(value));
 		}
 
 		void dump(toml::array& array) const

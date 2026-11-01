@@ -1,7 +1,7 @@
 #pragma once
 
 #include "imtk/datapath.hpp"
-#include "imtk/key.hpp"
+#include "imtk/pkey.hpp"
 
 #include <unordered_map>
 
@@ -14,10 +14,10 @@ namespace imtk::desc
 
 	public:
 		datapath_link link;
-		key key_;
+		pkey key;
 
-		map(key key, datapath_link link)
-			: link(std::move(link)), key_(key)
+		map(pkey key, datapath_link link)
+			: link(std::move(link)), key(key)
 		{
 		}
 
@@ -119,13 +119,13 @@ namespace imtk::desc
 
 		toml_node subnode(toml_node node) const
 		{
-			return node[encode_key(key_)];
+			return node[encode_pkey(key)];
 		}
 
 		template<typename value>
 		void dump_into(toml::table& table, value&& value_) const
 		{
-			table.insert_or_assign(encode_key(key_), std::forward<value>(value_));
+			table.insert_or_assign(encode_pkey(key), std::forward<value>(value_));
 		}
 	};
 }

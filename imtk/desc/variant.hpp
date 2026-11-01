@@ -1,7 +1,7 @@
 #pragma once
 
 #include "imtk/datapath.hpp"
-#include "imtk/key.hpp"
+#include "imtk/pkey.hpp"
 
 #include <variant>
 
@@ -107,28 +107,28 @@ namespace imtk::desc
 	{
 	public:
 		datapath_link link;
-		key key_;
+        pkey key;
 
 	private:
 		std::variant<ds...> _variant;
 
 	public:
-		subvariant(key key, datapath_link link)
-			: link(std::move(link)), key_(key), _variant(std::in_place_index<0>, key, this->link.share())
+		subvariant(pkey key, datapath_link link)
+			: link(std::move(link)), key(key), _variant(std::in_place_index<0>, key, this->link.share())
 		{
 		}
 
 		template<typename d>
-		subvariant(key key_, datapath_link link, d&& val)
-			: link(std::move(link)), key_(key), _variant(std::forward<d>(val))
+		subvariant(pkey key, datapath_link link, d&& val)
+			: link(std::move(link)), key(key), _variant(std::forward<d>(val))
 		{
-			std::visit([this](auto& v) { v.link = this->link.share(); v.key_ = this->key_; }, _variant);
+			std::visit([this](auto& v) { v.link = this->link.share(); v.key = this->key; }, _variant);
 		}
 
 		template<typename d>
 		d& set()
 		{
-			_variant = d(key_, link.share());
+			_variant = d(key, link.share());
 			return std::get<d>(_variant);
 		}
 
@@ -136,7 +136,7 @@ namespace imtk::desc
 		void set(d&& desc)
 		{
 			_variant = std::forward<d>(desc);
-			std::visit([this](auto& v) { v.link = link.share(); v.key_ = key_; }, _variant);
+			std::visit([this](auto& v) { v.link = link.share(); v.key = key; }, _variant);
 		}
 
 		auto visit(const auto& visitor)
@@ -199,13 +199,13 @@ namespace imtk::desc
 
 		toml_node subnode(toml_node node) const
 		{
-			return node[encode_key(key_)];
+			return node[encode_pkey(key)];
 		}
 
 		template<typename value>
 		void dump_into(toml::table& table, value&& value_) const
 		{
-			table.insert_or_assign(encode_key(key_), std::forward<value>(value_));
+			table.insert_or_assign(encode_pkey(key), std::forward<value>(value_));
 		}
 	};
 }

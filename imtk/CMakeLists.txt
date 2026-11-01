@@ -9,7 +9,6 @@ target_sources(imgui-toolkit PRIVATE
 	font_instance.cpp
 	id_scope.cpp
 	item_result.cpp
-	key.cpp
 	label_registry.cpp
 	list_model.cpp
 	logger.cpp
@@ -18,6 +17,7 @@ target_sources(imgui-toolkit PRIVATE
 	os_window.cpp
 	outline.cpp
 	overlays.cpp
+	pkey.cpp
 	popup.cpp
 	resource_loader.cpp
 	simple_scopes.cpp

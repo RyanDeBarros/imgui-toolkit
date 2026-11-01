@@ -1,6 +1,6 @@
 #pragma once
 
-#include "imtk/key.hpp"
+#include "imtk/pkey.hpp"
 #include "imtk/serializer.hpp"
 
 namespace imtk::field
@@ -9,21 +9,21 @@ namespace imtk::field
 	struct simple
 	{
 		ty value;
-		imtk::key key;
+        pkey key;
 
-		simple(ty value, imtk::key key)
+		simple(ty value, pkey key)
 			: value(std::move(value)), key(key)
 		{
 		}
 
 		void load(imtk::toml_node node)
 		{
-			imtk::serializer<ty>{}.load(value, node[imtk::encode_key(key)]);
+			imtk::serializer<ty>{}.load(value, node[imtk::encode_pkey(key)]);
 		}
 
 		void dump(toml::table& table)
 		{
-			table.insert_or_assign(imtk::encode_key(key), imtk::serializer<ty>{}.dump(value));
+			table.insert_or_assign(imtk::encode_pkey(key), imtk::serializer<ty>{}.dump(value));
 		}
 
 		const ty& operator*() const

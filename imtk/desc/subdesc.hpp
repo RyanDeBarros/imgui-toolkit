@@ -1,7 +1,7 @@
 #pragma once
 
 #include "imtk/datapath.hpp"
-#include "imtk/key.hpp"
+#include "imtk/pkey.hpp"
 
 #include <imp/type_erasure.hpp>
 
@@ -11,9 +11,9 @@ namespace imtk::desc
 	struct sub
 	{
 		desc d;
-		key key_;
+		pkey key;
 
-		sub(key key, datapath_link link = {}) : key_(key), d(std::move(link)) {}
+		sub(pkey key, datapath_link link = {}) : key(key), d(std::move(link)) {}
 
 		const desc& operator*() const
 		{
@@ -57,14 +57,14 @@ namespace imtk::desc
 
 		toml_node subnode(toml_node node) const
 		{
-			return node[encode_key(key_)];
+			return node[encode_pkey(key)];
 		}
 
 		template<typename value>
 		void dump_into(toml::table& table, value&& value_) const
 		{
 			// TODO IMTK_DUMP_FIELDS should work on descs too: add dump()/load() to desc methods.
-			table.insert_or_assign(encode_key(key_), std::forward<value>(value_));
+			table.insert_or_assign(encode_pkey(key), std::forward<value>(value_));
 		}
 	};
 }

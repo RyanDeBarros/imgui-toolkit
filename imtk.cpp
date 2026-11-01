@@ -24,8 +24,8 @@ namespace imtk
             config.dynamic_lists.delete_icon,
             config.dynamic_lists.clear_icon);
 
-		set_key_encoder(config.key_encoder);
-		set_key_decoder(config.key_decoder);
+		set_pkey_encoder(config.pkey_encoder);
+		set_pkey_decoder(config.pkey_decoder);
 		glfwSetErrorCallback(glfw_error_callback);
 	}
 }
