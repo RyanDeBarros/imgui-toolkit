@@ -44,39 +44,39 @@ namespace imtk::desc
 #define _IMTK_SUBPATH_QUERY_DIRTY(_, field) if (field.query_dirty(disk.field)) return true;
 #define _IMTK_SUBPATH_COPY_DATA(_, field) field.copy_data(o.field);
 #define IMTK_DESCRIPTOR_BODY(Klass, GENERATOR) \
-		public: imtk::datapath_link link; \
-		    GENERATOR(_IMTK_FIELD_DECL)\
-		private: \
+        public: imtk::datapath_link link; \
+            GENERATOR(_IMTK_FIELD_DECL)\
+        private: \
             enum : int { GENERATOR(_IMTK_SUBPATH_ENUM_ENTRY) }; \
-		public: \
+        public: \
             struct { GENERATOR(_IMTK_SUBPATH_STRUCT_ENTRY) } subpaths; \
-		    void* resolve(imtk::datapath_view path, imp::type_erasure type) \
-		    { \
-			    if (path.empty()) \
-				    return imp::resolve_type(type, this); \
-			    switch (path.step()) \
-			    { \
-				    GENERATOR(_IMTK_SUBPATH_PATH_GET); \
-			    default: \
-				    return nullptr; \
-			    } \
-		    } \
-		    void describe(std::ostream& os, imtk::datapath_view path) const \
-		    { \
-			    if (path.empty()) \
-				    os << "<error>"; \
-			    else \
-			    { \
-				    switch (path.step()) \
-				    { \
-					    GENERATOR(_IMTK_SUBPATH_PRINT_PATH); \
-				    default: \
-					    os << "<error>"; \
-				    } \
-			    } \
-		    } \
-		    bool query_dirty(const Klass& disk) const { GENERATOR(_IMTK_SUBPATH_QUERY_DIRTY); return false; } \
-		    void copy_data(const Klass& o) { GENERATOR(_IMTK_SUBPATH_COPY_DATA); }
+            void* resolve(imtk::datapath_view path, imp::type_erasure type) \
+            { \
+                if (path.empty()) \
+                    return imp::resolve_type(type, this); \
+                switch (path.step()) \
+                { \
+                    GENERATOR(_IMTK_SUBPATH_PATH_GET); \
+                default: \
+                    return nullptr; \
+                } \
+            } \
+            void describe(std::ostream& os, imtk::datapath_view path) const \
+            { \
+                if (path.empty()) \
+                    os << "<error>"; \
+                else \
+                { \
+                    switch (path.step()) \
+                    { \
+                        GENERATOR(_IMTK_SUBPATH_PRINT_PATH); \
+                    default: \
+                        os << "<error>"; \
+                    } \
+                } \
+            } \
+            bool query_dirty(const Klass& disk) const { GENERATOR(_IMTK_SUBPATH_QUERY_DIRTY); return false; } \
+            void copy_data(const Klass& o) { GENERATOR(_IMTK_SUBPATH_COPY_DATA); }
 
 #define _IMTK_DRAW_FIELD(_, field) desc.field.draw();
 #define IMTK_DRAW_FIELDS(GENERATOR) GENERATOR(_IMTK_DRAW_FIELD);

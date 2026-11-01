@@ -5,132 +5,132 @@
 
 namespace imtk::desc
 {
-	template<typename d>
-	struct simple
-	{
-		d desc;
-		pkey key;
+    template<typename d>
+    struct simple
+    {
+        d desc;
+        pkey key;
 
-		simple(pkey key)
-			: key(key)
-		{
-		}
+        simple(pkey key)
+            : key(key)
+        {
+        }
 
-		void load(imtk::toml_node node)
-		{
-			desc.load(node[imtk::encode_pkey(key)]);
-		}
+        void load(imtk::toml_node node)
+        {
+            desc.load(node[imtk::encode_pkey(key)]);
+        }
 
-		void dump(toml::table& table)
-		{
-			toml::table subtable;
-			desc.dump(subtable);
-			table.insert_or_assign(imtk::encode_pkey(key), std::move(subtable));
-		}
+        void dump(toml::table& table)
+        {
+            toml::table subtable;
+            desc.dump(subtable);
+            table.insert_or_assign(imtk::encode_pkey(key), std::move(subtable));
+        }
 
-		const d& operator*() const
-		{
-			return desc;
-		}
+        const d& operator*() const
+        {
+            return desc;
+        }
 
-		d& operator*()
-		{
-			return desc;
-		}
+        d& operator*()
+        {
+            return desc;
+        }
 
-		const d* operator->() const
-		{
-			return &desc;
-		}
+        const d* operator->() const
+        {
+            return &desc;
+        }
 
-		d* operator->()
-		{
-			return &desc;
-		}
+        d* operator->()
+        {
+            return &desc;
+        }
 
-		const d* value_ptr() const
-		{
-			return &desc;
-		}
+        const d* value_ptr() const
+        {
+            return &desc;
+        }
 
-		d* value_ptr()
-		{
-			return &desc;
-		}
-	};
+        d* value_ptr()
+        {
+            return &desc;
+        }
+    };
 
-	template<typename d>
-	struct simple_array
-	{
-		std::vector<d> descs;
-		pkey key;
+    template<typename d>
+    struct simple_array
+    {
+        std::vector<d> descs;
+        pkey key;
 
-		simple_array(pkey key)
-			: key(key)
-		{
-		}
+        simple_array(pkey key)
+            : key(key)
+        {
+        }
 
-		void load(imtk::toml_node node)
-		{
-			descs.clear();
-			if (auto array = node[imtk::encode_pkey(key)].as_array())
-			{
-				descs.resize(array->size());
-				for (size_t i = 0; i < descs.size(); ++i)
-					descs[i].load(imtk::toml_node(*array->get(i)));
-			}
-		}
+        void load(imtk::toml_node node)
+        {
+            descs.clear();
+            if (auto array = node[imtk::encode_pkey(key)].as_array())
+            {
+                descs.resize(array->size());
+                for (size_t i = 0; i < descs.size(); ++i)
+                    descs[i].load(imtk::toml_node(*array->get(i)));
+            }
+        }
 
-		void dump(toml::table& table)
-		{
-			toml::array array;
-			for (size_t i = 0; i < descs.size(); ++i)
-			{
-				toml::table subtable;
-				descs[i].dump(subtable);
-				array.push_back(std::move(subtable));
-			}
-			table.insert_or_assign(imtk::encode_pkey(key), std::move(array));
-		}
+        void dump(toml::table& table)
+        {
+            toml::array array;
+            for (size_t i = 0; i < descs.size(); ++i)
+            {
+                toml::table subtable;
+                descs[i].dump(subtable);
+                array.push_back(std::move(subtable));
+            }
+            table.insert_or_assign(imtk::encode_pkey(key), std::move(array));
+        }
 
-		const d& operator[](size_t i) const
-		{
-			return descs[i];
-		}
+        const d& operator[](size_t i) const
+        {
+            return descs[i];
+        }
 
-		d& operator[](size_t i)
-		{
-			return descs[i];
-		}
+        d& operator[](size_t i)
+        {
+            return descs[i];
+        }
 
-		auto begin() const noexcept
-		{
-			return descs.begin();
-		}
+        auto begin() const noexcept
+        {
+            return descs.begin();
+        }
 
-		auto end() const noexcept
-		{
-			return descs.end();
-		}
+        auto end() const noexcept
+        {
+            return descs.end();
+        }
 
-		auto begin() noexcept
-		{
-			return descs.begin();
-		}
+        auto begin() noexcept
+        {
+            return descs.begin();
+        }
 
-		auto end() noexcept
-		{
-			return descs.end();
-		}
+        auto end() noexcept
+        {
+            return descs.end();
+        }
 
-		auto cbegin() const noexcept
-		{
-			return descs.cbegin();
-		}
+        auto cbegin() const noexcept
+        {
+            return descs.cbegin();
+        }
 
-		auto cend() const noexcept
-		{
-			return descs.cend();
-		}
-	};
+        auto cend() const noexcept
+        {
+            return descs.cend();
+        }
+    };
 }

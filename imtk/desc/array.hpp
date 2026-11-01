@@ -13,19 +13,13 @@ namespace imtk::desc
         pkey key;
 
     private:
-        std::array<d, n> _array;
+        std::array<d, n> array_;
 
     public:
         array(pkey key, datapath_link link)
-            : link(std::move(link)), key(key), _array(init_array(this->link, std::make_index_sequence<n>{}))
+            : link(std::move(link)), key(key)
+            , array_(init_array(this->link, std::make_index_sequence<n>{}))
         {
-        }
-
-    private:
-        template<size_t... i>
-        static auto init_array(datapath_link& link, std::index_sequence<i...>)
-        {
-            return std::array<d, n>{ d(datapath_link(link, datapath::step(i)))... };
         }
 
     public:
@@ -36,32 +30,32 @@ namespace imtk::desc
 
         d& operator[](size_t i)
         {
-            return _array[i];
+            return array_[i];
         }
 
         const d& operator[](size_t i) const
         {
-            return _array[i];
+            return array_[i];
         }
 
         auto begin() const
         {
-            return _array.begin();
+            return array_.begin();
         }
 
         auto begin()
         {
-            return _array.begin();
+            return array_.begin();
         }
 
         auto end() const
         {
-            return _array.end();
+            return array_.end();
         }
 
         auto end()
         {
-            return _array.end();
+            return array_.end();
         }
 
         void* resolve(datapath_view path, imp::type_erasure type)
@@ -71,7 +65,7 @@ namespace imtk::desc
 
             int index = path.step();
             if (index >= 0 && index < n)
-                return _array[index].resolve(path.next(), type);
+                return array_[index].resolve(path.next(), type);
             else
                 return nullptr;
         }
@@ -91,7 +85,7 @@ namespace imtk::desc
                     else
                     {
                         os << index << ".";
-                        _array[index].describe(os, path);
+                        array_[index].describe(os, path);
                     }
                 }
                 else
@@ -103,7 +97,7 @@ namespace imtk::desc
         {
             for (size_t i = 0; i < n; ++i)
             {
-                if (_array[i].query_dirty(disk._array[i]))
+                if (array_[i].query_dirty(disk.array_[i]))
                     return true;
             }
 
@@ -113,7 +107,7 @@ namespace imtk::desc
         void copy_data(const array<d, n>& o)
         {
             for (size_t i = 0; i < n; ++i)
-                _array[i].copy_data(o._array[i]);
+                array_[i].copy_data(o.array_[i]);
         }
 
         // TODO macros to generate subnode/dump_into ?
@@ -123,10 +117,17 @@ namespace imtk::desc
             return node[encode_pkey(key)];
         }
 
-        template<typename value>
-        void dump_into(toml::table& table, value&& value_) const
+        template<typename value_ty>
+        void dump_into(toml::table& table, value_ty&& value) const
         {
-            table.insert_or_assign(encode_pkey(key), std::forward<value>(value_));
+            table.insert_or_assign(encode_pkey(key), std::forward<value_ty>(value));
+        }
+
+    private:
+        template<size_t... i>
+        static auto init_array(datapath_link& link, std::index_sequence<i...>)
+        {
+            return std::array<d, n>{ d(datapath_link(link, datapath::step(i)))... };
         }
     };
 }
