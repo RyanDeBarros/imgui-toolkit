@@ -4,71 +4,71 @@
 
 namespace imtk::prop
 {
-	value_outline::value_outline()
-	{
-		_begin_listener = value::on_value_begin().subscribe([this]() { on_begin_outline(); });
-		_end_listener = value::on_value_end().subscribe([this]() { on_end_outline(); });
-	}
-	
-	value_outline::value_outline(const value_outline& o)
-		: _begin(o._begin), _end(o._end)
-	{
-		_begin_listener = value::on_value_begin().subscribe([this]() { on_begin_outline(); });
-		_end_listener = value::on_value_end().subscribe([this]() { on_end_outline(); });
-	}
+    value_outline::value_outline()
+    {
+        begin_listener_ = value::on_value_begin().subscribe([this]() { on_begin_outline(); });
+        end_listener_ = value::on_value_end().subscribe([this]() { on_end_outline(); });
+    }
 
-	value_outline::value_outline(value_outline&& o) noexcept
-		: _begin(o._begin), _end(o._end)
-	{
-		_begin_listener = value::on_value_begin().subscribe([this]() { on_begin_outline(); });
-		_end_listener = value::on_value_end().subscribe([this]() { on_end_outline(); });
-	}
+    value_outline::value_outline(const value_outline& o)
+        : begin_(o.begin_), end_(o.end_)
+    {
+        begin_listener_ = value::on_value_begin().subscribe([this]() { on_begin_outline(); });
+        end_listener_ = value::on_value_end().subscribe([this]() { on_end_outline(); });
+    }
 
-	value_outline& value_outline::operator=(const value_outline& o)
-	{
-		if (this != &o)
-		{
-			_begin = o._begin;
-			_end = o._end;
-		}
+    value_outline::value_outline(value_outline&& o) noexcept
+        : begin_(o.begin_), end_(o.end_)
+    {
+        begin_listener_ = value::on_value_begin().subscribe([this]() { on_begin_outline(); });
+        end_listener_ = value::on_value_end().subscribe([this]() { on_end_outline(); });
+    }
 
-		return *this;
-	}
+    value_outline& value_outline::operator=(const value_outline& o)
+    {
+        if (this != &o)
+        {
+            begin_ = o.begin_;
+            end_ = o.end_;
+        }
 
-	value_outline& value_outline::operator=(value_outline&& o) noexcept
-	{
-		if (this != &o)
-		{
-			_begin = o._begin;
-			_end = o._end;
-		}
+        return *this;
+    }
 
-		return *this;
-	}
+    value_outline& value_outline::operator=(value_outline&& o) noexcept
+    {
+        if (this != &o)
+        {
+            begin_ = o.begin_;
+            end_ = o.end_;
+        }
 
-	value_outline::operator bool() const
-	{
-		return true;
-	}
+        return *this;
+    }
 
-	void value_outline::draw(ImU32 color, outline::config cfg) const
-	{
-		ImGui::GetWindowDrawList()->AddRect(_begin, _end, color, cfg.rounding, cfg.flags, cfg.border);
-	}
+    value_outline::operator bool() const
+    {
+        return true;
+    }
 
-	void value_outline::on_begin_outline()
-	{
-		_begin = ImGui::GetCursorScreenPos();
-	}
+    void value_outline::draw(ImU32 color, outline::config cfg) const
+    {
+        ImGui::GetWindowDrawList()->AddRect(begin_, end_, color, cfg.rounding, cfg.flags, cfg.border);
+    }
 
-	void value_outline::on_end_outline()
-	{
-		_end = { ImGui::GetItemRectMax().x, ImGui::GetItemRectMin().y + ImGui::GetFrameHeight() };
-	}
+    void value_outline::kill()
+    {
+        begin_listener_.detach();
+        end_listener_.detach();
+    }
 
-	void value_outline::kill()
-	{
-		_begin_listener.detach();
-		_end_listener.detach();
-	}
+    void value_outline::on_begin_outline()
+    {
+        begin_ = ImGui::GetCursorScreenPos();
+    }
+
+    void value_outline::on_end_outline()
+    {
+        end_ = { ImGui::GetItemRectMax().x, ImGui::GetItemRectMin().y + ImGui::GetFrameHeight() };
+    }
 }

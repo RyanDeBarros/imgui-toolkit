@@ -1,7 +1,7 @@
 #include "form.hpp"
 
-#include "imtk/simple_scopes.hpp"
 #include "imtk/errors.hpp"
+#include "imtk/simple_scopes.hpp"
 
 #include "imtk/prop/property_grid.hpp"
 
@@ -9,122 +9,133 @@
 
 namespace imtk::prop
 {
-	form* active_form = nullptr;
-	std::unique_ptr<child> form_child;
-	std::unique_ptr<table> form_table;
+    form* active_form = nullptr;
+    std::unique_ptr<child> form_child;
+    std::unique_ptr<table> form_table;
 
-	form::form()
-	{
-		begin_table();
-	}
+    form::form()
+    {
+        begin_table();
+    }
 
-	form::form(form&& other) noexcept
-		: _draw_content(other._draw_content), _id_counter(other._id_counter), _scope(std::move(other._scope))
-	{
-		other._draw_content = false;
-		other._id_counter = 0;
-		other._valid = false;
+    form::form(form&& o) noexcept
+        : draw_content_(o.draw_content_)
+        , id_counter_(o.id_counter_)
+        , scope_(std::move(o.scope_))
+    {
+        o.draw_content_ = false;
+        o.id_counter_ = 0;
+        o.valid_ = false;
 
-		if (&other == active_form)
-			active_form = this;
-	}
+        if (&o == active_form)
+            active_form = this;
+    }
 
-	form::~form()
-	{
-		if (_valid)
-			end_table();
-	}
+    form::~form()
+    {
+        if (valid_)
+            end_table();
+    }
 
-	form* form::active_instance()
-	{
-		return active_form;
-	}
+    form* form::active_instance()
+    {
+        return active_form;
+    }
 
-	form::operator bool() const
-	{
-		return _valid && _draw_content;
-	}
+    form::operator bool() const
+    {
+        return valid_ && draw_content_;
+    }
 
-	void form::begin_table()
-	{
-		if (active_form)
-			throw error(error_code::existing_active_instance);
+    void form::begin_table()
+    {
+        if (active_form)
+            throw error(error_code::existing_active_instance);
 
-		active_form = this;
-		_scope.push(&active_form).push(_id_counter++);
+        active_form = this;
+        scope_.push(&active_form).push(id_counter_++);
 
-		_draw_content = false;
-		form_table.reset();
-		form_child = std::make_unique<child>("##imtk-formID", ImVec2(0.f, 0.f), ImGuiChildFlags_AutoResizeY);
-		if (*form_child)
-		{
-			form_table = std::make_unique<table>("", 3, ImGuiTableFlags_BordersInner | ImGuiTableFlags_SizingFixedFit);
-			if (*form_table)
-			{
-				ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);
-				ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthStretch);
-				ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFrameHeight());
-				_draw_content = true;
-			}
-		}
-	}
+        draw_content_ = false;
+        form_table.reset();
+        form_child = std::make_unique<child>("##imtk-formID", ImVec2(0.f, 0.f), ImGuiChildFlags_AutoResizeY);
+        if (*form_child)
+        {
+            form_table = std::make_unique<table>(
+                "",
+                3,
+                ImGuiTableFlags_BordersInner | ImGuiTableFlags_SizingFixedFit);
 
-	void form::end_table()
-	{
-		form_table.reset();
-		form_child.reset();
-		_draw_content = false;
+            if (*form_table)
+            {
+                ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed);
+                ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, ImGui::GetFrameHeight());
+                draw_content_ = true;
+            }
+        }
+    }
 
-		_scope.pop_all();
-		active_form = nullptr;
-	}
+    void form::end_table()
+    {
+        form_table.reset();
+        form_child.reset();
+        draw_content_ = false;
 
-	// TODO maybe instead of checking in_form(), do away with scopes and call imtk::prop::form as a function that takes a callback (that executes on _draw_content = true). Then in that callback, can call imtk::prop::form_pause() which has two callbacks - on for 'inside' the pause, and one for after resuming the pause.
-	bool in_form()
-	{
-		return active_form && *active_form;
-	}
+        scope_.pop_all();
+        active_form = nullptr;
+    }
 
-	form::pause::pause(bool resume_after)
-		: _form(active_form), _resume_after(resume_after)
-	{
-		if (_form)
-			_was_drawing_content = _form->_draw_content;
+    // TODO maybe instead of checking in_form(), do away with scopes and call
+    // imtk::prop::form as a function that takes a callback (that executes on
+    // draw_content_ = true). Then in that callback, can call imtk::prop::form_pause()
+    // which has two callbacks - on for 'inside' the pause, and one for after resuming the pause.
+    bool in_form()
+    {
+        return active_form && *active_form;
+    }
 
-		if (_form)
-			_form->end_table();
-	}
+    form::pause::pause(bool resume_after)
+        : form_(active_form)
+        , resume_after_(resume_after)
+    {
+        if (form_)
+            was_drawing_content_ = form_->draw_content_;
 
-	form::pause::~pause()
-	{
-		if (_form && _resume_after)
-			_form->begin_table();
-	}
+        if (form_)
+            form_->end_table();
+    }
 
-	form::pause::operator bool() const
-	{
-		return _form && _form->_valid && _was_drawing_content;
-	}
+    form::pause::~pause()
+    {
+        if (form_ && resume_after_)
+            form_->begin_table();
+    }
 
-	// TODO DEBT use generators for as many headers as possible
-	subform::subform(std::string_view label, const view_generator& property_generator, config cfg)
-		: _pause(cfg.resume_after), _section(label, cfg.start_open)
-	{
-		grid::check_header(property_generator);
+    form::pause::operator bool() const
+    {
+        return form_ && form_->valid_ && was_drawing_content_;
+    }
 
-		if (_section)
-			_subform.emplace();
-	}
+    // TODO DEBT use generators for as many headers as possible
+    subform::subform(std::string_view label, const view_generator& property_generator, config cfg)
+        : pause_(cfg.resume_after)
+        , section_(label, cfg.start_open)
+    {
+        grid::check_header(property_generator);
 
-	subform::subform(std::string_view label, config cfg)
-		: _pause(cfg.resume_after), _section(label, cfg.start_open)
-	{
-		if (_section)
-			_subform.emplace();
-	}
+        if (section_)
+            subform_.emplace();
+    }
 
-	subform::operator bool() const
-	{
-		return _pause && _section && _subform && *_subform;
-	}
+    subform::subform(std::string_view label, config cfg)
+        : pause_(cfg.resume_after), section_(label, cfg.start_open)
+    {
+        if (section_)
+            subform_.emplace();
+    }
+
+    subform::operator bool() const
+    {
+        return pause_ && section_ && subform_ && *subform_;
+    }
 }
