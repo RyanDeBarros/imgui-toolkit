@@ -5,57 +5,58 @@
 
 namespace imtk::field
 {
-	template<typename ty>
-	struct simple
-	{
-		ty value;
+    template<typename ty>
+    struct simple
+    {
+        ty value;
         pkey key;
 
-		simple(ty value, pkey key)
-			: value(std::move(value)), key(key)
-		{
-		}
+        simple(ty value, pkey key)
+            : value(std::move(value))
+            , key(key)
+        {
+        }
 
-		void load(imtk::toml_node node)
-		{
-			imtk::serializer<ty>{}.load(value, node[imtk::encode_pkey(key)]);
-		}
+        void load(imtk::toml_node node)
+        {
+            imtk::serializer<ty>{}.load(value, node[imtk::encode_pkey(key)]);
+        }
 
-		void dump(toml::table& table)
-		{
-			table.insert_or_assign(imtk::encode_pkey(key), imtk::serializer<ty>{}.dump(value));
-		}
+        void dump(toml::table& table)
+        {
+            table.insert_or_assign(imtk::encode_pkey(key), imtk::serializer<ty>{}.dump(value));
+        }
 
-		const ty& operator*() const
-		{
-			return value;
-		}
+        const ty& operator*() const
+        {
+            return value;
+        }
 
-		ty& operator*()
-		{
-			return value;
-		}
+        ty& operator*()
+        {
+            return value;
+        }
 
-		const ty* operator->() const
-		{
-			return &value;
-		}
+        const ty* operator->() const
+        {
+            return &value;
+        }
 
-		ty* operator->()
-		{
-			return &value;
-		}
+        ty* operator->()
+        {
+            return &value;
+        }
 
-		const ty* value_ptr() const
-		{
-			return &value;
-		}
+        const ty* value_ptr() const
+        {
+            return &value;
+        }
 
-		ty* value_ptr()
-		{
-			return &value;
-		}
-	};
+        ty* value_ptr()
+        {
+            return &value;
+        }
+    };
 
 }
 
