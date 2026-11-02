@@ -6,18 +6,18 @@
 
 namespace imtk::w
 {
-	class widget
-	{
-		item_result _result;
-		
-	public:
-		virtual ~widget() = default;
+    class widget
+    {
+        item_result result_;
 
-		item_result result() const;
-		item_result draw();
+    public:
+        virtual ~widget() = default;
 
-	protected:
-		virtual item_result draw_impl() = 0;
-		static item_result prefix_label(std::string_view label);
-	};
+        item_result result() const;
+        item_result draw();
+
+    protected:
+        virtual item_result draw_impl() = 0;
+        static item_result prefix_label(std::string_view label);
+    };
 }

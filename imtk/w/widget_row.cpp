@@ -5,39 +5,54 @@
 
 namespace imtk::w
 {
-	static item_result draw_row(const auto& subwidgets, bool separators)
-	{
-		item_result result;
+    static item_result draw_row(const auto& subwidgets, bool separators)
+    {
+        item_result result;
 
-		style_var cell_padding(ImGuiStyleVar_CellPadding, ImVec2(ImGui::GetStyle().CellPadding.x, 0.f));
-		ImGuiTableFlags flags = ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_PreciseWidths;
+        style_var cell_padding(ImGuiStyleVar_CellPadding, ImVec2(ImGui::GetStyle().CellPadding.x, 0.f));
+        ImGuiTableFlags flags = ImGuiTableFlags_SizingStretchSame | ImGuiTableFlags_PreciseWidths;
 
-		if (separators)
-			flags |= ImGuiTableFlags_BordersInnerV;
+        if (separators)
+            flags |= ImGuiTableFlags_BordersInnerV;
 
-		if (auto _ = table("##InlineWidget", subwidgets.size(), flags,
-			ImVec2(-FLT_MIN, ImGui::GetFrameHeight())))
-		{
-			ImGui::TableNextRow();
+        if (auto _ = table(
+            "##InlineWidget",
+            subwidgets.size(),
+            flags,
+            ImVec2(-FLT_MIN, ImGui::GetFrameHeight())))
+        {
+            ImGui::TableNextRow();
 
-			for (size_t i = 0; i < subwidgets.size(); ++i)
-			{
-				ImGui::TableNextColumn();
-				if (auto _ = item_width_scope(expand_item_width{}))
-					result |= subwidgets[i]->draw();
-			}
-		}
+            for (size_t i = 0; i < subwidgets.size(); ++i)
+            {
+                ImGui::TableNextColumn();
+                if (auto _ = item_width_scope(expand_item_width{}))
+                    result |= subwidgets[i]->draw();
+            }
+        }
 
-		return result;
-	}
+        return result;
+    }
 
-	item_result bound_widget_row::draw_impl()
-	{
-		return draw_row(subwidgets, config.separators);
-	}
+    bound_widget_row::bound_widget_row(std::span<widget*> subwidgets, config_impl config)
+        : subwidgets(std::move(subwidgets))
+        , config(std::move(config))
+    {
+    }
 
-	item_result widget_row::draw_impl()
-	{
-		return draw_row(subwidgets, config.separators);
-	}
+    item_result bound_widget_row::draw_impl()
+    {
+        return draw_row(subwidgets, config.separators);
+    }
+
+    widget_row::widget_row(std::vector<std::unique_ptr<widget>> subwidgets, config_impl config)
+        : subwidgets(std::move(subwidgets))
+        , config(std::move(config))
+    {
+    }
+
+    item_result widget_row::draw_impl()
+    {
+        return draw_row(subwidgets, config.separators);
+    }
 }

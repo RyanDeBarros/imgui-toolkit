@@ -5,272 +5,313 @@
 
 namespace imtk
 {
-	static res::icon_id drag_icon;
-	static res::icon_id create_icon;
-	static res::icon_id delete_icon;
-	static res::icon_id clear_icon;
+    static res::icon_id drag_icon;
+    static res::icon_id create_icon;
+    static res::icon_id delete_icon;
+    static res::icon_id clear_icon;
 
-	namespace w
-	{
-		dynamic_list_header::dynamic_list_header(list_model& model)
-			: model(model)
-		{
-			create_button.config.str_id = "##+";
-			create_button.config.tooltip = "New item";
-			create_button.config.icon = create_icon;
-			delete_button.config.str_id = "##-";
-			delete_button.config.tooltip = "Remove item";
-			delete_button.config.icon = delete_icon;
-			clear_button.config.str_id = "##x";
-			clear_button.config.tooltip = "Clear items";
-			clear_button.config.icon = clear_icon;
-		}
+    namespace w
+    {
+        dynamic_list_header::dynamic_list_header(list_model& model)
+            : model(model)
+        {
+            create_button.config.str_id = "##+";
+            create_button.config.tooltip = "New item";
+            create_button.config.icon = create_icon;
+            delete_button.config.str_id = "##-";
+            delete_button.config.tooltip = "Remove item";
+            delete_button.config.icon = delete_icon;
+            clear_button.config.str_id = "##x";
+            clear_button.config.tooltip = "Clear items";
+            clear_button.config.icon = clear_icon;
+        }
 
-		dynamic_list_header::dynamic_list_header(list_model& model, const dynamic_list_header& o)
-			: model(model), create_button(o.create_button), delete_button(o.delete_button), clear_button(o.clear_button)
-		{
-		}
+        dynamic_list_header::dynamic_list_header(list_model& model, const dynamic_list_header& o)
+            : model(model)
+            , create_button(o.create_button)
+            , delete_button(o.delete_button)
+            , clear_button(o.clear_button)
+        {
+        }
 
-		dynamic_list_header::dynamic_list_header(list_model& model, dynamic_list_header&& o) noexcept
-			: model(model), create_button(std::move(o.create_button)), delete_button(std::move(o.delete_button)), clear_button(std::move(o.clear_button))
-		{
-		}
+        dynamic_list_header::dynamic_list_header(list_model& model, dynamic_list_header&& o) noexcept
+            : model(model)
+            , create_button(std::move(o.create_button))
+            , delete_button(std::move(o.delete_button))
+            , clear_button(std::move(o.clear_button))
+        {
+        }
 
-		dynamic_list_header& dynamic_list_header::operator=(const dynamic_list_header& o)
-		{
-			if (this != &o)
-			{
-				create_button = o.create_button;
-				delete_button = o.delete_button;
-				clear_button = o.clear_button;
-			}
+        dynamic_list_header& dynamic_list_header::operator=(const dynamic_list_header& o)
+        {
+            if (this != &o)
+            {
+                create_button = o.create_button;
+                delete_button = o.delete_button;
+                clear_button = o.clear_button;
+            }
 
-			return *this;
-		}
+            return *this;
+        }
 
-		dynamic_list_header& dynamic_list_header::operator=(dynamic_list_header&& o) noexcept
-		{
-			if (this != &o)
-			{
-				create_button = std::move(o.create_button);
-				delete_button = std::move(o.delete_button);
-				clear_button = std::move(o.clear_button);
-			}
+        dynamic_list_header& dynamic_list_header::operator=(dynamic_list_header&& o) noexcept
+        {
+            if (this != &o)
+            {
+                create_button = std::move(o.create_button);
+                delete_button = std::move(o.delete_button);
+                clear_button = std::move(o.clear_button);
+            }
 
-			return *this;
-		}
+            return *this;
+        }
 
-		item_result dynamic_list_header::draw_impl()
-		{
-			item_result result;
-			item_result subresult;
+        item_result dynamic_list_header::draw_impl()
+        {
+            item_result result;
+            item_result subresult;
 
-			subresult = create_button.draw();
-			result |= subresult;
-			if (subresult)
-				model.defer_append();
+            subresult = create_button.draw();
+            result |= subresult;
+            if (subresult)
+                model.defer_append();
 
-			if (auto d = disabled(model.size() == 0))
-			{
-				ImGui::SameLine();
-				subresult = delete_button.draw();
-				result |= subresult;
-				if (subresult)
-					model.defer_delete();
+            if (auto d = disabled(model.size() == 0))
+            {
+                ImGui::SameLine();
+                subresult = delete_button.draw();
+                result |= subresult;
+                if (subresult)
+                    model.defer_delete();
 
-				ImGui::SameLine();
-				subresult = clear_button.draw();
-				result |= subresult;
-				if (subresult)
-					model.defer_resize(0);
-			}
+                ImGui::SameLine();
+                subresult = clear_button.draw();
+                result |= subresult;
+                if (subresult)
+                    model.defer_resize(0);
+            }
 
-			return result;
-		}
-	}
+            return result;
+        }
+    }
 
-	struct dynamic_row_payload : public drag_droppable_pod<dynamic_row_payload>
-	{
-		const list_model* identity;
-		size_t index;
+    struct dynamic_row_payload
+        : public drag_droppable_pod<dynamic_row_payload>
+    {
+        const list_model* identity;
+        size_t index;
 
-		dynamic_row_payload(const list_model* identity, size_t index)
-			: identity(identity), index(index)
-		{
-		}
-	};
+        dynamic_row_payload(const list_model* identity, size_t index)
+            : identity(identity)
+            , index(index)
+        {
+        }
+    };
 
-	dynamic_row::dynamic_row(list_model& model, w::icon_button& drag_button, size_t index, const std::string_view str_id)
-		: _model(model), _drag_button(drag_button), _index(index)
-	{
-		_cursor = ImGui::GetCursorScreenPos();
-		_size = ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetFrameHeight());
-		_child = std::make_unique<child>(str_id, _size, ImGuiChildFlags_AutoResizeX);
+    dynamic_row::dynamic_row(
+        list_model& model,
+        w::icon_button& drag_button,
+        size_t index,
+        const std::string_view str_id)
+        : model_(model)
+        , drag_button_(drag_button)
+        , index_(index)
+    {
+        cursor_ = ImGui::GetCursorScreenPos();
+        size_ = ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetFrameHeight());
+        child_ = std::make_unique<child>(str_id, size_, ImGuiChildFlags_AutoResizeX);
 
-		if (*_child)
-		{
-			_visible = true;
+        if (*child_)
+        {
+            visible_ = true;
 
-			if (_drag_button.draw())
-				on_select();
+            if (drag_button_.draw())
+                on_select();
 
-			if (auto _ = drag_drop_source())
-			{
-				on_select();
+            if (auto _ = drag_drop_source())
+            {
+                on_select();
 
-				send_drag_drop_payload(dynamic_row_payload(&_model, _index));
-				ImGui::TextUnformatted("Move row");
-			}
+                send_drag_drop_payload(dynamic_row_payload(&model_, index_));
+                ImGui::TextUnformatted("Move row");
+            }
 
-			if (auto target = drag_drop_target())
-			{
-				if (auto payload = target.accept<dynamic_row_payload>())
-				{
-					if ((*payload)->identity == &_model && (*payload)->index != _index)
-						_model.defer_move((*payload)->index, _index);
-				}
-			}
+            if (auto target = drag_drop_target())
+            {
+                if (auto payload = target.accept<dynamic_row_payload>())
+                {
+                    if ((*payload)->identity == &model_ && (*payload)->index != index_)
+                        model_.defer_move((*payload)->index, index_);
+                }
+            }
 
-			ImGui::SameLine();
-		}
-	}
+            ImGui::SameLine();
+        }
+    }
 
-	dynamic_row::~dynamic_row()
-	{
-		_child.reset();
-		if (ImGui::IsItemClicked())
-			on_select();
+    dynamic_row::~dynamic_row()
+    {
+        child_.reset();
+        if (ImGui::IsItemClicked())
+            on_select();
 
-		if (_model.index() == _index)
-			ImGui::GetWindowDrawList()->AddRectFilled(_cursor, _cursor + _size, ImGui::GetColorU32(ImGuiCol_FrameBgHovered));
-		else if (_model.index_selected(_index))
-			ImGui::GetWindowDrawList()->AddRectFilled(_cursor, _cursor + _size, ImGui::GetColorU32(ImGuiCol_FrameBgHovered, 0.5f));
-	}
+        if (model_.index() == index_)
+        {
+            ImGui::GetWindowDrawList()->AddRectFilled(
+                cursor_,
+                cursor_ + size_,
+                ImGui::GetColorU32(ImGuiCol_FrameBgHovered));
+        }
+        else if (model_.index_selected(index_))
+        {
+            ImGui::GetWindowDrawList()->AddRectFilled(
+                cursor_,
+                cursor_ + size_,
+                ImGui::GetColorU32(ImGuiCol_FrameBgHovered, 0.5f));
+        }
+    }
 
-	dynamic_row::operator bool() const
-	{
-		return _visible;
-	}
+    dynamic_row::operator bool() const
+    {
+        return visible_;
+    }
 
-	void dynamic_row::on_select()
-	{
-		_model.on_select(_index, ImGui::GetIO().KeyCtrl, ImGui::GetIO().KeyShift);
-	}
+    void dynamic_row::on_select()
+    {
+        model_.on_select(index_, ImGui::GetIO().KeyCtrl, ImGui::GetIO().KeyShift);
+    }
 
-	size_t dynamic_row::index() const
-	{
-		return _index;
-	}
+    size_t dynamic_row::index() const
+    {
+        return index_;
+    }
 
-	namespace w
-	{
-		dynamic_list_body::dynamic_list_body(list_model& model)
-			: model(model)
-		{
-			drag_button.config.str_id = "##Drag";
-			drag_button.config.tooltip = "Drag item";
-			if (drag_icon)
-				drag_button.config.icon = drag_icon;
-		}
+    namespace w
+    {
+        dynamic_list_body::dynamic_list_body(list_model& model)
+            : model(model)
+        {
+            drag_button.config.str_id = "##Drag";
+            drag_button.config.tooltip = "Drag item";
+            if (drag_icon)
+                drag_button.config.icon = drag_icon;
+        }
 
-		dynamic_list_body::dynamic_list_body(list_model& model, const dynamic_list_body& o)
-			: model(model), row_draw(o.row_draw), drag_button(o.drag_button)
-		{
-		}
+        dynamic_list_body::dynamic_list_body(list_model& model, const dynamic_list_body& o)
+            : model(model)
+            , row_draw(o.row_draw)
+            , drag_button(o.drag_button)
+        {
+        }
 
-		dynamic_list_body::dynamic_list_body(list_model& model, dynamic_list_body&& o) noexcept
-			: model(model), row_draw(std::move(o.row_draw)), drag_button(std::move(o.drag_button))
-		{
-		}
+        dynamic_list_body::dynamic_list_body(list_model& model, dynamic_list_body&& o) noexcept
+            : model(model)
+            , row_draw(std::move(o.row_draw))
+            , drag_button(std::move(o.drag_button))
+        {
+        }
 
-		dynamic_list_body& dynamic_list_body::operator=(const dynamic_list_body& o)
-		{
-			if (this != &o)
-			{
-				row_draw = o.row_draw;
-				drag_button = o.drag_button;
-			}
+        dynamic_list_body& dynamic_list_body::operator=(const dynamic_list_body& o)
+        {
+            if (this != &o)
+            {
+                row_draw = o.row_draw;
+                drag_button = o.drag_button;
+            }
 
-			return *this;
-		}
+            return *this;
+        }
 
-		dynamic_list_body& dynamic_list_body::operator=(dynamic_list_body&& o) noexcept
-		{
-			if (this != &o)
-			{
-				row_draw = std::move(o.row_draw);
-				drag_button = std::move(o.drag_button);
-			}
+        dynamic_list_body& dynamic_list_body::operator=(dynamic_list_body&& o) noexcept
+        {
+            if (this != &o)
+            {
+                row_draw = std::move(o.row_draw);
+                drag_button = std::move(o.drag_button);
+            }
 
-			return *this;
-		}
+            return *this;
+        }
 
-		item_result dynamic_list_body::draw_impl()
-		{
-			item_result result;
+        item_result dynamic_list_body::draw_impl()
+        {
+            item_result result;
 
-			for (size_t i = 0; i < model.size(); ++i)
-			{
-				id_scope scope(i);
+            for (size_t i = 0; i < model.size(); ++i)
+            {
+                id_scope scope(i);
 
-				if (auto row = dynamic_row(model, drag_button, i, "Row"))
-				{
-					auto row_result = row_draw(row);
-					if (row_result.state.left_clicked() || row_result.state.focused())
-						row.on_select();
-					result |= row_result;
-				}
-			}
+                if (auto row = dynamic_row(model, drag_button, i, "Row"))
+                {
+                    auto row_result = row_draw(row);
+                    if (row_result.state.left_clicked() || row_result.state.focused())
+                        row.on_select();
+                    result |= row_result;
+                }
+            }
 
-			if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows) && !ImGui::GetIO().WantTextInput && ImGui::Shortcut(ImGuiKey_Delete))
-				model.defer_delete();
+            if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows)
+                && !ImGui::GetIO().WantTextInput && ImGui::Shortcut(ImGuiKey_Delete))
+            {
+                model.defer_delete();
+            }
 
-			return result;
-		}
-	}
+            return result;
+        }
+    }
 
-	dynamic_list::dynamic_list()
-		: header(model), body(model)
-	{
-	}
+    dynamic_list::dynamic_list()
+        : header(model)
+        , body(model)
+    {
+    }
 
-	dynamic_list::dynamic_list(const dynamic_list& o)
-		: model(o.model), header(model, o.header), body(model, o.body)
-	{
-	}
+    dynamic_list::dynamic_list(const dynamic_list& o)
+        : model(o.model)
+        , header(model, o.header)
+        , body(model, o.body)
+    {
+    }
 
-	dynamic_list::dynamic_list(dynamic_list&& o) noexcept
-		: model(std::move(o.model)), header(model, std::move(o.header)), body(model, std::move(o.body))
-	{
-	}
+    dynamic_list::dynamic_list(dynamic_list&& o) noexcept
+        : model(std::move(o.model))
+        , header(model, std::move(o.header))
+        , body(model, std::move(o.body))
+    {
+    }
 
-	item_result dynamic_list::draw(size_t list_size)
-	{
-		item_result result;
-		model.sync(list_size);
-		result |= header.draw();
-		result |= body.draw();
-		return result;
-	}
+    item_result dynamic_list::draw(size_t list_size)
+    {
+        item_result result;
+        model.sync(list_size);
+        result |= header.draw();
+        result |= body.draw();
+        return result;
+    }
 
-	void assign_dynamic_list_icons(res::icon_id drag_icon_, res::icon_id create_icon_, res::icon_id delete_icon_, res::icon_id clear_icon_)
-	{
-		drag_icon = drag_icon_;
-		create_icon = create_icon_;
-		delete_icon = delete_icon_;
-		clear_icon = clear_icon_;
-	}
+    void assign_dynamic_list_icons(
+        res::icon_id drag_icon_,
+        res::icon_id create_icon_,
+        res::icon_id delete_icon_,
+        res::icon_id clear_icon_)
+    {
+        drag_icon = drag_icon_;
+        create_icon = create_icon_;
+        delete_icon = delete_icon_;
+        clear_icon = clear_icon_;
+    }
 
-	namespace w
-	{
-		bound_dynamic_list::bound_dynamic_list(dynamic_list& list, size_t list_size)
-			: list(list), list_size(list_size)
-		{
-		}
+    namespace w
+    {
+        bound_dynamic_list::bound_dynamic_list(dynamic_list& list, size_t list_size)
+            : list(list)
+            , list_size(list_size)
+        {
+        }
 
-		item_result bound_dynamic_list::draw_impl()
-		{
-			return list.draw(list_size);
-		}
-	}
+        item_result bound_dynamic_list::draw_impl()
+        {
+            return list.draw(list_size);
+        }
+    }
 }

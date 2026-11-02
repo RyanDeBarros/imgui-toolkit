@@ -5,131 +5,210 @@
 
 namespace imtk::w
 {
-	static std::unordered_map<unsigned char, std::string> precision_formats;
+    static std::unordered_map<unsigned char, std::string> precision_formats;
 
-	static const char* precision_format(unsigned char precision)
-	{
-		auto it = precision_formats.find(precision);
-		if (it != precision_formats.end())
-			return it->second.c_str();
-		else
-			return precision_formats.emplace(precision, "%." + std::to_string(precision) + "f").first->second.c_str();
-	}
+    static const char* precision_format(unsigned char precision)
+    {
+        auto it = precision_formats.find(precision);
+        if (it != precision_formats.end())
+            return it->second.c_str();
+        else
+            return precision_formats.emplace(precision, "%." + std::to_string(precision) + "f").first->second.c_str();
+    }
 
-	item_result bound_widget<bool>::draw_impl()
-	{
-		id_scope scope(&data);
-		auto result = prefix_label(config.label.c_str());
+    bound_widget<bool>::bound_widget(bool& data, config_impl config)
+        : data(data)
+        , config(std::move(config))
+    {
+    }
 
-		result |= item_result::query(ImGui::Checkbox("", &data));
-		
-		result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<bool>>(data));
-		return result;
-	}
+    item_result bound_widget<bool>::draw_impl()
+    {
+        id_scope scope(&data);
+        auto result = prefix_label(config.label.c_str());
 
-	item_result bound_widget<int>::draw_impl()
-	{
-		id_scope scope(&data);
-		auto result = prefix_label(config.label.c_str());
+        result |= item_result::query(ImGui::Checkbox("", &data));
 
-		const int og = data;
-		result |= item_result::query(ImGui::InputInt("", &data, config.step, config.step_fast, config.flags));
-		if (imp::clamp(data, config.min, config.max))
-			result.modified = data != og;
-		
-		result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<int>>(data));
-		return result;
-	}
+        result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<bool>>(data));
+        return result;
+    }
 
-	item_result bound_widget<float>::draw_impl()
-	{
-		id_scope scope(&data);
-		auto result = prefix_label(config.label.c_str());
+    bound_widget<int>::bound_widget(int& data, config_impl config)
+        : data(data)
+        , config(std::move(config))
+    {
+    }
 
-		const float og = data;
-		result |= item_result::query(ImGui::InputFloat("", &data, config.step, config.step_fast, precision_format(config.precision), config.flags));
-		if (imp::clamp(data, config.min, config.max))
-			result.modified = data != og;
+    item_result bound_widget<int>::draw_impl()
+    {
+        id_scope scope(&data);
+        auto result = prefix_label(config.label.c_str());
 
-		result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<float>>(data));
-		return result;
-	}
+        const int og = data;
+        result |= item_result::query(ImGui::InputInt("", &data, config.step, config.step_fast, config.flags));
+        if (imp::clamp(data, config.min, config.max))
+            result.modified = data != og;
 
-	item_result bound_widget<double>::draw_impl()
-	{
-		id_scope scope(&data);
-		auto result = prefix_label(config.label.c_str());
+        result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<int>>(data));
+        return result;
+    }
 
-		const double og = data;
-		result |= item_result::query(ImGui::InputDouble("", &data, config.step, config.step_fast, precision_format(config.precision), config.flags));
-		if (imp::clamp(data, config.min, config.max))
-			result.modified = data != og;
+    bound_widget<float>::bound_widget(float& data, config_impl config)
+        : data(data)
+        , config(std::move(config))
+    {
+    }
 
-		result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<double>>(data));
-		return result;
-	}
+    item_result bound_widget<float>::draw_impl()
+    {
+        id_scope scope(&data);
+        auto result = prefix_label(config.label.c_str());
 
-	item_result bound_widget<glm::vec2>::draw_impl()
-	{
-		id_scope scope(&data);
-		auto result = prefix_label(config.label.c_str());
+        const float og = data;
+        result |= item_result::query(
+            ImGui::InputFloat(
+                "",
+                &data,
+                config.step,
+                config.step_fast,
+                precision_format(config.precision),
+                config.flags));
 
-		const glm::vec2 og = data;
-		result |= item_result::query(ImGui::InputFloat2("", glm::value_ptr(data), precision_format(config.precision), config.flags));
-		if (imp::clamp(glm::value_ptr(data), data.length(), config.min, config.max))
-			result.modified = data != og;
+        if (imp::clamp(data, config.min, config.max))
+            result.modified = data != og;
 
-		result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<glm::vec2>>(data));
-		return result;
-	}
+        result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<float>>(data));
+        return result;
+    }
 
-	item_result bound_widget<glm::vec3>::draw_impl()
-	{
-		id_scope scope(&data);
-		auto result = prefix_label(config.label.c_str());
+    bound_widget<double>::bound_widget(double& data, config_impl config)
+        : data(data)
+        , config(std::move(config))
+    {
+    }
 
-		const glm::vec3 og = data;
-		result |= item_result::query(ImGui::InputFloat3("", glm::value_ptr(data), precision_format(config.precision), config.flags));
-		if (imp::clamp(glm::value_ptr(data), data.length(), config.min, config.max))
-			result.modified = data != og;
+    item_result bound_widget<double>::draw_impl()
+    {
+        id_scope scope(&data);
+        auto result = prefix_label(config.label.c_str());
 
-		result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<glm::vec3>>(data));
-		return result;
-	}
+        const double og = data;
+        result |= item_result::query(
+            ImGui::InputDouble(
+                "",
+                &data,
+                config.step,
+                config.step_fast,
+                precision_format(config.precision), config.flags));
 
-	item_result bound_widget<glm::vec4>::draw_impl()
-	{
-		id_scope scope(&data);
-		auto result = prefix_label(config.label.c_str());
+        if (imp::clamp(data, config.min, config.max))
+            result.modified = data != og;
 
-		const glm::vec4 og = data;
-		result |= item_result::query(ImGui::InputFloat4("", glm::value_ptr(data), precision_format(config.precision), config.flags));
-		if (imp::clamp(glm::value_ptr(data), data.length(), config.min, config.max))
-			result.modified = data != og;
+        result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<double>>(data));
+        return result;
+    }
 
-		result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<glm::vec4>>(data));
-		return result;
-	}
+    bound_widget<glm::vec2>::bound_widget(glm::vec2& data, config_impl config)
+        : data(data)
+        , config(std::move(config))
+    {
+    }
 
-	item_result bound_widget<std::string>::draw_impl()
-	{
-		id_scope scope(&data);
-		auto result = prefix_label(config.label.c_str());
+    item_result bound_widget<glm::vec2>::draw_impl()
+    {
+        id_scope scope(&data);
+        auto result = prefix_label(config.label.c_str());
 
-		result |= item_result::query(controls::input_text("", data, config.max_size, config.flags, config.callback, config.user_data));
+        const glm::vec2 og = data;
+        result |= item_result::query(
+            ImGui::InputFloat2(
+                "",
+                glm::value_ptr(data),
+                precision_format(config.precision),
+                config.flags));
 
-		result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<std::string>>(data));
-		return result;
-	}
+        if (imp::clamp(glm::value_ptr(data), data.length(), config.min, config.max))
+            result.modified = data != og;
 
-	item_result bound_widget<color4>::draw_impl()
-	{
-		id_scope scope(&data);
-		auto result = prefix_label(config.label.c_str());
+        result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<glm::vec2>>(data));
+        return result;
+    }
 
-		result |= item_result::query(ImGui::ColorEdit4("", data.ptr(), config.flags));
+    bound_widget<glm::vec3>::bound_widget(glm::vec3& data, config_impl config)
+        : data(data)
+        , config(std::move(config))
+    {
+    }
 
-		result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<color4>>(data));
-		return result;
-	}
+    item_result bound_widget<glm::vec3>::draw_impl()
+    {
+        id_scope scope(&data);
+        auto result = prefix_label(config.label.c_str());
+
+        const glm::vec3 og = data;
+        result |= item_result::query(
+            ImGui::InputFloat3("", glm::value_ptr(data), precision_format(config.precision), config.flags));
+
+        if (imp::clamp(glm::value_ptr(data), data.length(), config.min, config.max))
+            result.modified = data != og;
+
+        result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<glm::vec3>>(data));
+        return result;
+    }
+
+    bound_widget<glm::vec4>::bound_widget(glm::vec4& data, config_impl config)
+        : data(data)
+        , config(std::move(config))
+    {
+    }
+
+    item_result bound_widget<glm::vec4>::draw_impl()
+    {
+        id_scope scope(&data);
+        auto result = prefix_label(config.label.c_str());
+
+        const glm::vec4 og = data;
+        result |= item_result::query(
+            ImGui::InputFloat4("", glm::value_ptr(data), precision_format(config.precision), config.flags));
+        if (imp::clamp(glm::value_ptr(data), data.length(), config.min, config.max))
+            result.modified = data != og;
+
+        result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<glm::vec4>>(data));
+        return result;
+    }
+
+    bound_widget<std::string>::bound_widget(std::string& data, config_impl config)
+        : data(data)
+        , config(std::move(config))
+    {
+    }
+
+    item_result bound_widget<std::string>::draw_impl()
+    {
+        id_scope scope(&data);
+        auto result = prefix_label(config.label.c_str());
+
+        result |= item_result::query(
+            controls::input_text("", data, config.max_size, config.flags, config.callback, config.user_data));
+
+        result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<std::string>>(data));
+        return result;
+    }
+
+    bound_widget<color4>::bound_widget(color4& data, config_impl config)
+        : data(data)
+        , config(std::move(config))
+    {
+    }
+
+    item_result bound_widget<color4>::draw_impl()
+    {
+        id_scope scope(&data);
+        auto result = prefix_label(config.label.c_str());
+
+        result |= item_result::query(ImGui::ColorEdit4("", data.ptr(), config.flags));
+
+        result.modified |= prop::grid::check_property(std::make_unique<prop::simple_view<color4>>(data));
+        return result;
+    }
 }
